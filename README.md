@@ -4,6 +4,10 @@ Atlas is an always-on personal assistant I built and run daily: a Telegram bot, 
 
 This repo is a **curated, read-only code export for review purposes** — not a toy demo and not a packaged installer. Real secrets, personal data (prospects, journal, calendar), and runtime-only files (voice biometrics, Telegram session, trading login state) are excluded; see [What's excluded](#whats-excluded--why) below. It isn't meant to be cloned and run as-is: it's wired into my own live Telegram bot, a running MetaTrader terminal, and my own Zoho/Google/GitHub accounts. What's here is the real logic that runs every day, for reading.
 
+## Why voice-first
+
+I started building Atlas while recovering from a fractured hand that kept me away from a keyboard for a few months. Talking to it wasn't a nice-to-have feature — it was the only way I could keep working. That constraint is why wake-word detection, speech-to-text and TTS came before the web dashboard did, and why almost everything in this project can be done by voice, not just by clicking through a UI.
+
 ## Why this repo exists
 
 I use Claude (via this project, and via Claude Code to build it) daily for real work: triaging prospect replies, drafting follow-up emails, deciding which leads to disqualify, and orchestrating a dozen APIs. This repo is meant to show that work concretely: a working **Model Context Protocol (MCP) server**, several **API integrations** done right (OAuth flows, rate-limit discovery, empirical API-quirk handling), and **automation** that replaced manual daily busywork.
