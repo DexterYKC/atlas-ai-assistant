@@ -1,0 +1,2156 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#131A2E">
+<title>Projets</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Chakra+Petch:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #131A2E; --surface: #1C2440; --surface2: #232D4E; --line: #2C3658;
+    --gold: #E2B04A; --gold-soft: rgba(226,176,74,.13); --text: #EEF0F6; --muted: #EEF0F6;
+    --red: #E0503F; --green: #4CB782; --blue: #5B9BE0;
+    --display: "Chakra Petch", "Segoe UI", system-ui, sans-serif; --body: "Barlow", "Segoe UI", system-ui, -apple-system, sans-serif;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font: 400 16px/1.45 var(--body); -webkit-font-smoothing: antialiased; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; } ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(226,176,74,.35); border-radius: 6px; }
+  @supports not selector(::-webkit-scrollbar) { * { scrollbar-width: thin; scrollbar-color: rgba(226,176,74,.35) transparent; } }
+
+  header { position: sticky; top: 0; z-index: 5; background: rgba(19,26,46,.94); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line);
+    padding: calc(env(safe-area-inset-top) + 10px) 16px 10px; }
+  .bar { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  h1 { margin: 0; font: 600 21px/1.1 var(--display); letter-spacing: .02em; flex: 1 1 auto; }
+  h1 a { color: var(--muted); text-decoration: none; font-size: 14px; font-family: var(--body); font-weight: 500; margin-right: 10px; }
+  .btn { border: 1px solid var(--line); background: transparent; border-radius: 10px; padding: 8px 14px; min-height: 40px; }
+  .btn:hover { border-color: var(--gold); }
+  .btn.gold { background: var(--gold); color: #1a1405; border-color: var(--gold); font-weight: 600; }
+  .btn.danger { color: var(--red); border-color: rgba(224,80,63,.4); }
+  .btn.small { min-height: 32px; padding: 4px 10px; font-size: 14px; }
+  input, select, textarea { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; min-height: 40px; width: 100%; }
+  textarea { resize: vertical; min-height: 64px; }
+  .filtres { max-width: 1100px; margin: 10px auto 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .filtres input[type=search] { flex: 1 1 200px; width: auto; }
+  .filtres select { width: auto; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 5px 12px; font-size: 14px; color: var(--muted); }
+  .chip[aria-pressed=true] { border-color: var(--gold); color: var(--gold); background: var(--gold-soft); }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 16px 16px calc(env(safe-area-inset-bottom) + 40px); }
+  .resume { color: var(--muted); font-size: 15px; margin: 0; }
+  .grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 16px; }
+  .carte { text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 10px; min-height: 130px; }
+  .carte:hover { border-color: var(--gold); }
+  .carte h3 { margin: 0; font: 600 22px/1.2 var(--display); word-break: break-word; }
+  .ligne { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .badge { font-size: 14px; padding: 3px 12px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+  .badge[data-st="en cours"] { color: var(--green); border-color: rgba(76,183,130,.5); } .badge[data-st="idée"] { color: var(--gold); border-color: rgba(226,176,74,.5); }
+  .badge[data-st="en attente"] { color: var(--blue); border-color: rgba(91,155,224,.5); }
+  .prio { margin-left: auto; display: inline-flex; gap: 3px; }
+  .prio i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); display: block; }
+  .prio i.on { background: var(--gold); }
+  .carte p { margin: 0; color: var(--muted); font-size: 16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .pied { margin-top: auto; font-size: 15px; align-items: center; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; }
+  .vide { text-align: center; color: var(--muted); padding: 60px 16px; }
+
+  dialog { background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 16px; padding: 0; width: min(760px, calc(100vw - 20px)); max-height: calc(100dvh - 20px); }
+  dialog::backdrop { background: rgba(5,8,18,.7); }
+  .dlg-tete { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--bg); z-index: 2; }
+  .dlg-tete input { font: 600 20px var(--display); flex: 1; background: transparent; border-color: transparent; }
+  .dlg-tete input:hover, .dlg-tete input:focus { border-color: var(--line); background: var(--surface); }
+  .dlg-corps { padding: 14px 16px 18px; display: grid; gap: 18px; overflow-y: auto; }
+  .champs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  label.f { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+  section h4 { margin: 0 0 8px; font: 600 13px var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--gold); }
+  ul.l { list-style: none; margin: 0 0 8px; padding: 0; display: grid; gap: 6px; }
+  ul.l li { font-size: 17px; display: flex; gap: 10px; align-items: flex-start; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+  ul.l li span.t { flex: 1; word-break: break-word; }
+  ul.l li.fait span.t { text-decoration: line-through; color: var(--muted); }
+  ul.l li input[type=checkbox] { width: 20px; height: 20px; min-height: 0; margin-top: 2px; accent-color: var(--gold); }
+  ul.l small { color: var(--muted); display: block; }
+  .x { border: none; background: transparent; color: var(--muted); padding: 0 6px; font-size: 18px; line-height: 1; }
+  .x:hover { color: var(--red); }
+  .ajout { display: flex; gap: 8px; } .ajout input { flex: 1; }
+  a { color: var(--gold); }
+  .git { font-size: 15px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+  .git b { color: var(--text); font-weight: 500; }
+  .modifie { color: var(--gold); }
+  table.imp { width: 100%; border-collapse: collapse; font-size: 15px; }
+  table.imp td { padding: 6px 6px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  table.imp input[type=text], table.imp select { min-height: 34px; padding: 4px 8px; }
+  table.imp input[type=checkbox] { width: 20px; height: 20px; min-height: 0; accent-color: var(--gold); }
+  .imp-liste { max-height: 55dvh; overflow: auto; }
+  .aide { color: var(--muted); font-size: 14px; margin: 0; }
+  .toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 20px); transform: translateX(-50%); background: var(--surface2); border: 1px solid var(--gold);
+    border-radius: 12px; padding: 10px 16px; z-index: 50; max-width: calc(100vw - 32px); opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .toast.on { opacity: 1; } .toast.err { border-color: var(--red); }
+  [hidden] { display: none !important; }
+  /* Sur le PC, grand écran : Atlas (chat, micro, agenda…) est intégré à droite du tableau de bord */
+  body { overflow: hidden; }
+  #cadre { display: flex; height: 100vh; height: 100dvh; }
+  #contenu { flex: 1; min-width: 0; overflow-y: auto; }
+  /* Barre latérale : icônes seules, elle s'élargit au survol (par-dessus le contenu) */
+  #lateral { position: relative; flex: 0 0 68px; z-index: 30; }
+  #nav { position: absolute; top: 0; bottom: 0; left: 0; width: 68px; background: var(--bg); border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; padding: 12px 10px; overflow: hidden; transition: width .15s ease; }
+  #lateral:hover #nav, #lateral:focus-within #nav { width: 216px; box-shadow: 10px 0 30px rgba(0,0,0,.45); }
+  .nav-btn { position: relative; display: flex; align-items: center; gap: 16px; width: 100%; padding: 11px 12px; border-radius: 12px; border: 1px solid transparent; background: transparent; color: var(--muted); font-size: 17px; text-align: left; white-space: nowrap; text-decoration: none; }
+  .nav-btn svg { width: 24px; height: 24px; flex: none; }
+  .nav-btn .lib { opacity: 0; transition: opacity .1s; }
+  #lateral:hover .nav-btn .lib, #lateral:focus-within .nav-btn .lib { opacity: 1; }
+  #securite, #musique { display: grid; gap: 24px; }
+  .nav-btn:hover:not([disabled]) { color: var(--text); background: var(--surface); }
+  .nav-btn[aria-current=page] { color: var(--gold); background: var(--gold-soft); border-color: rgba(226,176,74,.35); }
+  .nav-btn[disabled] { opacity: .45; cursor: default; }
+  .nav-btn.retour { margin-top: auto; }
+  .nav-btn .pt { position: absolute; top: 5px; left: 28px; min-width: 16px; height: 16px; border-radius: 8px; font-size: 11px; line-height: 16px; text-align: center; color: #1a1405; padding: 0 4px; display: none; }
+  .nav-btn .pt.ok { display: block; background: var(--green); min-width: 10px; height: 10px; top: 9px; left: 30px; }
+  .nav-btn .pt.att { display: block; background: var(--gold); } .nav-btn .pt.ko { display: block; background: var(--red); color: #fff; }
+  .nav-btn.enfant { padding-left: 12px; }   /* repliée : alignée comme les icônes de titre, pas d'indentation */
+  #lateral:hover .nav-btn.enfant, #lateral:focus-within .nav-btn.enfant { padding-left: 30px; }
+  #lateral:hover .nav-btn.enfant svg, #lateral:focus-within .nav-btn.enfant svg { width: 20px; height: 20px; }
+  .nav-btn .chevron { margin-left: auto; flex: none; width: 16px; height: 16px; opacity: 0; transition: opacity .1s, transform .15s ease; }
+  #lateral:hover .nav-btn .chevron, #lateral:focus-within .nav-btn .chevron { opacity: .55; }
+  .nav-btn.groupe.ouvert .chevron { transform: rotate(90deg); }
+  .sec { min-height: 100%; animation: sec-apparition .22s ease; } .sec.plein { height: 100%; } .sec.plein iframe { width: 100%; height: 100%; border: 0; display: block; background: var(--bg); color-scheme: dark; }
+  @keyframes sec-apparition { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  @media (prefers-reduced-motion: reduce) { .sec { animation: none; } }
+  .sec-corps { padding: 22px 26px 50px; max-width: 1000px; margin: 0 auto; display: grid; gap: 20px; align-content: start; }
+  .sec-titre { margin: 0; font: 600 28px/1.1 var(--display); letter-spacing: .02em; }
+  .sec-statut { border: 1px solid var(--line); border-radius: 16px; padding: 16px 20px; display: grid; gap: 8px; justify-items: start; background: var(--surface); }
+  .sec-statut.ok { border-color: rgba(76,183,130,.5); } .sec-statut.ko { border-color: rgba(224,80,63,.6); background: rgba(224,80,63,.1); }
+  .sec-statut .v { font: 600 22px var(--display); } .sec-statut .l { color: var(--muted); font-size: 16px; }
+  .conf { display: grid; gap: 8px; padding: 14px 18px; border: 1px solid rgba(226,176,74,.5); background: var(--gold-soft); border-radius: 14px; font-size: 17px; }
+  .journal { display: grid; gap: 4px; font-size: 15px; } .journal .lg { display: grid; grid-template-columns: 96px 130px 1fr; gap: 10px; padding: 8px 10px; border-bottom: 1px solid var(--line); align-items: baseline; }
+  .journal .lg small { color: var(--muted); display: block; } .journal .ok { color: var(--green); } .journal .ko { color: var(--red); } .journal .att { color: var(--gold); }
+  .sec-corps h4 { margin: 0 0 8px; font: 600 13px var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--gold); }
+  .pres-boutons { display: flex; gap: 8px; flex-wrap: wrap; }
+  details.guide { border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; background: var(--surface); }
+  details.guide summary { cursor: pointer; font: 600 17px var(--display); color: var(--gold); }
+  details.guide ol { margin: 10px 0 0; padding-left: 22px; display: grid; gap: 10px; font-size: 16px; }
+  .copie { display: flex; gap: 8px; align-items: center; } .copie code { flex: 1; min-width: 0; overflow: auto; white-space: nowrap; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-size: 14px; }
+  .offre { display: grid; gap: 7px; padding: 14px 16px; border: 1px solid var(--line); background: var(--surface); border-radius: 14px; }
+  .offre.nouvelle { border-color: rgba(226,176,74,.55); background: var(--gold-soft); }
+  .offre.ecartee { opacity: .6; }
+  .offre .haut { display: flex; gap: 10px; align-items: baseline; justify-content: space-between; flex-wrap: wrap; }
+  .offre .titre { font: 600 19px var(--display); color: var(--text); text-decoration: none; overflow-wrap: anywhere; }
+  .offre a.titre:hover { color: var(--gold); text-decoration: underline; }
+  .offre .meta { color: var(--muted); font-size: 15px; overflow-wrap: anywhere; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { font-size: 13px; padding: 2px 9px; border-radius: 99px; background: var(--bg); border: 1px solid var(--line); color: var(--muted); }
+  .chip.score { color: var(--gold); border-color: rgba(226,176,74,.5); font-weight: 600; }
+  .offres { display: grid; gap: 10px; }
+  .app-ligne { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 9px 12px; border-bottom: 1px solid var(--line); font-size: 16px; }
+  .trou { display: grid; gap: 10px; padding: 16px 18px; border: 1px solid rgba(226,176,74,.5); background: var(--gold-soft); border-radius: 14px; }
+  .trou .q { font-size: 17px; } .trou .quand { color: var(--gold); font: 600 15px var(--display); letter-spacing: .03em; }
+  .trou textarea { min-height: 84px; }
+  .suivi { display: flex; gap: 12px; align-items: baseline; padding: 9px 12px; border-bottom: 1px solid var(--line); font-size: 16px; }
+  .suivi .ok { color: var(--green); } .suivi .ko { color: var(--red); } .suivi .att { color: var(--gold); } .suivi small { color: var(--muted); }
+  pre.jtxt { margin: 0; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; white-space: pre-wrap; word-break: break-word; font: 400 15px/1.55 var(--body); max-height: 60vh; overflow: auto; }
+  .mus-carte { display: flex; gap: 22px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 20px; flex-wrap: wrap; }
+  .mus-carte img { width: 170px; height: 170px; border-radius: 12px; object-fit: cover; flex: none; }
+  .mus-info { flex: 1; min-width: 260px; display: grid; gap: 10px; } .mus-titre { font: 600 26px/1.15 var(--display); } .mus-art { color: var(--muted); font-size: 17px; }
+  .mus-ctl { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; } .mus-ctl .btn { font-size: 20px; min-width: 54px; }
+  .btn.actif { border-color: var(--gold); color: var(--gold); background: var(--gold-soft); }
+  .mus-vol { width: 170px; min-height: 0; padding: 0; accent-color: var(--gold); background: transparent; border: 0; }
+  .carte.pl { padding: 12px; min-height: 0; } .carte.pl img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; }
+  .pl-grille { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+  #barreMobile, #voile { display: none; }
+  @media (max-width: 699px) {
+    /* Téléphone : une barre en haut (☰ + titre de la section), et la barre latérale devient un TIROIR qui glisse depuis la gauche */
+    #cadre { flex-direction: column; }
+    #barreMobile { display: flex; align-items: center; gap: 12px; flex: none; padding: calc(env(safe-area-inset-top) + 8px) 14px 8px; border-bottom: 1px solid var(--line); background: var(--bg); position: relative; z-index: 5; }
+    #menuBtn { position: relative; width: 46px; height: 46px; flex: none; border-radius: 12px; border: 1px solid var(--line); background: transparent; display: grid; place-items: center; }
+    #menuBtn svg { width: 24px; height: 24px; } #menuBtn[data-alerte="1"]::after { content: ""; position: absolute; top: 6px; right: 6px; width: 11px; height: 11px; border-radius: 50%; background: var(--gold); }
+    #menuBtn[data-alerte="2"]::after { content: ""; position: absolute; top: 6px; right: 6px; width: 11px; height: 11px; border-radius: 50%; background: var(--red); }
+    #titreMobile { font: 600 22px var(--display); letter-spacing: .02em; }
+    #lateral { position: fixed; top: 0; bottom: 0; left: 0; width: min(84vw, 320px); z-index: 60; flex: none; transform: translateX(-105%); transition: transform .2s ease; background: var(--bg); }
+    #nav { position: static; width: 100%; height: 100%; flex-direction: column; overflow-y: auto; padding: calc(env(safe-area-inset-top) + 14px) 12px calc(env(safe-area-inset-bottom) + 14px); border-right: 1px solid var(--line); }
+    #lateral:hover #nav, #lateral:focus-within #nav { width: 100%; box-shadow: none; }
+    html.menu-ouvert #lateral { transform: none; box-shadow: 10px 0 40px rgba(0,0,0,.6); }
+    #voile { position: fixed; inset: 0; z-index: 55; background: rgba(5,8,18,.6); } html.menu-ouvert #voile { display: block; }
+    .nav-btn .lib { opacity: 1; } .nav-btn .chevron { opacity: .55; } .nav-btn { font-size: 19px; padding: 14px 12px; } .nav-btn .pt { left: 30px; }
+    .nav-btn.enfant { padding-left: 30px; } .nav-btn.enfant svg { width: 20px; height: 20px; }
+    header { padding-top: 12px; }
+    .journal .lg { grid-template-columns: 1fr; }
+    dialog { padding-top: env(safe-area-inset-top); }
+  }
+  /* 30vw (relatif à la fenêtre) inclut la barre de défilement de la fenêtre sur certains navigateurs : dès qu'elle apparaît/disparaît (une section qui change de hauteur), tout le panneau Atlas se redimensionne et glisse.
+     30% (relatif à #cadre, qui n'a lui-même pas de barre) n'a pas ce problème. */
+  #jarvisPanel { flex: 0 0 clamp(380px, 30%, 470px); border-left: 1px solid var(--line); background: var(--bg); display: flex; flex-direction: column; }
+  #jarvisPanel iframe { flex: 1; width: 100%; border: 0; background: var(--bg); color-scheme: dark; }
+  #btnPanneau { display: none; } html.avec-jarvis #btnPanneau { display: inline-block; }
+  @media (max-width: 999px) { #jarvisPanel { display: none !important; } }
+  .onglets { max-width: 1100px; margin: 10px auto 0; display: flex; gap: 6px; }
+  .onglet { border: 1px solid var(--line); background: transparent; border-radius: 10px; padding: 7px 16px; color: var(--muted); font-weight: 500; }
+  .onglet[aria-selected=true] { border-color: var(--gold); color: var(--gold); background: var(--gold-soft); }
+  .onglet .n { margin-left: 7px; font-size: 13px; opacity: .75; }
+  .badge[data-etat="ready"] { color: var(--green); border-color: rgba(76,183,130,.5); }
+  .badge[data-etat="error"] { color: var(--red); border-color: rgba(224,80,63,.6); background: rgba(224,80,63,.1); }
+  .badge[data-etat="building"], .badge[data-etat="enqueued"], .badge[data-etat="processing"], .badge[data-etat="uploading"], .badge[data-etat="new"], .badge[data-etat="retrying"] { color: var(--blue); border-color: rgba(91,155,224,.5); }
+  .pill { font-size: 14px; padding: 3px 12px; border-radius: 999px; background: var(--gold-soft); color: var(--gold); border: 0; cursor: pointer; }
+  .pill.rouge { background: rgba(224,80,63,.14); color: var(--red); } .pill.vert { background: rgba(76,183,130,.13); color: var(--green); } .pill.neutre { background: var(--surface2); color: var(--muted); cursor: default; }
+  div.carte.ext { cursor: pointer; } div.carte.ext:focus-visible { outline: 2px solid var(--gold); }
+  .carte .sous { color: var(--muted); font-size: 16px; }
+  .bandeau { margin: 0 0 14px; padding: 10px 14px; border: 1px solid rgba(224,80,63,.55); background: rgba(224,80,63,.1); border-radius: 12px; color: var(--text); }
+  .info-ext { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; color: var(--muted); font-size: 14px; margin: 0 0 14px; }
+  .dlg-corps .ligne a { font-size: 16px; }
+  .sugg { font-size: 14px; color: var(--muted); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .ext-bloc { display: grid; gap: 6px; padding: 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+  .ext-bloc select { background: var(--bg); }
+  main .filtres { margin: 0 0 16px; max-width: none; align-items: center; }
+  .sous-barre { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0 0 18px; }
+  .sous-barre .onglets { margin: 0; max-width: none; flex-wrap: wrap; } .sous-barre .spacer { flex: 1; }
+  .onglets.sous .onglet { padding: 6px 12px; font-size: 15px; } .onglets.sous { gap: 5px; }
+  .bloc { margin: 0 0 34px; } .bloc-tete { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 14px; }
+  .bloc-tete h2 { margin: 0; font: 600 24px/1.1 var(--display); letter-spacing: .02em; } .bloc-tete .spacer { flex: 1; }
+  .carte.site { padding: 0; overflow: hidden; gap: 0; min-height: 0; }
+  .carte.site .capture { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: top; background: var(--surface2); display: block; border-bottom: 1px solid var(--line); }
+  .carte.site .corps { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .carte.site h3 { font-size: 24px; } .carte.site .badge { font-size: 15px; }
+  .sante { display: flex; gap: 8px; flex-wrap: wrap; font-size: 16px; color: var(--text); align-items: center; }
+  .point { width: 11px; height: 11px; border-radius: 50%; background: var(--muted); display: inline-block; flex: none; }
+  .point.ok { background: var(--green); } .point.ko { background: var(--red); } .point.att { background: var(--gold); }
+  dialog.large { width: min(1040px, calc(100vw - 20px)); }
+  .tuiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .tuile { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  .tuile .v { font: 600 24px/1.1 var(--display); } .tuile .l { color: var(--muted); font-size: 14px; margin-top: 4px; }
+  .tuile.ok .v { color: var(--green); } .tuile.ko .v { color: var(--red); } .tuile.att .v { color: var(--gold); }
+  .carte-tete { font: 600 16px var(--display); color: var(--text); }
+  #overview { align-items: start; }   /* chaque carte garde sa propre hauteur : le survol d'une carte n'étire jamais sa voisine */
+  #overview .tuile { background: none; border: 0; padding: 0; }
+  #overview .tuile .v { font-size: 34px; } #overview .tuile .l { font-size: 15px; }
+  #overview .carte { position: relative; z-index: 1; padding: 22px; min-height: 160px; background: rgba(28, 36, 64, .62); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); transition: border-color .2s ease; }
+  #overview .carte:hover, #overview .carte:focus-within { z-index: 20; }   /* toute la carte (donc son survol flottant) passe au-dessus de TOUTES les autres, peu importe leur ordre */
+  #overview .carte-tete { font-size: 18px; }
+  #overview .apercu-ligne { font-size: 15px; }
+  /* Le détail flotte AU-DESSUS du contenu suivant (jamais dans le flux) : une carte qui s'ouvre ne déplace jamais ses voisines, ni celles en dessous */
+  #overview .apercu-liste {
+    position: absolute; left: 22px; right: 22px; top: 100%; margin-top: 8px; z-index: 5;
+    background: rgba(20, 27, 50, .96); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px;
+    box-shadow: 0 14px 34px rgba(0,0,0,.5); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    max-height: 0; opacity: 0; overflow: hidden; pointer-events: none;
+    transition: max-height .32s ease, opacity .22s ease;
+  }
+  #overview .carte:hover .apercu-liste, #overview .carte:focus-visible .apercu-liste { max-height: 220px; opacity: 1; pointer-events: auto; transition: max-height .38s ease, opacity .3s ease .05s; }
+  @media (prefers-reduced-motion: reduce) { #overview .apercu-liste, #overview .carte:hover .apercu-liste, #overview .carte:focus-visible .apercu-liste { transition: none; } }
+  .apercu-musique { display: flex; gap: 12px; align-items: center; min-width: 0; }
+  .apercu-musique img { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; flex: none; }
+  .apercu-musique > div { min-width: 0; }
+  .apercu-musique .apercu-ligne { white-space: normal; overflow-wrap: anywhere; -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+  .apercu-liste { display: flex; flex-direction: column; gap: 4px; }
+  .apercu-ligne { font-size: 14px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #notes .apercu-ligne { white-space: normal; overflow: visible; padding: 5px 0; font-size: 19px; line-height: 1.4; }
+  #notes h4 { margin: 20px 0 8px; font-size: 16px; }
+  #notes h4:first-child { margin-top: 0; }
+  .hero { display: grid; grid-template-columns: minmax(0, 340px) 1fr; gap: 16px; align-items: start; }
+  .hero img { width: 100%; border-radius: 12px; border: 1px solid var(--line); display: block; }
+  .verdict { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 12px; }
+  .vcol { border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; background: var(--surface); }
+  .vcol h5 { margin: 0 0 10px; font: 600 17px var(--display); }
+  .vcol.marche { border-color: rgba(76,183,130,.5); } .vcol.marche h5 { color: var(--green); }
+  .vcol.afaire { border-color: rgba(226,176,74,.5); } .vcol.afaire h5 { color: var(--gold); }
+  .vcol.eviter { border-color: rgba(224,80,63,.5); } .vcol.eviter h5 { color: var(--red); }
+  .vcol ul { margin: 0; padding-left: 20px; display: grid; gap: 8px; font-size: 16px; }
+  table.checks { width: 100%; border-collapse: collapse; font-size: 16px; }
+  table.checks td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; } table.checks td:first-child { width: 30px; text-align: center; }
+  table.checks .ok { color: var(--green); } table.checks .attention { color: var(--gold); } table.checks .ko { color: var(--red); }
+  table.checks small { display: block; color: var(--muted); font-size: 14px; }
+  .barres { display: flex; align-items: flex-end; gap: 4px; height: 76px; }
+  .barres i { flex: 1; min-width: 6px; border-radius: 3px 3px 0 0; background: var(--green); display: block; }
+  .barres i.error { background: var(--red); } .barres i.autre { background: var(--blue); } .barres.commits i { background: var(--gold); }
+  .legende { color: var(--muted); font-size: 14px; margin-top: 6px; }
+  .scores { display: flex; gap: 16px; flex-wrap: wrap; } .score { text-align: center; }
+  .score .rond { width: 78px; height: 78px; border-radius: 50%; display: grid; place-items: center; font: 600 26px var(--display); border: 6px solid var(--line); }
+  .score.ok .rond { border-color: var(--green); color: var(--green); } .score.att .rond { border-color: var(--gold); color: var(--gold); } .score.ko .rond { border-color: var(--red); color: var(--red); }
+  .score .l { font-size: 14px; color: var(--muted); margin-top: 6px; }
+  .bloc-info { padding: 12px 16px; border: 1px dashed var(--line); border-radius: 12px; color: var(--text); font-size: 16px; display: grid; gap: 8px; }
+  .jauge { height: 10px; background: var(--surface2); border-radius: 999px; overflow: hidden; margin-top: 6px; } .jauge i { display: block; height: 100%; background: var(--gold); }
+  @media (max-width: 760px) { .hero { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) {
+    header { position: static; }                                  /* sur téléphone, l'en-tête défile avec la page */
+    .filtres input[type=search] { flex: 1 1 100%; }
+    .filtres select { flex: 1 1 40%; min-width: 0; }
+    .chips { flex-wrap: nowrap; overflow-x: auto; width: 100%; padding-bottom: 4px; }
+    .chip { white-space: nowrap; }
+  }
+  @media (max-width: 520px) { dialog { width: 100vw; max-height: 100dvh; height: 100dvh; border-radius: 0; } .champs { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<div id="cadre">
+<div id="barreMobile"><button id="menuBtn" type="button" aria-label="Menu" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><span id="titreMobile">Projets</span></div>
+<div id="voile"></div>
+<div id="lateral"><nav id="nav" aria-label="Sections du tableau de bord"></nav></div>
+<div id="contenu">
+<div id="sec-projets">
+<header>
+  <div class="bar">
+    <h1>Projets</h1>
+    <button class="btn" id="btnPanneau" title="Afficher ou masquer Atlas à droite">Atlas</button>
+    <button class="btn" id="btnActu">Actualiser</button>
+  </div>
+  <div class="onglets" role="tablist" id="onglets"></div>
+  <div class="filtres"><input type="search" id="q" placeholder="Rechercher un site, un projet, un dépôt…" aria-label="Rechercher"></div>
+</header>
+<main>
+  <div class="bandeau" id="bandeau" hidden></div>
+  <div id="ext" hidden><p class="info-ext" id="extInfo"></p><div class="grille" id="extGrille"></div></div>
+  <div id="vueProjets">
+    <div class="sous-barre">
+      <div class="onglets sous" role="tablist" id="sousOnglets"></div>
+      <span class="spacer"></span>
+      <button class="btn" id="btnImport" title="Importer mes dossiers (C:\dev et Bureau) comme projets">Importer</button><button class="btn gold" id="btnNouveau">+ Nouveau</button>
+    </div>
+    <div id="vueSites">
+      <p class="resume" id="sitesResume" style="margin:0 0 14px"></p>
+      <div class="grille" id="grilleSites"></div>
+    </div>
+    <div id="vueListe" hidden>
+      <div class="filtres">
+        <select id="type" aria-label="Type"><option value="">Tous les types</option></select>
+        <select id="tri" aria-label="Tri"><option value="prio">Trier : priorité</option><option value="recent">Trier : dernière activité</option><option value="nom">Trier : nom</option><option value="taches">Trier : tâches ouvertes</option></select>
+        <span class="resume" id="resume"></span>
+      </div>
+      <div class="grille" id="grille"></div>
+      <div class="vide" id="vide" hidden>Aucun projet dans cette catégorie. Importe tes dossiers, crée un projet avec « + Nouveau », ou dis : « Atlas, crée le projet … ».</div>
+    </div>
+  </div>
+</main>
+</div>
+<div id="sec-agenda" class="sec plein" hidden><iframe id="fr-agenda" title="Agenda"></iframe></div>
+<div id="sec-business" class="sec plein" hidden><iframe id="fr-business" title="Business"></iframe></div>
+<div id="sec-overview" class="sec" hidden><div class="sec-corps">
+  <h1 class="sec-titre">Vue d'ensemble</h1>
+  <div id="overview" class="grille"><p class="aide">Chargement…</p></div>
+</div></div>
+<div id="sec-notes" class="sec" hidden><div class="sec-corps">
+  <h1 class="sec-titre">Notes</h1>
+  <div id="notes"><p class="aide">Chargement…</p></div>
+</div></div>
+<div id="sec-trading" class="sec" hidden><div class="sec-corps">
+  <h1 class="sec-titre">Trading (compte démo)</h1>
+  <div id="trading"><p class="aide">Chargement…</p></div>
+</div></div>
+<div id="sec-mail" class="sec" hidden><div class="sec-corps">
+  <h1 class="sec-titre">Mail</h1>
+  <div id="mail"><p class="aide">Chargement…</p></div>
+</div></div>
+<div id="sec-automatisation" class="sec" hidden><div class="sec-corps">
+  <h1 class="sec-titre">Automatisation (N8N)</h1>
+  <div id="automatisation"><p class="aide">Chargement…</p></div>
+</div></div>
+<div id="sec-emploi" class="sec" hidden><div class="sec-corps">
+  <h1 class="sec-titre">Emploi</h1>
+  <div id="emploi"><p class="aide">Chargement…</p></div>
+</div></div>
+<div id="sec-journal" class="sec" hidden><div class="sec-corps">
+  <h1 class="sec-titre">Journal</h1>
+  <div id="journal"><p class="aide">Chargement…</p></div>
+</div></div>
+<div id="sec-musique" class="sec" hidden><div class="sec-corps">
+  <h1 class="sec-titre">Musique</h1>
+  <div id="musLecteur"><p class="aide">Chargement…</p></div>
+  <div class="bloc-tete" id="musListesTete" hidden><h2>Mes playlists</h2><input type="search" id="musRecherche" placeholder="Rechercher une playlist…" style="max-width:320px" aria-label="Rechercher une playlist"></div>
+  <div class="grille pl-grille" id="musListes"></div>
+</div></div>
+<div id="sec-securite" class="sec" hidden><div class="sec-corps">
+  <h1 class="sec-titre">Sécurité</h1>
+  <div id="securite"><p class="aide">Chargement…</p></div>
+</div></div>
+<div id="sec-parametres" class="sec" hidden><div class="sec-corps">
+  <h1 class="sec-titre">Paramètres</h1>
+  <div id="parametres"><p class="aide">Chargement…</p></div>
+</div></div>
+<div id="sec-seo" class="sec" hidden><div class="sec-corps">
+  <h1 class="sec-titre">SEO</h1>
+  <p class="aide">Dis « Atlas, audite tel-site.com » ou « cherche des plombiers à Lyon » : ça ouvre et pilote directement ton outil (audit complet multi-pages, prospection, PDF) — Atlas ne fabrique jamais son propre audit ni son propre PDF. Dépose le PDF « rapport client » téléchargé dans <code>F:\Jarvis\seo_pdfs</code>, puis dis « j'ai déposé le PDF, c'est un bon prospect ? » : Atlas le lit et, si c'est un bon prospect, prépare un mail simple (sans jargon technique).</p>
+  <section class="bloc-tete"><h2>Nouvel audit complet</h2>
+    <div class="ajout"><input id="seo-site" placeholder="site-a-auditer.com"><input id="seo-client" placeholder="Nom du client (pour le rapport)"><button class="btn" id="seo-lancer">Lancer dans l'outil ↗</button></div>
+  </section>
+  <section id="seo-recherche-s" hidden><h2>Prospects trouvés</h2>
+    <p class="aide">Tous les prospects trouvés depuis le début, gardés ici (les plus récents en premier) — rien n'est jamais supprimé.</p>
+    <ul class="l" id="seo-recherche"></ul>
+  </section>
+  <section><h2>Historique <button class="btn small" id="seo-actualiser" style="margin-left:8px">Actualiser</button></h2>
+    <ul class="l" id="seo-hist"><li class="aide">Chargement…</li></ul>
+  </section>
+</div></div>
+<div id="sec-agentsia" class="sec" hidden><div class="sec-corps">
+  <h1 class="sec-titre">Agents IA</h1>
+  <p class="aide">Dis « Atlas, cherche des artisans » (avec ou sans métier/ville précis) : Atlas trouve sur Google Maps des artisans susceptibles d'avoir besoin d'un agent IA téléphonique (ils ratent des appels), toujours avec un email. Ceux dont le site montre déjà une équipe/un standard/un assistant vocal sont écartés automatiquement (basé sur tes propres motifs de rejet) ; les autres arrivent ici à trier, parfois avec un ⚠ si un signal faible a été repéré. « Bon » les garde ici (groupés par métier) ET les ajoute en prospect dans la section Business (avec site et email) ; « Pas bon » les écarte pour toujours (avec ton motif, si tu en donnes un). Aucun mail n'est jamais rédigé ni envoyé pour eux — c'est toi qui écris.</p>
+  <section class="bloc-tete"><h2>Nouvelle recherche</h2>
+    <div class="ajout"><input id="ai-metiers" placeholder="Métiers (facultatif, virgule)"><input id="ai-villes" placeholder="Villes (facultatif, virgule)"><button class="btn" id="ai-lancer">Chercher</button></div>
+    <p class="aide">Laisse vide pour utiliser sa liste de métiers configurée et avancer tout seul dans la rotation des villes.</p>
+  </section>
+  <section><h2>À trier <span class="aide" id="ai-compte"></span></h2>
+    <ul class="l" id="ai-trier"><li class="aide">Chargement…</li></ul>
+  </section>
+  <section><h2>Validés, groupés par métier</h2>
+    <div id="ai-valides"><p class="aide">Chargement…</p></div>
+  </section>
+</div></div>
+</div>
+<aside id="jarvisPanel" hidden aria-label="Atlas"><iframe id="jarvisFrame" title="Atlas" allow="microphone; autoplay; clipboard-write"></iframe></aside>
+</div>
+
+<dialog id="dlgExt" aria-label="Détails">
+  <div class="dlg-tete"><strong id="x-titre" style="flex:1;font:600 20px var(--display);word-break:break-word"></strong><button class="btn small" data-fermer="dlgExt" autofocus>Fermer</button></div>
+  <div class="dlg-corps" id="x-corps"></div>
+</dialog>
+
+<dialog id="dlg" aria-label="Fiche projet">
+  <div class="dlg-tete"><input id="d-nom" aria-label="Nom du projet" maxlength="80"><button class="btn small" id="d-fermer" autofocus>Fermer</button></div>
+  <div class="dlg-corps" id="d-corps">
+    <div class="champs">
+      <label class="f">Statut<select id="d-statut"></select></label>
+      <label class="f">Type<select id="d-type"></select></label>
+      <label class="f">Priorité<select id="d-prio"><option value="1">1 · haute</option><option value="2">2 · normale</option><option value="3">3 · basse</option></select></label>
+    </div>
+    <label class="f">Résumé<textarea id="d-resume" maxlength="300" placeholder="À quoi sert ce projet, où il en est…"></textarea></label>
+    <section><h4>Tâches</h4><ul class="l" id="d-taches"></ul><div class="ajout"><input id="d-tache-in" placeholder="Nouvelle tâche…" maxlength="300"><button class="btn" id="d-tache-ok">Ajouter</button></div></section>
+    <section><h4>Notes</h4><ul class="l" id="d-notes"></ul><div class="ajout"><input id="d-note-in" placeholder="Nouvelle note…" maxlength="1000"><button class="btn" id="d-note-ok">Ajouter</button></div></section>
+    <section><h4>Dossiers</h4><ul class="l" id="d-dossiers"></ul><div class="ajout"><input id="d-dossier-in" placeholder="C:\dev\mon-projet" list="d-dossier-liste"><button class="btn" id="d-dossier-ok">Associer</button></div>
+      <datalist id="d-dossier-liste"></datalist><p class="aide" id="d-dossier-aide"></p></section>
+    <section><h4>Liens</h4><ul class="l" id="d-liens"></ul><div class="ajout"><input id="d-lien-titre" placeholder="Titre" style="max-width:35%"><input id="d-lien-url" placeholder="https://…" inputmode="url"><button class="btn" id="d-lien-ok">Ajouter</button></div></section>
+    <section id="d-ext-s"><h4>GitHub &amp; Netlify</h4><div id="d-ext" style="display:grid;gap:10px"></div></section>
+    <section><h4>Application liée</h4><label class="f">Adresse du site déployé<input id="d-outil" placeholder="https://mon-outil.netlify.app" inputmode="url"></label>
+      <p class="aide">L'historique complet des audits (avec les PDF) est dans la section SEO de la barre latérale.</p></section>
+    <section id="d-mentions-s" hidden><h4>Dans ton agenda et ton carnet</h4><ul class="l" id="d-mentions"></ul></section>
+    <div><button class="btn danger small" id="d-suppr">Supprimer ce projet</button></div>
+  </div>
+</dialog>
+
+<dialog id="dlgNouveau" aria-label="Nouveau projet">
+  <div class="dlg-tete"><strong style="flex:1;font:600 20px var(--display)">Nouveau projet</strong><button class="btn small" data-fermer="dlgNouveau">Annuler</button></div>
+  <div class="dlg-corps">
+    <label class="f">Nom<input id="n-nom" maxlength="80" placeholder="Ex : Refonte du site de …"></label>
+    <div class="champs">
+      <label class="f">Type<select id="n-type"></select></label>
+      <label class="f">Statut<select id="n-statut"></select></label>
+      <label class="f">Priorité<select id="n-prio"><option value="1">1 · haute</option><option value="2" selected>2 · normale</option><option value="3">3 · basse</option></select></label>
+    </div>
+    <label class="f">Résumé (facultatif)<textarea id="n-resume" maxlength="300"></textarea></label>
+    <div><button class="btn gold" id="n-ok">Créer</button></div>
+  </div>
+</dialog>
+
+<dialog id="dlgImport" aria-label="Importer des dossiers">
+  <div class="dlg-tete"><strong style="flex:1;font:600 20px var(--display)">Importer mes dossiers</strong><button class="btn small" data-fermer="dlgImport">Fermer</button></div>
+  <div class="dlg-corps">
+    <p class="aide">Voici les dossiers de <b>C:\dev</b> et du <b>Bureau</b> qui ne sont pas encore des projets (seuls les noms sont lus). Coche ceux qui comptent, corrige le nom, le type et le statut. Les dossiers sensibles sont exclus d'office.</p>
+    <div class="ligne"><button class="btn small" id="i-code">Cocher les projets de code</button><button class="btn small" id="i-rien">Tout décocher</button><span class="aide" id="i-compte"></span></div>
+    <div class="imp-liste"><table class="imp"><tbody id="i-corps"></tbody></table></div>
+    <div><button class="btn gold" id="i-ok">Importer les dossiers cochés</button></div>
+  </div>
+</dialog>
+<dialog id="dlgRapport" aria-label="Rapport d'étude">
+  <div class="dlg-tete"><strong style="flex:1;font:600 20px var(--display)" id="rapTitre">Rapport</strong><button class="btn small" data-fermer="dlgRapport" autofocus>Fermer</button></div>
+  <div class="dlg-corps"><pre class="jtxt" id="rapTexte" style="white-space:pre-wrap;max-height:65vh;overflow:auto"></pre></div>
+</dialog>
+<dialog id="dlgCand" aria-label="Ma candidature">
+  <div class="dlg-tete"><strong style="flex:1;font:600 20px var(--display)">✉ Ma candidature</strong><button class="btn small" data-fermer="dlgCand" autofocus>Fermer</button></div>
+  <div class="dlg-corps">
+    <div class="aide" id="candInfo" style="font-size:16px"></div>
+    <div class="aide" id="candEtat" role="status"></div>
+    <label class="aide">Objet<input id="candSujet" maxlength="200" style="width:100%"></label>
+    <label class="aide">Message<textarea id="candTexte" rows="13" maxlength="4000" style="width:100%"></textarea></label>
+    <div class="aide" id="candSignature" style="white-space:pre-line"></div>
+    <div class="pres-boutons">
+      <button class="btn gold" id="candCopier">📋 Copier (message + signature)</button>
+      <button class="btn" id="candSauver">💾 Enregistrer mes corrections</button>
+      <button class="btn" id="candRegen">🔄 Réécrire</button>
+      <button class="btn" id="candOuvrir">↗ Ouvrir l'offre</button>
+      <button class="btn" id="candPostulee">✔ J'ai envoyé</button>
+    </div>
+    <p class="aide" style="margin:0">Atlas n'envoie rien : relis, corrige, copie, envoie toi-même, puis touche « J'ai envoyé ». Il n'invente rien : il n'écrit que ce qui est dans ton profil (F:\Jarvis\profil\profil.md).</p>
+  </div>
+</dialog>
+<dialog id="dlgCarte" aria-label="Où est mon iPhone">
+  <div class="dlg-tete"><strong style="flex:1;font:600 20px var(--display)">📍 Où est mon iPhone ?</strong><button class="btn small" data-fermer="dlgCarte" autofocus>Fermer</button></div>
+  <div class="dlg-corps">
+    <div class="sec-statut" id="carteEtat"></div>
+    <iframe id="carteFrame" title="Carte de la position de l'iPhone" referrerpolicy="no-referrer" style="width:100%;height:52vh;min-height:280px;border:1px solid var(--line);border-radius:12px;background:var(--surface)"></iframe>
+    <div class="pres-boutons">
+      <button class="btn" id="carteActu">↻ Actualiser</button>
+      <button class="btn gold" id="carteSonner">🔔 Faire sonner</button>
+      <button class="btn" id="carteExterne">↗ Google Maps</button>
+    </div>
+    <p class="aide" style="margin:0">La carte se met à jour toute seule tant que cette fenêtre est ouverte. « Faire sonner » ouvre la page « Localiser » d'Apple dans une petite fenêtre (Apple interdit de l'afficher ici) : touche « Lire un son ».</p>
+  </div>
+</dialog>
+<dialog id="dlgPres" aria-label="Présence">
+  <div class="dlg-tete"><strong style="flex:1;font:600 20px var(--display)">Où es-tu ?</strong><button class="btn small" data-fermer="dlgPres" autofocus>Fermer</button></div>
+  <div class="dlg-corps">
+    <div class="sec-statut" id="presEtat"></div>
+    <div>
+      <p class="aide" style="margin:0 0 8px">Ton iPhone le dit tout seul (voir « Configurer l'iPhone »). Tu peux aussi le forcer, ou dire à Atlas « je sors » / « je suis rentré » :</p>
+      <div class="pres-boutons">
+        <button class="btn" data-mode="absent">🚶 Je sors</button><button class="btn" data-mode="maison">🏠 Chez moi, pas au PC</button>
+        <button class="btn" data-mode="pc">💻 Devant le PC</button><button class="btn gold" data-mode="auto">↺ Automatique</button>
+      </div>
+    </div>
+    <section id="calmeBloc"><h4>Ne pas déranger</h4>
+      <div class="sec-statut" id="calmeEtat"></div>
+      <div class="pres-boutons" style="margin-top:8px">
+        <button class="btn" data-calme="+60">🌙 1 h</button><button class="btn" data-calme="+180">🌙 3 h</button><button class="btn" data-calme="fin">☀️ Terminer</button>
+      </div>
+      <p class="aide" style="margin:8px 0 0">Ou dis à Atlas « je dors jusqu'à 10 h », « je fais une sieste d'une heure », « réveille-moi à 9 h » (il t'appelle), ou « je suis réveillé ». Tes routines (médicament…) et tes rappels restent actifs.</p>
+    </section>
+    <section id="telBloc"><h4>Mon iPhone</h4>
+      <div class="sec-statut" id="telEtat"></div>
+      <div class="pres-boutons" style="margin-top:8px">
+        <button class="btn" id="telCarte" hidden>🗺️ Voir sur la carte</button>
+        <button class="btn gold" id="telSonner">🔔 Localiser / faire sonner</button>
+        <button class="btn" id="telMaison">🏠 Ma maison est ici</button>
+      </div>
+      <p class="aide" style="margin:8px 0 0">« Voir sur la carte » l'affiche ici même. « Localiser / faire sonner » ouvre la page d'Apple dans une petite fenêtre (position exacte et sonnerie même en silencieux, en 4G / 5G). Tu peux aussi dire à Atlas « où est mon iPhone ? » ou « fais sonner mon iPhone ».</p>
+    </section>
+    <section><h4>Derniers signaux</h4><ul class="l" id="presHist"></ul></section>
+    <details class="guide" id="presGuide"><summary>Configurer l'iPhone (une seule fois)</summary>
+      <ol id="presEtapes"></ol>
+    </details>
+    <details class="guide" id="presGuideOT"><summary>Position de l'iPhone en continu (OwnTracks, une seule fois)</summary>
+      <ol id="otEtapes"></ol>
+    </details>
+  </div>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+let token = '';
+try { token = localStorage.getItem('jarvis_token') || ''; } catch {}
+const h = new URLSearchParams(location.hash.slice(1)).get('t');
+if (h) { token = h; try { localStorage.setItem('jarvis_token', token); } catch {} history.replaceState(null, '', location.pathname); }
+
+let data = { projets: [], types: [], statuts: [], dossiers_autorises: [] };
+let filtreStatut = 'enligne', ouvert = null, activite = {};      // sous-onglet de "Projets" : "enligne" (sites Netlify), un statut, ou "tous"
+try { const o = localStorage.getItem('projets_sous'); if (o) filtreStatut = o; } catch {}
+let onglet = 'projets', ext = { gh: null, nf: null, at: 0 }, sante = {};
+try { const o = localStorage.getItem('projets_onglet'); if (['projets', 'github'].includes(o)) onglet = o; } catch {}
+const dlg = $('#dlg');
+
+async function api(chemin, corps) {
+  const r = await fetch(chemin, { method: corps ? 'POST' : 'GET', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: corps ? JSON.stringify(corps) : undefined });
+  if (r.status === 401) { token = ''; throw new Error('Accès refusé : ouvre cette page depuis l\'appli Atlas.'); }
+  return r.json();
+}
+let tt;
+function toast(msg, err) { const t = $('#toast'); t.textContent = msg; t.className = 'toast on' + (err ? ' err' : ''); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('on'), 3200); }
+async function op(o, silencieux) {
+  try {
+    const r = await api('/api/projets/op', o);
+    if (!silencieux || !r.ok) toast(r.message || (r.ok ? 'Fait.' : 'Refusé.'), !r.ok);
+    await charger(true); return r;
+  } catch (e) { toast(e.message, true); return { ok: false }; }
+}
+
+const ilya = (iso) => {
+  if (!iso) return '';
+  const j = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  return j <= 0 ? "aujourd'hui" : j === 1 ? 'hier' : j < 30 ? `il y a ${j} j` : j < 365 ? `il y a ${Math.floor(j / 30)} mois` : `il y a ${Math.floor(j / 365)} an(s)`;
+};
+const ouvertes = (p) => p.taches.filter((t) => !t.fait).length;
+const derniere = (p) => { const a = activite[p.id]; const d = a ? (a.git && a.git.dernier_commit) || a.modifie : ''; return d || ''; };
+
+function remplirSelect(sel, liste, valeur) { sel.replaceChildren(...liste.map((x) => { const o = el('option', '', x); o.value = x; return o; })); if (valeur !== undefined) sel.value = valeur; }
+
+function filtrer() {
+  const q = $('#q').value.trim().toLowerCase(), type = $('#type').value;
+  let l = data.projets.filter((p) => {
+    if (filtreStatut !== 'tous' && p.statut !== filtreStatut) return false;
+    if (type && p.type !== type) return false;
+    if (q) {
+      const s = [p.nom, p.resume, ...p.taches.map((t) => t.texte), ...p.notes.map((n) => n.texte), ...p.dossiers, ...p.liens.map((x) => x.titre)].join(' ').toLowerCase();
+      if (!s.includes(q)) return false;
+    }
+    return true;
+  });
+  const tri = $('#tri').value;
+  l.sort((a, b) => tri === 'nom' ? a.nom.localeCompare(b.nom) : tri === 'taches' ? ouvertes(b) - ouvertes(a)
+    : tri === 'recent' ? (derniere(b) || b.maj).localeCompare(derniere(a) || a.maj) : (a.priorite - b.priorite) || (b.maj.localeCompare(a.maj)));
+  return l;
+}
+
+function dessiner() {
+  dessinerOnglets();
+  const p = onglet === 'projets';
+  $('#vueProjets').hidden = !p; $('#ext').hidden = p;
+  const ko = sitesListe().filter((x) => x.deploy && x.deploy.etat === 'error');
+  $('#bandeau').hidden = !ko.length || !p;
+  if (ko.length) $('#bandeau').textContent = `⚠ Déploiement Netlify en échec : ${ko.map((x) => x.nom).join(', ')}`;
+  if (p) { dessinerSites(); dessinerProjets(); } else dessinerGithub();
+}
+const SOUS = [['enligne', 'En ligne'], ['en cours', 'En cours'], ['en attente', 'En attente'], ['idée', 'Idées'], ['terminé', 'Terminés'], ['archivé', 'Archivés'], ['tous', 'Tous']];
+function dessinerProjets() {
+  if (!SOUS.some(([v]) => v === filtreStatut)) filtreStatut = 'enligne';
+  $('#sousOnglets').replaceChildren(...SOUS.map(([v, t]) => {
+    const n = v === 'enligne' ? sitesListe().length : v === 'tous' ? data.projets.length : data.projets.filter((p) => p.statut === v).length;
+    const b = el('button', 'onglet', t); b.append(el('span', 'n', String(n)));
+    b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', String(filtreStatut === v));
+    b.onclick = () => { filtreStatut = v; try { localStorage.setItem('projets_sous', v); } catch {} dessiner(); };
+    return b;
+  }));
+  const enLigne = filtreStatut === 'enligne';
+  $('#vueSites').hidden = !enLigne; $('#vueListe').hidden = enLigne;
+  if (enLigne) return;                                              // les cartes des sites sont dessinées par dessinerSites()
+  const l = filtrer(), grille = $('#grille');
+  $('#resume').textContent = `${l.length} projet(s) · ${l.reduce((n, p) => n + ouvertes(p), 0)} tâche(s) à faire`;
+  $('#vide').hidden = l.length > 0;
+  grille.replaceChildren(...l.map((p) => {
+    const c = el('button', 'carte'); c.type = 'button'; c.onclick = () => ouvrir(p.id);
+    c.append(el('h3', '', p.nom));
+    const b = el('div', 'ligne');
+    const st = el('span', 'badge', p.statut); st.dataset.st = p.statut;
+    b.append(el('span', 'badge', p.type), st);
+    const pr = el('span', 'prio'); pr.title = 'Priorité ' + p.priorite;
+    for (let i = 1; i <= 3; i++) pr.append(el('i', i >= 4 - p.priorite ? 'on' : ''));
+    b.append(pr); c.append(b);
+    if (p.resume) c.append(el('p', '', p.resume));
+    const pied = el('div', 'pied');
+    const o = ouvertes(p);
+    pied.append(el('span', '', o ? `☑ ${o} à faire` : p.taches.length ? '☑ tout fait' : '☐ aucune tâche'));
+    if (p.dossiers.length) pied.append(el('span', '', `📁 ${p.dossiers.length}`));
+    const d = derniere(p);
+    if (d) pied.append(el('span', '', `activité ${ilya(d)}`));
+    const ex = p.externe || {};
+    if (ex.github) pied.append(el('span', 'pill neutre', '⎇ ' + ex.github.split('/')[1]));
+    const site = ex.netlify ? sitesListe().find((x) => x.id === ex.netlify) : null;
+    if (site) pied.append(el('span', 'pill ' + (site.deploy && site.deploy.etat === 'error' ? 'rouge' : site.deploy && site.deploy.etat === 'ready' ? 'vert' : 'neutre'), '▲ ' + site.nom));
+    c.append(pied);
+    return c;
+  }));
+}
+
+async function charger(forcer) {
+  try {
+    data = await api('/api/projets');
+    if (!$('#type').options.length || $('#type').options.length === 1) {
+      const t = $('#type'); data.types.forEach((x) => { const o = el('option', '', x); o.value = x; t.append(o); });
+      remplirSelect($('#d-statut'), data.statuts); remplirSelect($('#d-type'), data.types);
+      remplirSelect($('#n-statut'), data.statuts, 'idée'); remplirSelect($('#n-type'), data.types, 'autre');
+    }
+    dessiner();
+    if (dlg.open && ouvert) remplirFiche(forcer);
+    chargerActivites();
+  } catch (e) { $('#resume').textContent = e.message; }
+}
+let actEnCours = false;
+async function chargerActivites() {
+  if (actEnCours) return; actEnCours = true;
+  try {
+    for (const p of data.projets.filter((x) => x.dossiers.length && x.statut !== 'archivé')) {
+      const r = await api('/api/projets/activite?id=' + p.id);
+      if (r.ok && r.dossiers.length) {
+        const best = r.dossiers.map((d) => (d.git && d.git.dernier_commit) || d.modifie || '').sort().pop();
+        activite[p.id] = { modifie: best, git: null };
+        if (ouvert === p.id) { activite.detail = r; }
+      }
+    }
+    dessiner();
+  } catch { /* activité facultative */ } finally { actEnCours = false; }
+}
+
+// ---------- GitHub et Netlify (lecture seule) ----------
+const depotsListe = () => (ext.gh && ext.gh.ok ? ext.gh.depots : []);
+const sitesListe = () => (ext.nf && ext.nf.ok ? ext.nf.sites : []);
+const ETATS = { ready: 'en ligne', error: 'échec', building: 'build en cours', enqueued: 'en attente', processing: 'préparation', uploading: 'envoi', new: 'nouveau', retrying: 'nouvel essai', skipped: 'ignoré', canceled: 'annulé' };
+// GitHub, Netlify, ses sites... : ouverts dans Firefox sur le PC (pas dans Edge, qui héberge déjà ce tableau de bord). href gardé pour l'affichage/clic droit "copier le lien".
+const lien = (texte, url) => {
+  const a = el('a', '', texte);
+  if (/^https:\/\//.test(url || '')) {
+    a.href = url; a.title = 'Ouvrir dans Firefox';
+    a.onclick = (e) => { e.preventDefault(); e.stopPropagation(); api('/api/ouvrir', { url }).catch((err) => toast(err.message, true)); };
+  } else a.onclick = (e) => e.stopPropagation();
+  return a;
+};
+const badgeEtat = (etat) => { const b = el('span', 'badge', ETATS[etat] || etat || '?'); b.dataset.etat = etat; return b; };
+const projetLie = (cle_, val) => data.projets.find((p) => p.externe && p.externe[cle_] === val);
+
+async function chargerExt(force) {
+  try { const r = await api('/api/externe' + (force ? '?force=1' : '')); ext.gh = r.github; ext.nf = r.netlify; ext.at = Date.now(); } catch (e) { ext.gh = ext.gh || { ok: false, message: e.message }; }
+  dessiner();
+  if (dlg.open && ouvert) remplirExt();
+  chargerSante();
+}
+let santeEnCours = false;
+async function chargerSante() {
+  if (santeEnCours || !sitesListe().length) return; santeEnCours = true;
+  try { const r = await api('/api/externe/sante'); if (r.ok) { sante = r.sante; dessiner(); } } catch { /* facultatif */ } finally { santeEnCours = false; }
+}
+function dessinerOnglets() {
+  const defs = [['projets', 'Projets', data.projets.length + (ext.nf && ext.nf.ok ? sitesListe().filter((x) => !projetLie('netlify', x.id)).length : 0)], ['github', 'Code (GitHub)', ext.gh && ext.gh.ok ? depotsListe().length : '']];
+  $('#onglets').replaceChildren(...defs.map(([v, t, n]) => {
+    const b = el('button', 'onglet', t); if (n !== '') b.append(el('span', 'n', String(n)));
+    b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', String(onglet === v));
+    b.onclick = () => { onglet = v; try { localStorage.setItem('projets_onglet', v); } catch {} dessiner(); };
+    return b;
+  }));
+}
+function boutonProjet(source, ref) {
+  const p = projetLie(source === 'github' ? 'github' : 'netlify', ref);
+  if (p) { const b = el('button', 'pill', '📁 ' + p.nom); b.title = 'Ouvrir la fiche du projet'; b.onclick = (e) => { e.stopPropagation(); ouvrir(p.id); }; return b; }
+  const b = el('button', 'pill', '+ Projet'); b.title = 'Créer un projet à partir de cet élément';
+  b.onclick = async (e) => { e.stopPropagation(); const r = await op({ op: 'creer_depuis', source, ref }); if (r.ok && r.projet) ouvrir(r.projet.id); };
+  return b;
+}
+function carteExt(clic) { const c = el('div', 'carte ext'); c.tabIndex = 0; c.setAttribute('role', 'button'); c.onclick = clic; c.onkeydown = (e) => { if (e.key === 'Enter') clic(); }; return c; }
+function dessinerGithub() {
+  const src = ext.gh, info = $('#extInfo'), grille = $('#extGrille');
+  info.replaceChildren(); grille.replaceChildren();
+  if (!src) { info.textContent = 'Chargement…'; return; }
+  if (!src.ok) { info.textContent = src.message; return; }
+  const q = $('#q').value.trim().toLowerCase();
+  const compte = {}; src.depots.forEach((x) => { const o = x.nom.split('/')[0]; compte[o] = (compte[o] || 0) + 1; });
+  const moi = Object.keys(compte).sort((a, b) => compte[b] - compte[a])[0];
+  const liste = src.depots.filter((x) => !q || [x.nom, x.description, x.langage].join(' ').toLowerCase().includes(q));
+  info.append(`${liste.length} dépôt(s) de code · lecture seule · à jour ${ilya(new Date(src.at).toISOString())}`);
+  if (src.avertissement) info.append(el('span', 'pill rouge', src.avertissement));
+  if (!liste.length) { info.append(' — rien à afficher.'); return; }
+  grille.replaceChildren(...liste.map((x) => {
+    const c = carteExt(() => detailDepot(x));
+    c.append(el('h3', '', (x.prive ? '🔒 ' : '') + x.court));
+    const b = el('div', 'ligne'); if (x.langage) b.append(el('span', 'badge', x.langage)); if (x.fork) b.append(el('span', 'badge', 'fork')); if (x.archive) b.append(el('span', 'badge', 'archivé'));
+    if (x.nom.split('/')[0] !== moi) b.append(el('span', 'badge', x.nom.split('/')[0]));   // propriétaire affiché seulement si ce n'est pas toi
+    c.append(b);
+    if (x.description) c.append(el('p', '', x.description));
+    const pied = el('div', 'pied');
+    pied.append(el('span', '', `poussé ${ilya(x.pousse)}`));
+    if (x.ouvertes) pied.append(el('span', '', `● ${x.ouvertes} ouverte(s)`));
+    for (const s of x.sites || []) pied.append(el('span', 'pill ' + (s.etat === 'error' ? 'rouge' : s.etat === 'ready' ? 'vert' : 'neutre'), '▲ ' + s.nom));
+    pied.append(boutonProjet('github', x.nom)); c.append(pied);
+    return c;
+  }));
+}
+// ---------- Sites en ligne (Netlify) : cartes en haut de l'onglet Projets ----------
+const gigas = (o) => (o / 1073741824 >= 10 ? Math.round(o / 1073741824) : (o / 1073741824).toFixed(1)) + ' Go';
+function santeLigne(x) {
+  const h = sante[x.id], l = el('div', 'sante');
+  if (!h) { l.append(el('span', 'point'), 'vérification…'); return l; }
+  const niv = !h.statut || h.statut >= 400 ? 'ko' : h.ms >= 2000 ? 'att' : 'ok';
+  l.append(el('span', 'point ' + niv), h.statut ? `HTTP ${h.statut} · ${h.ms} ms` : (h.erreur || 'injoignable'));
+  if (h.ssl_jours != null) l.append(`· certificat ${h.ssl_jours} j`);
+  return l;
+}
+function carteSite(x) {
+  const c = carteExt(() => ouvrirSite(x)); c.classList.add('site');
+  if (x.capture) { const im = el('img', 'capture'); im.src = x.capture; im.alt = ''; im.loading = 'lazy'; im.referrerPolicy = 'no-referrer'; im.onerror = () => im.remove(); c.append(im); }
+  const b = el('div', 'corps');
+  b.append(el('h3', '', x.nom));
+  const l1 = el('div', 'ligne'); if (x.deploy) l1.append(badgeEtat(x.deploy.etat)); b.append(l1);
+  if (x.url) { const u = el('div', 'sous'); u.append(lien((x.domaine || x.url).replace(/^https:\/\//, ''), x.url)); b.append(u); }
+  b.append(santeLigne(x));
+  if (x.deploy) b.append(el('p', '', `${x.deploy.message || 'dernier déploiement'}${x.deploy.erreur ? ' — ' + x.deploy.erreur : ''}`));
+  const pied = el('div', 'pied');
+  if (x.deploy) pied.append(el('span', '', `déployé ${ilya(x.deploy.cree)}${x.deploy.branche ? ' · ' + x.deploy.branche : ''}`));
+  if (x.depot_nom) pied.append(el('span', 'pill neutre', '⎇ ' + x.depot_nom));
+  pied.append(boutonProjet('netlify', x.id)); b.append(pied);
+  c.append(b); return c;
+}
+function dessinerSites() {
+  const grille = $('#grilleSites'), info = $('#sitesResume');
+  grille.replaceChildren();
+  if (!ext.nf) { info.textContent = 'Chargement de Netlify…'; return; }
+  if (!ext.nf.ok) { info.textContent = ext.nf.message; return; }
+  const q = $('#q').value.trim().toLowerCase(), tous = sitesListe(), c = ext.nf.compte;
+  const ko = tous.filter((x) => x.deploy && x.deploy.etat === 'error').length;
+  info.textContent = `${tous.length} site(s) · ${ko ? ko + ' en échec' : 'déploiements tous réussis'}` + (c && c.bande_passante ? ` · bande passante ${gigas(c.bande_passante.utilise)} / ${gigas(c.bande_passante.inclus)}` : '') + (c && c.minutes_build ? ` · minutes de build ${c.minutes_build.utilise} / ${c.minutes_build.inclus}` : '');
+  const l = tous.filter((x) => !q || [x.nom, x.url, x.domaine, x.depot_nom].join(' ').toLowerCase().includes(q));
+  l.sort((a, b) => (b.deploy && b.deploy.etat === 'error') - (a.deploy && a.deploy.etat === 'error') || ((b.deploy && b.deploy.cree) || b.maj || '').localeCompare((a.deploy && a.deploy.cree) || a.maj || ''));
+  grille.replaceChildren(...l.map(carteSite));
+}
+function section(titre, items, fabrique, vide) {
+  const s = el('section'); s.append(el('h4', '', titre));
+  if (!items.length) { s.append(el('p', 'aide', vide || 'Rien.')); return s; }
+  const ul = el('ul', 'l'); items.forEach((i) => { const li = el('li'); li.append(fabrique(i)); ul.append(li); }); s.append(ul); return s;
+}
+async function detailDepot(d) {
+  $('#dlgExt').classList.remove('large');
+  $('#x-titre').textContent = d.nom; const corps = $('#x-corps'); corps.replaceChildren(el('p', 'aide', 'Chargement…')); if (!$('#dlgExt').open) $('#dlgExt').showModal();
+  try {
+    const r = await api('/api/externe/github/detail?nom=' + encodeURIComponent(d.nom));
+    if (!r.ok) { corps.replaceChildren(el('p', 'aide', r.message)); return; }
+    const t = el('div', 'ligne'); t.append(lien('Ouvrir sur GitHub ↗', d.url)); if (d.description) t.append(el('span', 'aide', d.description));
+    const bloc = (a, sub) => { const w = el('span', 't'); w.append(a); if (sub) w.append(el('small', '', sub)); return w; };
+    corps.replaceChildren(t,
+      ...(r.action ? [section('Dernière exécution (Actions)', [r.action], (a) => bloc(lien(`${a.nom} : ${a.resultat || a.etat}`, a.url), ilya(a.date)))] : []),
+      section('Pull requests ouvertes', r.prs, (x) => bloc(lien(`#${x.numero} ${x.titre}${x.brouillon ? ' (brouillon)' : ''}`, x.url), `${x.auteur || ''} · ${ilya(x.date)}`), 'Aucune.'),
+      section('Issues ouvertes', r.issues, (x) => bloc(lien(`#${x.numero} ${x.titre}`, x.url), `${x.auteur || ''} · ${ilya(x.date)}`), 'Aucune.'),
+      section('Derniers commits', r.commits, (x) => bloc(lien(x.message || '(sans message)', x.url), `${x.auteur || ''} · ${ilya(x.date)}`), 'Aucun commit visible.'));
+  } catch (e) { corps.replaceChildren(el('p', 'aide', e.message)); }
+}
+const ICONES = { ok: '✔', attention: '⚠', ko: '✖' };
+const tuile = (l, v, niv) => { const t = el('div', 'tuile ' + (niv || '')); t.append(el('div', 'v', v), el('div', 'l', l)); return t; };
+const H4 = (t) => el('h4', '', t);
+const bloc = (titre, ...contenu) => { const s = el('section'); s.append(H4(titre), ...contenu); return s; };
+function barres(serie, classe) {
+  const max = Math.max(1, ...serie.map((x) => x.v)), b = el('div', 'barres ' + (classe || ''));
+  serie.forEach((x) => { const i = el('i', x.cls || ''); i.style.height = Math.max(6, Math.round(76 * x.v / max)) + 'px'; i.title = x.titre || ''; b.append(i); });
+  return b;
+}
+function scoreRond(l, v) { const niv = v == null ? '' : v >= 90 ? 'ok' : v >= 50 ? 'att' : 'ko'; const s = el('div', 'score ' + niv); s.append(el('div', 'rond', v == null ? '—' : String(v)), el('div', 'l', l)); return s; }
+
+async function ouvrirSite(s, force) {
+  const d = $('#dlgExt'); d.classList.add('large');
+  $('#x-titre').textContent = s.nom;
+  const corps = $('#x-corps'); corps.replaceChildren(el('p', 'aide', 'Analyse du site en cours (une dizaine de secondes)…'));
+  if (!d.open) d.showModal();
+  try {
+    const b = await api('/api/site/bilan?id=' + encodeURIComponent(s.id) + (force ? '&force=1' : ''));
+    if (!b.ok) { corps.replaceChildren(el('p', 'aide', b.message)); return; }
+    renderBilan(s, b);
+  } catch (e) { corps.replaceChildren(el('p', 'aide', e.message)); }
+}
+function renderBilan(s, b) {
+  const corps = $('#x-corps'), dp = b.deploys, cn = b.code, f = b.formulaires, q = b.compte;
+  const parts = [];
+  // 1) en-tête : capture + chiffres clés
+  const hero = el('div', 'hero');
+  const pleine = () => { hero.style.gridTemplateColumns = '1fr'; };               // sans capture : les chiffres prennent toute la largeur
+  if (b.capture) { const im = el('img'); im.src = b.capture; im.alt = 'Capture du site'; im.referrerPolicy = 'no-referrer'; im.onerror = () => { im.remove(); pleine(); }; hero.append(im); } else pleine();
+  const droite = el('div'); droite.style.display = 'grid'; droite.style.gap = '12px';
+  const t = el('div', 'tuiles');
+  t.append(tuile('Dernier déploiement', b.etat === 'error' ? 'échec' : b.etat === 'ready' ? 'en ligne' : (ETATS[b.etat] || '?'), b.etat === 'ready' ? 'ok' : b.etat === 'error' ? 'ko' : 'att'));
+  if (dp && dp.dernier) t.append(tuile('Mis en ligne', ilya(dp.dernier.cree)));
+  if (dp && dp.taux !== null) t.append(tuile(`Déploiements réussis (${dp.total})`, dp.taux + ' %', dp.taux >= 90 ? 'ok' : dp.taux >= 70 ? 'att' : 'ko'));
+  if (dp && dp.duree_moy) t.append(tuile('Durée moyenne du build', dp.duree_moy + ' s'));
+  if (b.ssl_jours != null) t.append(tuile('Certificat HTTPS', b.ssl_jours + ' j', b.ssl_jours > 14 ? 'ok' : 'ko'));
+  if (f && f.presents) t.append(tuile('Messages reçus (30 j)', String(f.derniers_30j), f.derniers_30j ? 'ok' : 'att'));
+  droite.append(t);
+  const liens = el('div', 'ligne'); liens.append(lien('Ouvrir le site ↗', b.url)); if (b.admin) liens.append(lien('Ouvrir dans Netlify ↗', b.admin)); if (b.depot) liens.append(lien('Dépôt ↗', b.depot));
+  const re = el('button', 'btn small', 'Analyser à nouveau'); re.onclick = () => ouvrirSite(s, true); liens.append(re);
+  droite.append(liens); hero.append(droite); parts.push(hero);
+
+  // 2) le verdict
+  const v = b.verdict, vb = el('div', 'verdict');
+  for (const [cls, titre, items, vide] of [['marche', '✔ Ce qui marche', v.marche, 'Rien de mesuré pour le moment.'], ['afaire', '⚠ À faire', v.afaire, 'Rien d\'urgent.'], ['eviter', '✖ À éviter', v.eviter, 'Rien de particulier.']]) {
+    const c = el('div', 'vcol ' + cls); c.append(el('h5', '', titre));
+    const ul = el('ul'); (items.length ? items : [vide]).forEach((x) => ul.append(el('li', '', x))); c.append(ul); vb.append(c);
+  }
+  parts.push(bloc('Verdict', vb));
+
+  // 3) trafic
+  const tr = el('div', 'bloc-info');
+  tr.append(el('div', '', b.analytics.length ? 'Outil(s) de mesure détecté(s) sur la page d\'accueil : ' + b.analytics.map((o) => o.nom + (o.id ? ' (' + o.id + ')' : '')).join(', ') + '.' : 'Aucun outil de mesure du trafic détecté sur la page d\'accueil.'));
+  tr.append(el('div', 'aide', 'Netlify ne fournit pas les visites sur l\'offre gratuite (Analytics est une option payante) : Atlas ne peut donc pas afficher le trafic tant qu\'un outil gratuit n\'est pas branché (Cloudflare Web Analytics, Google Analytics / Search Console, Umami ou GoatCounter).'));
+  parts.push(bloc('Trafic', tr));
+
+  // 4) santé technique et SEO de base
+  const tb = el('table', 'checks');
+  b.checks.forEach((c) => { const tr_ = el('tr'), i = el('td', c.niveau, ICONES[c.niveau]), n = el('td'); n.append(c.label); if (c.detail) n.append(el('small', '', c.detail)); tr_.append(i, n); tb.append(tr_); });
+  parts.push(bloc('Santé du site et bases du référencement (page d\'accueil)', tb));
+
+  // 5) déploiements
+  if (dp && dp.serie.length) {
+    const g = barres(dp.serie.map((x) => ({ v: x.duree || 1, cls: x.etat === 'error' ? 'error' : x.etat === 'ready' ? '' : 'autre', titre: `${ETATS[x.etat] || x.etat} · ${x.duree || 0} s · ${ilya(x.cree)} · ${x.message}` })));
+    const c = el('div'); c.append(g, el('div', 'legende', `${dp.serie.length} derniers déploiements (du plus ancien au plus récent) : hauteur = durée du build, rouge = échec.`));
+    if (dp.dernier_echec) c.append(el('div', 'legende', `Dernier échec ${ilya(dp.dernier_echec.cree)}${dp.dernier_echec.erreur ? ' : ' + dp.dernier_echec.erreur : ''}`));
+    const ul = el('ul', 'l'); ul.style.marginTop = '10px';
+    dp.serie.slice(-6).reverse().forEach((x) => { const li = el('li'), w = el('span', 't'), l = el('div', 'ligne'); l.append(badgeEtat(x.etat), el('span', '', x.message || '(sans message)')); w.append(l, el('small', '', `${ilya(x.cree)}${x.duree ? ' · ' + x.duree + ' s' : ''}`)); li.append(w); ul.append(li); });
+    c.append(ul); parts.push(bloc('Déploiements', c));
+  }
+
+  // 6) code
+  if (cn) {
+    const c = el('div'), tt = el('div', 'tuiles');
+    tt.append(tuile('Modifications (8 semaines)', String(cn.commits_56j), cn.commits_56j ? 'ok' : ''), tuile('Issues ouvertes', String(cn.issues.length), cn.issues.length ? 'att' : 'ok'), tuile('Pull requests ouvertes', String(cn.prs.length), cn.prs.length ? 'att' : 'ok'));
+    if (cn.action) tt.append(tuile('Vérification automatique', cn.action.resultat === 'success' ? 'réussie' : cn.action.resultat === 'failure' ? 'échec' : (cn.action.resultat || cn.action.etat), cn.action.resultat === 'success' ? 'ok' : cn.action.resultat === 'failure' ? 'ko' : 'att'));
+    c.append(tt);
+    const g = barres(cn.semaines.map((n, i) => ({ v: n, titre: `il y a ${7 - i} semaine(s) : ${n} modification(s)` })), 'commits'); g.style.marginTop = '12px';
+    c.append(g, el('div', 'legende', 'Modifications du code par semaine (8 dernières semaines).'));
+    const l = el('div', 'ligne'); l.style.marginTop = '8px'; l.append(lien('Dépôt ' + cn.nom + ' ↗', cn.url)); c.append(l);
+    parts.push(bloc('Code (GitHub)', c));
+  }
+
+  // 7) formulaires (jamais le contenu des messages)
+  if (f && f.presents) {
+    const ul = el('ul', 'l'); f.formulaires.forEach((x) => { const li = el('li'); li.append(el('span', 't', `${x.nom} : ${x.envois} message(s) au total`)); ul.append(li); });
+    parts.push(bloc('Formulaires', ul, el('div', 'legende', f.derniers_30j + ' message(s) reçu(s) ces 30 derniers jours. Atlas ne lit que le nombre, jamais le contenu des messages.')));
+  }
+
+  // 8) quotas du compte Netlify
+  if (q) {
+    const c = el('div', 'tuiles');
+    const jauge = (titre, x, fmt) => { const t = el('div', 'tuile'); t.append(el('div', 'v', fmt(x.utilise) + ' / ' + fmt(x.inclus))); t.append(el('div', 'l', titre)); const j = el('div', 'jauge'), i = el('i'); i.style.width = Math.min(100, x.inclus ? 100 * x.utilise / x.inclus : 0) + '%'; j.append(i); t.append(j); return t; };
+    if (q.bande_passante) c.append(jauge('Bande passante du mois (tous tes sites)', q.bande_passante, gigas));
+    if (q.minutes_build) c.append(jauge('Minutes de build du mois', q.minutes_build, (n) => String(n)));
+    parts.push(bloc('Forfait Netlify (' + (q.offre || '?') + ')', c));
+  }
+
+  // 9) PageSpeed à la demande
+  const zone = el('div'), btn = el('button', 'btn', 'Mesurer la performance (Google PageSpeed)');
+  const aide = el('p', 'aide', 'Envoie l\'adresse publique du site à Google (gratuit, environ 20 secondes) : note de performance, de référencement, d\'accessibilité et de bonnes pratiques sur mobile.');
+  btn.onclick = async () => {
+    btn.disabled = true; btn.textContent = 'Mesure en cours…';
+    try {
+      const r = await api('/api/site/pagespeed?id=' + encodeURIComponent(s.id));
+      btn.disabled = false; btn.textContent = 'Mesurer à nouveau';
+      if (!r.ok) { aide.textContent = r.message; return; }
+      aide.remove();
+      const sc = el('div', 'scores'); sc.append(scoreRond('Performance', r.scores.performance), scoreRond('Référencement', r.scores.seo), scoreRond('Accessibilité', r.scores.accessibility), scoreRond('Bonnes pratiques', r.scores['best-practices']));
+      const m = r.metriques, res = el('div'); res.style.display = 'grid'; res.style.gap = '12px'; res.append(sc);
+      res.append(el('div', 'legende', `Affichage du premier contenu ${m.fcp || '?'} · plus grand élément ${m.lcp || '?'} · décalages de mise en page ${m.cls || '?'} · blocage ${m.tbt || '?'} (mobile, Google)`));
+      const liste = (titre, items) => { if (!items.length) return; const c = el('div'); c.append(el('strong', '', titre)); const ul = el('ul'); ul.style.margin = '6px 0 0'; items.forEach((x) => ul.append(el('li', '', x))); c.append(ul); res.append(c); };
+      liste('Pour aller plus vite', r.opportunites); liste('Référencement à corriger', r.seo_a_corriger); liste('Accessibilité à corriger', r.accessibilite_a_corriger);
+      zone.replaceChildren(res, btn);
+    } catch (e) { btn.disabled = false; btn.textContent = 'Réessayer'; aide.textContent = e.message; }
+  };
+  zone.append(btn, aide); parts.push(bloc('Performance', zone));
+  corps.replaceChildren(...parts);
+}
+const detailSite = (s) => ouvrirSite(s);
+// Section "GitHub & Netlify" de la fiche projet : lier à un dépôt / un site (proposition automatique, jamais appliquée sans ton clic)
+function remplirExt() {
+  const p = courant(), box = $('#d-ext'); if (!p) return;
+  const ex = p.externe || {}, r = activite.detail || {}, sug = r.suggestion || {};
+  const nonConf = (ext.gh && !ext.gh.ok && !depotsListe().length && ext.nf && !ext.nf.ok);
+  if (nonConf) { box.replaceChildren(el('p', 'aide', `${ext.gh.message} ${ext.nf.message}`)); return; }
+  const bloc = (titre, liste, valeur, cle_, libelle, resume) => {
+    const b = el('div', 'ext-bloc'), sel = el('select'); sel.setAttribute('aria-label', titre);
+    sel.append(new Option('— aucun —', ''));
+    liste.forEach((x) => sel.append(new Option(libelle(x), x.id || x.nom)));
+    if (valeur && !liste.some((x) => (x.id || x.nom) === valeur)) sel.append(new Option(valeur, valeur));
+    sel.value = valeur || '';
+    sel.onchange = () => op({ op: 'lier', id: p.id, [cle_]: sel.value }, true);
+    const lab = el('label', 'f', titre); lab.append(sel); b.append(lab);
+    if (resume) b.append(resume);
+    return b;
+  };
+  const gh = r.github, nf = r.netlify;
+  let rg = null, rn = null;
+  if (gh) { rg = el('div', 'ligne'); rg.append(el('span', 'aide', `poussé ${ilya(gh.pousse)}${gh.ouvertes ? ' · ' + gh.ouvertes + ' ouverte(s)' : ''}`)); const b = el('button', 'btn small', 'Détails'); b.onclick = () => detailDepot(gh); rg.append(b, lien('GitHub ↗', gh.url)); }
+  if (nf) { rn = el('div', 'ligne'); if (nf.deploy) rn.append(badgeEtat(nf.deploy.etat), el('span', 'aide', `déployé ${ilya(nf.deploy.cree)}`)); const b = el('button', 'btn small', 'Déploiements'); b.onclick = () => detailSite(nf); rn.append(b, lien('Site ↗', nf.url)); }
+  const parts = [bloc('Dépôt GitHub', depotsListe(), ex.github, 'github', (x) => (x.prive ? '🔒 ' : '') + x.nom, rg), bloc('Site Netlify', sitesListe(), ex.netlify, 'netlify', (x) => x.nom + (x.domaine ? ' · ' + x.domaine : ''), rn)];
+  const propose = (texte, cle_, val) => { const s = el('div', 'sugg', texte); const b = el('button', 'btn small', 'Lier'); b.onclick = () => op({ op: 'lier', id: p.id, [cle_]: val }); s.append(b); return s; };
+  if (sug.github && !ex.github) parts.push(propose(`Suggestion : ${sug.github} (d'après ${sug.source})`, 'github', sug.github));
+  if (sug.netlify && !ex.netlify) { const s = sitesListe().find((x) => x.id === sug.netlify); if (s) parts.push(propose(`Suggestion : site ${s.nom}`, 'netlify', s.id)); }
+  box.replaceChildren(...parts);
+}
+
+// ---------- Fiche ----------
+function courant() { return data.projets.find((p) => p.id === ouvert); }
+function ouvrir(id) { ouvert = id; remplirFiche(true); dlg.showModal(); chargerDetail(); }
+function remplirFiche(forcer) {
+  const p = courant(); if (!p) { dlg.close(); return; }
+  const actif = document.activeElement;
+  const enSaisie = dlg.open && actif && dlg.contains(actif) && /^(INPUT|TEXTAREA)$/.test(actif.tagName) && actif.value;
+  if (enSaisie && !forcer) return;                                     // ne pas écraser ce que tu es en train de taper
+  $('#d-nom').value = p.nom; $('#d-statut').value = p.statut; $('#d-type').value = p.type; $('#d-prio').value = String(p.priorite); $('#d-resume').value = p.resume;
+  $('#d-outil').value = p.outil || '';
+  $('#d-taches').replaceChildren(...p.taches.map((t) => {
+    const li = el('li', t.fait ? 'fait' : ''), cb = el('input'); cb.type = 'checkbox'; cb.checked = t.fait; cb.setAttribute('aria-label', t.texte);
+    cb.onchange = () => op({ op: 'tache_cocher', id: p.id, tid: t.id, fait: cb.checked }, true);
+    const x = el('button', 'x', '×'); x.title = 'Retirer'; x.onclick = () => op({ op: 'tache_retirer', id: p.id, tid: t.id }, true);
+    li.append(cb, el('span', 't', t.texte), x); return li;
+  }));
+  $('#d-notes').replaceChildren(...p.notes.slice().reverse().map((n) => {
+    const li = el('li'), s = el('span', 't', n.texte), sm = el('small', '', n.date); s.append(sm);
+    const x = el('button', 'x', '×'); x.title = 'Retirer'; x.onclick = () => op({ op: 'note_retirer', id: p.id, nid: n.id }, true);
+    li.append(s, x); return li;
+  }));
+  $('#d-dossiers').replaceChildren(...p.dossiers.map((d, i) => {
+    const li = el('li'), s = el('span', 't', d);
+    const info = el('div', 'git'); info.dataset.dossier = d; s.append(info);
+    const ouvrirB = el('button', 'btn small', 'Ouvrir'); ouvrirB.onclick = () => op({ op: 'ouvrir_dossier', id: p.id, i }, true);
+    const x = el('button', 'x', '×'); x.title = 'Dissocier (rien n\'est supprimé sur le disque)'; x.onclick = () => op({ op: 'dossier_retirer', id: p.id, i }, true);
+    li.append(s, ouvrirB, x); return li;
+  }));
+  $('#d-liens').replaceChildren(...p.liens.map((l, i) => {
+    const li = el('li'), a = el('a', '', l.titre); a.href = l.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+    const s = el('span', 't'); s.append(a);
+    const x = el('button', 'x', '×'); x.title = 'Retirer'; x.onclick = () => op({ op: 'lien_retirer', id: p.id, i }, true);
+    li.append(s, x); return li;
+  }));
+  remplirExt();
+  $('#d-dossier-aide').textContent = data.dossiers_autorises.length ? `Dossiers que Atlas peut voir : ${data.dossiers_autorises.join('  ·  ')}` : 'Aucun dossier autorisé pour Atlas (config.json).';
+  afficherDetail();
+}
+async function chargerDetail() {
+  const p = courant(); if (!p) return;
+  try { const r = await api('/api/projets/activite?id=' + p.id); if (r.ok && ouvert === p.id) { activite.detail = r; afficherDetail(); } } catch { /* facultatif */ }
+}
+function afficherDetail() {
+  const r = activite.detail, p = courant(); if (!r || !p) return;
+  remplirExt();
+  for (const info of document.querySelectorAll('#d-dossiers .git')) {
+    const d = r.dossiers.find((x) => x.dossier === info.dataset.dossier); if (!d) continue;
+    info.replaceChildren();
+    if (d.refuse) { info.textContent = `Refusé par la sécurité : ${d.refuse}`; continue; }
+    if (!d.existe) { info.textContent = 'Dossier introuvable (déplacé ou supprimé ?)'; continue; }
+    const g = d.git;
+    if (g) {
+      const l1 = el('div'); l1.append('Git · branche ', el('b', '', g.branche || '?'), ' · ');
+      const m = el('span', g.modifs ? 'modifie' : '', g.modifs ? `${g.modifs} fichier(s) non commité(s)` : 'propre'); l1.append(m); info.append(l1);
+      if (g.dernier_commit) info.append(el('div', '', `Dernier commit ${ilya(g.dernier_commit)} : ${g.sujet}`));
+      if (/^https:\/\/(github\.com|gitlab\.com|bitbucket\.org)\//.test(g.depot)) { const a = el('a', '', g.depot.replace('https://', '')); a.href = g.depot; a.target = '_blank'; a.rel = 'noopener noreferrer'; const dv = el('div'); dv.append('Dépôt : ', a); info.append(dv); }
+    } else info.append(`Modifié ${ilya(d.modifie)} (pas de git)`);
+  }
+  const m = r.mentions, l = $('#d-mentions'); l.replaceChildren();
+  m.agenda.forEach((e) => { const li = el('li'); li.append(el('span', 't', `📅 ${e.date}${e.heure ? ' ' + e.heure : ''} · ${e.titre}`)); l.append(li); });
+  m.rappels.forEach((e) => { const li = el('li'); li.append(el('span', 't', `⏰ ${new Date(e.at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })} · ${e.texte}`)); l.append(li); });
+  m.carnet.forEach((e) => { const li = el('li'); li.append(el('span', 't', `📝 ${e}`)); l.append(li); });
+  $('#d-mentions-s').hidden = !l.children.length;
+}
+// ---------- SEO : historique complet (base Supabase de l'outil, lu en direct) + lancement d'un nouvel audit complet ----------
+const seoOutilUrl = () => (data.projets.find((p) => p.outil) || {}).outil || '';
+async function chargerSeo(force) {
+  const ul = $('#seo-hist');
+  try {
+    const r = await api('/api/seo/historique' + (force ? '?force=1' : ''));
+    if (sectionCourante !== 'seo') return;
+    if (!r.ok) { ul.replaceChildren(el('li', 'aide', r.message)); return; }
+    if (!r.audits.length) { ul.replaceChildren(el('li', 'aide', 'Aucun audit enregistré pour le moment.')); return; }
+    ul.replaceChildren(...r.audits.slice(0, 30).map((a) => {
+      const li = el('li'), s = el('span', 't');
+      const couleur = a.score >= 75 ? 'vert' : a.score >= 50 ? 'neutre' : 'rouge';
+      s.append(el('span', 'pill ' + couleur, `${a.score}/100`), ` ${a.site}${a.client ? ' · ' + a.client : ''} — ${a.critiques} critique(s), ${a.majeurs} majeur(s) · ${ilya(a.date)}`);
+      const b = el('button', 'btn small', 'Générer les PDF ↗');
+      b.title = "Rouvre l'audit dans l'outil (seul endroit qui sait fabriquer les 2 PDF)";
+      b.onclick = async () => { b.disabled = true; const r2 = await api('/api/seo/reauditer', { id: a.id }); b.disabled = false; if (!r2.ok) toast(r2.message, true); };
+      li.append(s, b); return li;
+    }));
+  } catch (e) { if (sectionCourante === 'seo') ul.replaceChildren(el('li', 'aide', e.message)); }
+}
+async function chargerSeoRecherche() {
+  try {
+    const r = await api('/api/seo/prospects');
+    if (sectionCourante !== 'seo') return;
+    const s = $('#seo-recherche-s'); if (!r.ok || !r.prospects.length) { s.hidden = true; return; }
+    s.hidden = false;
+    $('#seo-recherche').replaceChildren(...r.prospects.map((e) => {
+      const li = el('li'), s2 = el('span', 't');
+      const couleur = e.scan.scoreProspect >= 60 ? 'rouge' : e.scan.scoreProspect >= 35 ? 'neutre' : 'vert';   // score prospect élevé = mauvais SEO = bonne opportunité
+      s2.append(el('span', 'pill ' + couleur, `${e.scan.scoreProspect}/100`), ` ${e.nom} — ${(e.scan.problemes || []).slice(0, 3).join(', ') || 'peu de problèmes'}${e.scan.emails && e.scan.emails.length ? ' · ' + e.scan.emails[0] : ' · pas d\'email trouvé'}`);
+      s2.append(el('br'), el('small', '', `${(e.metiers || []).join(', ')} à ${e.ville || '?'} · ${ilya(e.trouve_le)}`));
+      if (e.site) s2.append(el('br'), lien(e.site, e.site));
+      const colonne = el('div'); colonne.style.cssText = 'display:flex;flex-direction:column;gap:6px';
+      const bAudit = el('button', 'btn small', 'Auditer dans mon outil ↗');
+      bAudit.onclick = async () => {
+        const base = seoOutilUrl(); if (!base || !e.site) { toast('Site ou outil manquant.', true); return; }
+        const r2 = await api('/api/ouvrir', { url: base + '/?u=' + encodeURIComponent(e.site) + '&c=' + encodeURIComponent(e.nom) + '&go=1' });
+        if (!r2.ok) toast(r2.message, true);
+      };
+      const bMail = el('button', 'btn small', 'Rédiger un mail');
+      bMail.onclick = async () => { bMail.disabled = true; bMail.textContent = 'Rédaction…'; const r2 = await api('/api/seo/mail', { ref: e.nom }); bMail.disabled = false; bMail.textContent = 'Rédiger un mail';
+        if (!r2.ok) { toast(r2.message, true); return; } $('#rapTitre').textContent = 'Mail de prospection — ' + e.nom; $('#rapTexte').textContent = r2.message; $('#dlgRapport').showModal(); };
+      colonne.append(bAudit, bMail);
+      li.append(s2, colonne); return li;
+    }));
+  } catch (e) { if (sectionCourante === 'seo') $('#seo-recherche-s').hidden = true; }
+}
+$('#seo-actualiser').onclick = () => chargerSeo(true);
+$('#seo-lancer').onclick = async () => {
+  const site = $('#seo-site').value.trim(), client = $('#seo-client').value.trim();
+  if (!site) { toast('Indique un site.', true); return; }
+  const base = seoOutilUrl();
+  if (!base) { toast("Aucun outil SEO lié (projet « Audit SEO »).", true); return; }
+  try { const r = await api('/api/ouvrir', { url: base + '/?u=' + encodeURIComponent(site) + '&c=' + encodeURIComponent(client) + '&go=1' }); if (!r.ok) toast(r.message, true); }
+  catch (e) { toast(e.message, true); }
+};
+
+// ---------- Agents IA : prospection d'artisans (Google Maps, email obligatoire, tri bon/pas bon, jamais de mail) ----------
+let agentsIASig = '';
+async function decideArtisan(id, decision, motif) {
+  try { await api('/api/agentsia/decider', { id, decision, motif }); agentsIASig = ''; chargerAgentsIA(); }
+  catch (e) { toast(e.message, true); }
+}
+async function chargerAgentsIA() {
+  try {
+    const r = await api('/api/agentsia/liste');
+    if (sectionCourante !== 'agentsia') return;
+    const sig = JSON.stringify(r);
+    if (sig === agentsIASig) return; agentsIASig = sig;
+    if (!r.ok) return;
+    $('#ai-compte').textContent = r.aTrier.length ? `(${r.aTrier.length})` : '';
+    $('#ai-trier').replaceChildren(...(r.aTrier.length ? r.aTrier.map((e) => {
+      const li = el('li'), s = el('span', 't');
+      s.append(`${e.nom} — ${e.metier || '?'} à ${e.ville || '?'}${e.tel ? ' · ' + e.tel : ''}${e.email ? ' · ' + e.email : ''}`);
+      if (e.note != null) s.append(el('br'), el('small', '', `★ ${e.note} (${e.avis || 0} avis)`));
+      if (e.site) s.append(el('br'), lien(e.site, e.site));
+      if (e.trouves && e.trouves.length) { const av = el('small', '', `⚠ ${e.trouves.join(', ')}`); av.style.color = 'var(--red)'; s.append(el('br'), av); }
+      const colonne = el('div'); colonne.style.cssText = 'display:flex;gap:6px';
+      const bBon = el('button', 'btn small gold', '✅ Bon'); bBon.onclick = () => decideArtisan(e.id, 'bon');
+      const bPas = el('button', 'btn small', '❌ Pas bon');
+      bPas.onclick = () => { const motif = prompt('Pourquoi pas bon ? (facultatif — sert à cibler les prochaines recherches)', ''); if (motif === null) return; decideArtisan(e.id, 'pas_bon', motif); };
+      colonne.append(bBon, bPas);
+      li.append(s, colonne); return li;
+    }) : [el('li', 'aide', 'Aucun artisan en attente pour l\'instant.')]));
+    const metiers = Object.keys(r.valides).sort();
+    $('#ai-valides').replaceChildren(...(metiers.length ? metiers.map((m) => {
+      const box = el('div'); box.style.marginBottom = '14px';
+      box.append(el('h3', '', `${m} (${r.valides[m].length})`));
+      const ul = el('ul', 'l');
+      ul.append(...r.valides[m].map((e) => {
+        const li = el('li'), s2 = el('span', 't');
+        s2.append(`${e.nom} à ${e.ville || '?'}${e.tel ? ' · ' + e.tel : ''}${e.email ? ' · ' + e.email : ''}`);
+        if (e.site) s2.append(el('br'), lien(e.site, e.site));
+        li.append(s2); return li;
+      }));
+      box.append(ul); return box;
+    }) : [el('p', 'aide', 'Aucun artisan validé pour l\'instant.')]));
+  } catch (e) { if (sectionCourante === 'agentsia') $('#ai-trier').replaceChildren(el('li', 'aide', e.message)); }
+}
+$('#ai-lancer').onclick = async () => {
+  const b = $('#ai-lancer'); b.disabled = true; b.textContent = 'Recherche…';
+  try { const r = await api('/api/agentsia/rechercher', { metiers: $('#ai-metiers').value.trim(), villes: $('#ai-villes').value.trim() }); toast(r.message, !r.ok); if (r.ok) { agentsIASig = ''; chargerAgentsIA(); } }
+  catch (e) { toast(e.message, true); }
+  b.disabled = false; b.textContent = 'Chercher';
+};
+
+$('#d-fermer').onclick = () => dlg.close();
+dlg.addEventListener('close', () => { ouvert = null; delete activite.detail; });
+const champ = (id, nom, lire) => { $(id).onchange = () => { const p = courant(); if (p) op({ op: 'modifier', id: p.id, champ: nom, valeur: lire ? lire() : $(id).value }, true); }; };
+champ('#d-nom', 'nom'); champ('#d-statut', 'statut'); champ('#d-type', 'type'); champ('#d-prio', 'priorite'); champ('#d-resume', 'resume'); champ('#d-outil', 'outil');
+function ajouter(idIn, idBtn, faire) {
+  const go = async () => { const v = $(idIn).value.trim(); if (!v) return; const r = await faire(v); if (r && r.ok) { $(idIn).value = ''; $(idIn).focus(); } };
+  $(idBtn).onclick = go; $(idIn).addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); go(); } });
+}
+ajouter('#d-tache-in', '#d-tache-ok', (t) => op({ op: 'tache_ajout', id: ouvert, texte: t }, true));
+ajouter('#d-note-in', '#d-note-ok', (t) => op({ op: 'note_ajout', id: ouvert, texte: t }, true));
+ajouter('#d-dossier-in', '#d-dossier-ok', (t) => op({ op: 'dossier_ajout', id: ouvert, chemin: t }).then((r) => { chargerDetail(); return r; }));
+$('#d-lien-ok').onclick = async () => { const r = await op({ op: 'lien_ajout', id: ouvert, titre: $('#d-lien-titre').value, url: $('#d-lien-url').value }); if (r.ok) { $('#d-lien-titre').value = ''; $('#d-lien-url').value = ''; } };
+$('#d-suppr').onclick = async () => {
+  const p = courant(); if (!p) return;
+  if (!confirm(`Supprimer définitivement le projet « ${p.nom} » (${p.taches.length} tâche(s), ${p.notes.length} note(s)) ?\nTes dossiers sur le disque ne sont pas touchés.`)) return;
+  const r = await op({ op: 'supprimer', id: p.id }); if (r.ok) dlg.close();
+};
+
+// ---------- Nouveau ----------
+$('#btnNouveau').onclick = () => { $('#n-nom').value = ''; $('#n-resume').value = ''; $('#dlgNouveau').showModal(); $('#n-nom').focus(); };
+$('#n-ok').onclick = async () => {
+  const r = await op({ op: 'creer', nom: $('#n-nom').value, type: $('#n-type').value, statut: $('#n-statut').value, priorite: $('#n-prio').value, resume: $('#n-resume').value });
+  if (r.ok) { $('#dlgNouveau').close(); if (r.projet) ouvrir(r.projet.id); }
+};
+$('#n-nom').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#n-ok').click(); });
+document.querySelectorAll('[data-fermer]').forEach((b) => { b.onclick = () => $('#' + b.dataset.fermer).close(); });
+
+// ---------- Importer ----------
+let cands = [];
+function compte() { $('#i-compte').textContent = `${document.querySelectorAll('#i-corps input[type=checkbox]:checked').length} coché(s) sur ${cands.length}`; }
+$('#btnImport').onclick = async () => {
+  $('#i-corps').replaceChildren(); $('#dlgImport').showModal();
+  try {
+    cands = (await api('/api/projets/candidats')).candidats;
+    $('#i-corps').replaceChildren(...cands.map((c, i) => {
+      const tr = el('tr'), td = () => el('td');
+      const cb = el('input'); cb.type = 'checkbox'; cb.checked = false; cb.dataset.i = i; cb.onchange = compte; cb.setAttribute('aria-label', 'Importer ' + c.nom);
+      const nom = el('input'); nom.type = 'text'; nom.value = c.nom; nom.dataset.nom = i; nom.maxLength = 80;
+      const ty = el('select'); remplirSelect(ty, data.types, c.type); ty.dataset.type = i;
+      const st = el('select'); remplirSelect(st, data.statuts, c.statut); st.dataset.statut = i;
+      const info = el('div', 'aide', `${c.racine.toLowerCase().includes('bureau') ? 'Bureau' : 'C:\\dev'}${c.git ? ' · git' : c.code ? ' · code' : ''}${c.modifie ? ' · modifié ' + ilya(c.modifie) : ''}`);
+      const t1 = td(); t1.append(cb); const t2 = td(); t2.append(nom, info); const t3 = td(); t3.append(ty); const t4 = td(); t4.append(st);
+      tr.append(t1, t2, t3, t4); return tr;
+    }));
+    if (!cands.length) { const tr = el('tr'), td = el('td', 'aide', 'Aucun nouveau dossier à proposer.'); tr.append(td); $('#i-corps').replaceChildren(tr); }
+    compte();
+  } catch (e) { toast(e.message, true); }
+};
+$('#i-code').onclick = () => { document.querySelectorAll('#i-corps input[type=checkbox]').forEach((c) => { c.checked = cands[c.dataset.i].code; }); compte(); };
+$('#i-rien').onclick = () => { document.querySelectorAll('#i-corps input[type=checkbox]').forEach((c) => { c.checked = false; }); compte(); };
+$('#i-ok').onclick = async () => {
+  const liste = [...document.querySelectorAll('#i-corps input[type=checkbox]:checked')].map((c) => {
+    const i = c.dataset.i;
+    return { chemin: cands[i].chemin, nom: document.querySelector(`[data-nom="${i}"]`).value, type: document.querySelector(`[data-type="${i}"]`).value, statut: document.querySelector(`[data-statut="${i}"]`).value };
+  });
+  if (!liste.length) return toast('Coche au moins un dossier.', true);
+  const r = await op({ op: 'importer', liste });
+  if (r.ok) $('#dlgImport').close();
+};
+
+// ---------- Téléphone : tiroir ☰ ----------
+const fermerMenu = () => { document.documentElement.classList.remove('menu-ouvert'); const b = $('#menuBtn'); if (b) b.setAttribute('aria-expanded', 'false'); };
+function basculerMenu() { const o = document.documentElement.classList.toggle('menu-ouvert'); $('#menuBtn').setAttribute('aria-expanded', String(o)); }
+$('#menuBtn').onclick = basculerMenu; $('#voile').onclick = fermerMenu;
+addEventListener('keydown', (e) => { if (e.key === 'Escape') fermerMenu(); });
+
+// ---------- Barre latérale : les sections du tableau de bord ----------
+const ICO_NAV = {
+  overview: '<rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="13" width="7.5" height="7.5" rx="1.8"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.8"/>',
+  projets: '<rect x="3.5" y="4" width="17" height="16" rx="2.5"/><path d="M9 4v16M14.5 9H20M14.5 13H20"/>',
+  agenda: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  business: '<rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M8.5 7V5.5a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2V7M3 12.5h18"/>',
+  trading: '<path d="M3.5 18l5-6 4 3 7-9"/><path d="M15 6h4.5v4.5"/>',
+  emploi: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5M11 8v6M8 11h6"/>',
+  journal: '<path d="M6 3.5h9.5L19 7v13.5H6z"/><path d="M15 3.5V7h4M9 11h7M9 14.5h7M9 18h4"/>',
+  musique: '<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>',
+  securite: '<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9.5 12l2 2 3-3.5"/>',
+  parametres: '<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>',
+  seo: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-5.5-5.5"/>',
+  agentsia: '<path d="M6.5 3.5h3l1.3 3.6-2 1.6a12.5 12.5 0 0 0 6 6l1.6-2 3.6 1.3v3c0 1-.8 1.8-1.8 1.7C10.3 18.5 5.5 13.7 4.8 6.3c-.1-1 .7-1.8 1.7-1.8z"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5"/>',
+  notes: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="14 3 14 9 20 9"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>',
+  automatisation: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82A1.65 1.65 0 0 0 3 13.09H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  retour: '<path d="M15 5l-7 7 7 7"/>',
+  presence: '<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/>',
+};
+const SECTIONS = [['overview', 'Overview'], ['projets', 'Projets'], ['notes', 'Notes'], ['agenda', 'Agenda'], ['business', 'Business'], ['emploi', 'Emploi'], ['trading', 'Trading'], ['mail', 'Mail'], ['seo', 'SEO'], ['agentsia', 'Agents IA'], ['automatisation', 'Automatisation'], ['journal', 'Journal'], ['musique', 'Musique'], ['securite', 'Sécurité'], ['parametres', 'Paramètres']];
+// Regroupement de la barre latérale (pour ne pas avoir 13 icônes à plat) : un groupe se déplie/replie, un seul ouvert à la fois.
+const GROUPES_NAV = [
+  { v: 'overview' },
+  { g: 'projets', lib: 'Projets', enfants: ['projets', 'automatisation'] },
+  { g: 'business', lib: 'Business', enfants: ['business', 'emploi', 'trading', 'seo', 'agentsia', 'mail'] },
+  { g: 'organisation', lib: 'Organisation', enfants: ['agenda', 'notes', 'journal'] },
+  { v: 'musique' },
+  { g: 'systeme', lib: 'Système', enfants: ['parametres', 'securite'] },
+];
+const groupeDe = (v) => (GROUPES_NAV.find((x) => x.enfants && x.enfants.includes(v)) || {}).g || null;
+let sectionCourante = 'overview';
+try { const o = localStorage.getItem('projets_section'); if (SECTIONS.some(([v]) => v === o)) sectionCourante = o; } catch {}
+let groupeOuvert = groupeDe(sectionCourante);
+if (!groupeOuvert) { try { const g = localStorage.getItem('projets_groupe'); if (GROUPES_NAV.some((x) => x.g === g)) groupeOuvert = g; } catch {} }
+const svg = (chemins) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${chemins}</svg>`;
+const CHEVRON = '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+function boutonSection(v, lib) {
+  const b = el('button', 'nav-btn'); b.type = 'button'; b.dataset.section = v; b.title = lib;
+  b.innerHTML = svg(ICO_NAV[v]);
+  b.append(el('span', 'lib', lib), el('span', 'pt'));
+  b.onclick = () => afficherSection(v);
+  return b;
+}
+function construireNav() {
+  const nav = $('#nav'), items = [];
+  for (const it of GROUPES_NAV) {
+    if (it.v) { items.push(boutonSection(it.v, (SECTIONS.find(([v]) => v === it.v) || [0, it.v])[1])); continue; }
+    const ouvert = groupeOuvert === it.g;
+    const gb = el('button', 'nav-btn groupe' + (ouvert ? ' ouvert' : '')); gb.type = 'button'; gb.dataset.groupe = it.g; gb.title = it.lib;
+    gb.innerHTML = svg(ICO_NAV[it.enfants[0]]) + CHEVRON;
+    gb.insertBefore(el('span', 'lib', it.lib), gb.querySelector('.chevron'));
+    gb.append(el('span', 'pt'));
+    gb.onclick = () => { groupeOuvert = ouvert ? null : it.g; try { localStorage.setItem('projets_groupe', groupeOuvert || ''); } catch {} construireNav(); };
+    items.push(gb);
+    if (ouvert) for (const v of it.enfants) { const b = boutonSection(v, (SECTIONS.find(([vv]) => vv === v) || [0, v])[1]); b.classList.add('enfant'); items.push(b); }
+  }
+  nav.replaceChildren(...items);
+  const pr = el('button', 'nav-btn'); pr.type = 'button'; pr.id = 'presBtn'; pr.title = 'Où es-tu ? (présence)'; pr.style.marginTop = 'auto';
+  pr.innerHTML = svg(ICO_NAV.presence); pr.append(el('span', 'lib', 'Présence'), el('span', 'pt')); pr.onclick = ouvrirPresence;
+  nav.append(pr);
+  const r = el('a', 'nav-btn retour'); r.style.marginTop = '0'; r.href = '/'; r.id = 'retourAtlas'; r.title = 'Retour à Atlas (remet la petite fenêtre)';
+  r.innerHTML = svg(ICO_NAV.retour); r.append(el('span', 'lib', 'Atlas'));
+  nav.append(r);
+  for (const b of nav.querySelectorAll('.nav-btn[data-section]')) { if (b.dataset.section === sectionCourante) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }
+  appliquerBadges();
+}
+// Badges (nouvelles offres, trous du journal, alertes sécurité) : mis en cache ici (pas juste dans le DOM), car un groupe replié retire son enfant du DOM.
+let badgeEmploi = { n: 0 }, badgeJournal = { n: 0 }, badgeSecu = { n: 0, suspendu: false };
+function appliquerBadges() {
+  const set = (sel, cls, texte) => { const b = document.querySelector(sel); if (b) { b.className = 'pt' + (cls ? ' ' + cls : ''); b.textContent = texte || ''; } };
+  const etats = { emploi: badgeEmploi.n ? 'att' : '', journal: badgeJournal.n ? 'att' : '', securite: badgeSecu.n ? 'att' : (badgeSecu.suspendu ? 'ko' : '') };
+  const textes = { emploi: badgeEmploi.n ? String(badgeEmploi.n) : '', journal: badgeJournal.n ? String(badgeJournal.n) : '', securite: badgeSecu.n ? String(badgeSecu.n) : (badgeSecu.suspendu ? '!' : '') };
+  for (const v of Object.keys(etats)) set('.nav-btn[data-section="' + v + '"] .pt', etats[v], textes[v]);
+  const mb = $('#menuBtn'); if (mb) mb.dataset.alerte = badgeSecu.suspendu ? '2' : badgeSecu.n ? '1' : '0';
+  for (const it of GROUPES_NAV) {
+    if (!it.g) continue;
+    if (groupeOuvert === it.g) { set('.nav-btn[data-groupe="' + it.g + '"] .pt', '', ''); continue; }   // déplié : les enfants montrent déjà leur propre badge
+    let pire = '';
+    for (const v of it.enfants) { const e = etats[v]; if (e === 'ko') pire = 'ko'; else if (e === 'att' && pire !== 'ko') pire = 'att'; }
+    set('.nav-btn[data-groupe="' + it.g + '"] .pt', pire, pire === 'ko' ? '!' : '');
+  }
+}
+let musTimer = null, musTick = null, jourTimer = null, empTimer = null, tradTimer = null, mailTimer = null, autoTimer = null, overTimer = null, paramTimer = null, notesTimer = null, seoTimer = null, agentsIATimer = null;
+function afficherSection(s) {
+  if (!SECTIONS.some(([v]) => v === s)) s = 'projets';
+  sectionCourante = s; try { localStorage.setItem('projets_section', s); } catch {}
+  const g = groupeDe(s);
+  if (g && g !== groupeOuvert) { groupeOuvert = g; try { localStorage.setItem('projets_groupe', g); } catch {} construireNav(); }
+  const tm = $('#titreMobile'); if (tm) tm.textContent = (SECTIONS.find(([v]) => v === s) || [0, 'Projets'])[1];
+  fermerMenu();
+  for (const [v] of SECTIONS) { const d = $('#sec-' + v); if (d) d.hidden = v !== s; }
+  for (const b of $('#nav').querySelectorAll('.nav-btn[data-section]')) { if (b.dataset.section === s) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }
+  for (const [v, page] of [['agenda', 'agenda'], ['business', 'biz']]) {          // Agenda et Business : les mêmes écrans que dans Atlas, avec toute leur édition
+    if (s !== v) continue;
+    const f = $('#fr-' + v);
+    if (!f.getAttribute('src')) f.src = '/?plein=' + page; else { try { f.contentWindow.postMessage('rafraichir', location.origin); } catch {} }
+  }
+  clearInterval(musTimer); clearInterval(musTick); clearInterval(jourTimer); clearInterval(empTimer);
+  if (s === 'emploi') { chargerEmploi(); empTimer = setInterval(chargerEmploi, 30000); }
+  clearInterval(tradTimer); if (s === 'trading') { chargerTrading(); tradTimer = setInterval(chargerTrading, 8000); }
+  clearInterval(mailTimer); if (s === 'mail') { chargerMail(); mailTimer = setInterval(chargerMail, 5000); }
+  clearInterval(autoTimer); if (s === 'automatisation') { chargerAutomatisation(); autoTimer = setInterval(chargerAutomatisation, 4000); }
+  clearInterval(overTimer); if (s === 'overview') { chargerOverview(); overTimer = setInterval(chargerOverview, 30000); }
+  clearInterval(paramTimer); if (s === 'parametres') { chargerParametres(); paramTimer = setInterval(chargerParametres, 5000); }
+  clearInterval(notesTimer); if (s === 'notes') { chargerNotes(); notesTimer = setInterval(chargerNotes, 15000); }
+  clearInterval(seoTimer); if (s === 'seo') { chargerSeo(); chargerSeoRecherche(); seoTimer = setInterval(() => { chargerSeo(); chargerSeoRecherche(); }, 30000); }
+  clearInterval(agentsIATimer); if (s === 'agentsia') { chargerAgentsIA(); agentsIATimer = setInterval(chargerAgentsIA, 20000); }
+  if (s === 'journal') { chargerJournal(); jourTimer = setInterval(chargerJournal, 6000); }
+  if (s === 'musique') { chargerMusique(); musTimer = setInterval(chargerMusique, 4000); musTick = setInterval(tickMusique, 1000); }
+  if (s === 'securite') chargerSecurite();
+  $('#contenu').scrollTop = 0;
+}
+
+// ---------- Trading : compte DÉMO + étude des stratégies + exécuteur démo (règles fixes, garde-fous dans le code). ----------
+let trad = null, tradSig = '', tradExec = null;
+async function chargerTrading(force) {
+  try { trad = await api('/api/trading' + (force === true ? '?force=1' : '')); if (trad.executeur && trad.executeur.actif) { try { tradExec = await api('/api/trading/executeur'); } catch { tradExec = null; } } else tradExec = null; if (sectionCourante === 'trading') dessinerTrading(); } catch (e) { $('#trading').textContent = e.message; }
+}
+const num2 = (x, d = 2) => (x == null || Number.isNaN(Number(x)) ? '—' : Number(x).toLocaleString('fr-FR', { minimumFractionDigits: d, maximumFractionDigits: d }));
+async function lancerEtude() {
+  try { const r = await api('/api/trading/etude', {}); toast(r.ok ? "Étude lancée (5 à 10 minutes) : tu peux quitter cette page." : r.message, !r.ok); } catch (e) { toast(e.message, true); }
+  tradSig = ''; chargerTrading();
+}
+async function voirRapport(unite, symbole) {
+  try { const r = await api('/api/trading/rapport?unite=' + encodeURIComponent(unite) + (symbole ? '&symbole=' + encodeURIComponent(symbole) : '')); $('#rapTitre').textContent = `Rapport d'étude — ${symbole ? symbole.replace(/\.vx$/, '') + ' ' : ''}${unite}`; $('#rapTexte').textContent = r.ok ? r.texte : r.message; $('#dlgRapport').showModal(); } catch (e) { toast(e.message, true); }
+}
+async function execAction(chemin, corps, msg) {
+  try { const r = await api(chemin, corps || {}); toast((r.message || msg || 'Fait').replace(/^[^A-Za-zÀ-ÿ0-9]+/, '').split('\n')[0], r.ok === false); } catch (e) { toast(e.message, true); }
+  tradSig = ''; chargerTrading(true);
+}
+function dessinerExecuteur(v, b) {
+  const box = el('div'), d = v.dernier;
+  const st = el('div', 'sec-statut ' + (v.actif && !v.arret && !v.suspendu ? 'ok' : 'ko'));
+  st.append(el('div', 'v', !v.actif ? '⚪ Désactivé : Atlas ne passe aucun ordre' : v.arret ? "🛑 ARRÊTÉ (arrêt d'urgence) : aucune entrée" : v.suspendu ? '⏸ Atlas est suspendu : aucune nouvelle entrée' : '🟢 Activé : Atlas applique ses règles sur le compte démo'));
+  if (v.actif && d) st.append(el('div', 'l', d.ok ? `Dernier passage ${new Date(d.t).toLocaleTimeString('fr-FR')} · ${(d.positions || []).length} position(s) de Atlas · résultat du jour ${num2(d.pnl_jour)} (limite de perte ${num2(d.perte_max_jour)}) · ${d.ordres_jour} ordre(s) aujourd'hui${d.entrees_autorisees ? '' : ' · entrées suspendues : ' + d.motif}` : 'Bloqué : ' + d.raison));
+  box.append(st);
+  const barre = el('div', 'ligne');
+  const on = el('button', 'btn ' + (v.actif ? '' : 'gold'), v.actif ? 'Désactiver' : "Activer l'exécuteur"); on.onclick = () => execAction('/api/trading/executeur/actif', { actif: !v.actif }); barre.append(on);
+  const stop = el('button', 'btn', '🛑 Tout fermer + arrêt'); stop.onclick = () => { if (confirm('Fermer toutes les positions ouvertes par Atlas (pas les tiennes) et bloquer toute nouvelle entrée ?')) execAction('/api/trading/executeur/arret'); }; barre.append(stop);
+  if (v.arret) { const re = el('button', 'btn gold', "▶ Lever l'arrêt"); re.onclick = () => execAction('/api/trading/executeur/reprendre'); barre.append(re); }
+  box.append(barre);
+  const bil = {}; for (const s of ((b && b.bilan && b.bilan.strategies) || [])) bil[s.id] = s;
+  for (const s of v.strategies) {
+    const l = el('div', 'suivi'); l.style.display = 'block'; const r = bil[s.id];
+    l.append(el('div', '', `${s.statut === 'candidat' ? '✅' : '🧪'} ${s.nom} — ${s.lot} lot`), el('div', 'aide', `${s.statut === 'candidat' ? 'Candidat du laboratoire' : 'Exploration (non confirmée)'} · attendu : ${s.attendu}`));
+    if (r) l.append(el('div', 'aide', r.transactions ? `Résultats réels (90 j) : ${r.transactions} transaction(s), net ${num2(r.net)}, ${num2(r.gagnantes_pct, 1)} % gagnantes, facteur de profit ${r.facteur_de_profit == null ? '—' : num2(r.facteur_de_profit)}${r.transactions < 100 ? ' — trop peu pour conclure (il en faut 100 ou plus)' : ''}` : 'Pas encore de transaction.'));
+    box.append(l);
+  }
+  box.append(el('p', 'aide', `Garde-fous dans le code : compte démo uniquement · ton bouton « Trading Algo » · stop obligatoire · ${v.limites.positions_max} positions max · ${v.limites.ordres_max_jour} ordres/jour max · arrêt si la perte du jour dépasse ${v.limites.perte_max_jour_pct} % · tes propres positions ne sont jamais touchées.`));
+  return box;
+}
+function dessinerTrading() {
+  if (!trad) return;
+  const sig = JSON.stringify([trad.etat, trad.en_cours, trad.details, trad.executeur, tradExec]);
+  if (sig === tradSig && $('#trading').children.length > 1) return; tradSig = sig;
+  const parts = [], e = trad.etat || {};
+  const carte = el('div', 'sec-statut ' + (e.ok ? 'ok' : 'ko'));
+  if (e.ok) {
+    const c = e.compte;
+    carte.append(el('div', 'v', `✔ Compte DÉMO ${c.login} — ${c.serveur}`),
+      el('div', 'l', `Solde ${num2(c.solde)} ${c.devise} · équité ${num2(c.equite)} · profit flottant ${num2(c.profit_flottant)} · marge libre ${num2(c.marge_libre)} · levier 1:${c.levier}`),
+      el('div', 'l', e.positions.length ? `${e.positions.length} position(s) ouverte(s)` : 'Aucune position ouverte.'),
+      el('div', 'l', `Trading algorithmique du terminal : ${e.terminal.algo_trading_autorise ? 'ACTIVÉ' : 'désactivé'} — c'est TON verrou (bouton « Trading Algo » de MetaTrader). Atlas ne passe d'ordres que si l'exécuteur ci-dessous est activé ; si tu coupes « Trading Algo », il n'en passe plus aucun.`));
+  } else carte.append(el('div', 'v', e.refus_compte_reel ? '⛔ Compte non démo : refus' : '⚠ MetaTrader indisponible'), el('div', 'l', e.raison || ''));
+  parts.push(carte);
+  if (e.ok && e.positions.length) {
+    const b = el('div');
+    for (const p of e.positions) { const l = el('div', 'suivi'); l.append(el('span', p.profit >= 0 ? 'ok' : 'ko', `${p.sens} ${p.volume} ${p.symbole}`), el('span', '', `ouverte à ${num2(p.prix_ouverture)} · actuel ${num2(p.prix_actuel)} · SL ${p.sl ? num2(p.sl) : '—'} · TP ${p.tp ? num2(p.tp) : "aucun (sortie sur signal ou délai)"}`), el('small', '', `profit ${num2(p.profit)}`)); b.append(l); }
+    parts.push(bloc('Positions ouvertes', b));
+  }
+  if (trad.executeur) parts.push(bloc('Exécuteur démo (Atlas trade tout seul, règles fixes)', dessinerExecuteur(trad.executeur, tradExec)));
+  const sec = el('div');
+  const barre = el('div', 'ligne');
+  const bl = el('button', 'btn gold', trad.en_cours ? '⏳ Étude en cours…' : '🔬 Lancer une nouvelle étude'); bl.disabled = !!trad.en_cours || !e.ok; bl.onclick = lancerEtude;
+  const ba = el('button', 'btn', '↻ Actualiser le compte'); ba.onclick = () => chargerTrading(true);
+  barre.append(bl, ba); sec.append(barre);
+  const d = trad.details || [];
+  if (!d.length) sec.append(el('p', 'aide', trad.en_cours ? "L'étude tourne : elle lit l'historique de l'or et du Bitcoin, teste 64 règles simples par marché avec les vrais coûts, et te donne un verdict." : "Aucune étude pour l'instant. Elle lit l'historique de l'or et du Bitcoin, teste 64 règles simples par marché avec les vrais coûts, et te dit s'il existe un avantage fiable."));
+  for (const x of d) {
+    const c = el('div', 'offre ' + (x.ok && x.candidats ? 'nouvelle' : ''));
+    if (!x.ok) { c.append(el('div', 'titre', `${(x.symbole || '').replace(/\.vx$/, '')} ${x.unite} — étude impossible`), el('div', 'meta', x.raison || '')); sec.append(c); continue; }
+    c.append(el('div', 'titre', `${(x.symbole || '').replace(/\.vx$/, '')} · bougies ${x.unite} — ${x.donnees.barres} du ${x.donnees.debut.slice(0, 10)} au ${x.donnees.fin.slice(0, 10)}`));
+    c.append(el('div', 'meta', `${x.n_tests} combinaisons essayées · coût d'un aller-retour ${num2(x.couts.cout_aller_retour)} $ par unité · buy & hold (test) ${num2(x.buy_hold.test)} $/once`));
+    const v = el('div', 'sec-statut ' + (x.candidats ? 'ok' : ''), ''); v.append(el('div', 'v', x.candidats ? `✅ ${x.candidats} candidat(s) — à confirmer en démo, ce n'est PAS une preuve` : '❌ Aucun avantage fiable trouvé après coûts'), el('div', 'l', x.verdict)); c.append(v);
+    for (const r of x.examines) {
+      const l = el('div', 'suivi'); l.style.display = 'block';
+      l.append(el('div', '', `${r.candidat ? '✅' : '❌'} ${r.strategie}`),
+        el('div', 'aide', `Entraînement : PF ${num2(r.entrainement.pf, 2)} · validation : PF ${num2(r.validation.pf, 2)} · TEST : PF ${num2(r.test.pf, 2)}, ${num2(r.test.net)} $/once, ${r.test.n} transactions, ${Math.round(r.test.gagnants * 100)} % gagnantes, baisse max ${num2(r.test.dd_max)} $ · sans tendance : PF ${num2(r.sans_tendance.pf, 2)} · coûts +50 % : PF ${num2(r.couts_x1_5.pf, 2)} · hasard : p = ${num2(r.p_hasard, 3)} (seuil ${num2(x.seuil_hasard, 3)})`));
+      if (!r.candidat && r.raisons_echec && r.raisons_echec.length) l.append(el('div', 'aide', 'Écartée : ' + r.raisons_echec.join(' ; ')));
+      c.append(l);
+    }
+    if (!x.examines.length) c.append(el('p', 'aide', "Aucune règle ne s'est confirmée sur la validation : rien n'a même été présenté au test."));
+    const br = el('button', 'btn small', '📄 Rapport complet'); br.onclick = () => voirRapport(x.unite, x.symbole); c.append(br);
+    sec.append(c);
+  }
+  parts.push(bloc('Étude des stratégies (or et Bitcoin)', sec));
+  parts.push(el('p', 'aide', "Comment lire ça : « PF » = facteur de profit (gains ÷ pertes, coûts inclus ; au-dessus de 1 = rentable). Une règle n'est retenue que si elle résiste à TOUS les contrôles : période de test jamais vue, prix sans tendance (l'or a beaucoup monté), coûts majorés de 50 % et test de hasard corrigé du nombre d'essais. « Aucun avantage » est le résultat normal pour des règles simples. L'exécuteur applique ces règles en démo pour mesurer la réalité : un candidat du laboratoire n'est pas une preuve, et les règles « exploration » (Bitcoin) n'ont PAS été confirmées : elles servent à récolter des résultats."));
+  $('#trading').replaceChildren(...parts);
+}
+
+// ---------- Mail : lecture de Proton (Brave, sur demande) + tri par le modèle local. Rien n'est envoyé nulle part, aucun mail n'est ouvert. ----------
+let mailEtat = null, mailSig = '';
+async function chargerMail() {
+  try { mailEtat = await api('/api/mail'); if (sectionCourante === 'mail') dessinerMail(); if (!mailEtat.en_cours) clearInterval(mailTimer); } catch (e) { $('#mail').textContent = e.message; }
+}
+async function lancerVerifMail() {
+  try { const r = await api('/api/mail/verifier', {}); if (!r.ok) return toast(r.message, true); toast('Vérification lancée (15 à 30 secondes)…'); mailTimer = setInterval(chargerMail, 3000); }
+  catch (e) { toast(e.message, true); }
+  mailSig = ''; chargerMail();
+}
+function dessinerMail() {
+  if (!mailEtat) return;
+  const sig = JSON.stringify(mailEtat);
+  if (sig === mailSig && $('#mail').children.length > 1) return; mailSig = sig;
+  const parts = [], d = mailEtat.dernier;
+  const carte = el('div', 'sec-statut ' + (d && d.ok ? 'ok' : d ? 'ko' : ''));
+  if (!d) carte.append(el('div', 'v', '📬 Aucune vérification pour l\'instant'), el('div', 'l', "Lit ta boîte Zoho (API officielle) et trie l'importance avec le modèle local : rien ne part vers Gemini ni Groq."));
+  else if (!d.ok) carte.append(el('div', 'v', '⚠ Vérification impossible'), el('div', 'l', d.raison || ''));
+  else {
+    carte.append(el('div', 'v', `✔ ${d.non_lus_total ?? '?'} mail(s) non lu(s) au total`),
+      el('div', 'l', `${d.aujourdhui} reçu(s) aujourd'hui · ${d.lus_cette_fois} lu(s) lors de cette vérification · ${new Date(d.t).toLocaleString('fr-FR')}`),
+      d.erreur_tri ? el('div', 'l', '⚠ Tri indisponible : ' + d.erreur_tri) : null);
+  }
+  parts.push(carte);
+  const lig = el('div', 'ligne'); lig.style.marginTop = '8px';
+  const b = el('button', 'btn gold', mailEtat.en_cours ? '⏳ Vérification en cours…' : '📬 Vérifier mes mails'); b.disabled = !!mailEtat.en_cours; b.onclick = lancerVerifMail;
+  lig.append(b); parts.push(lig);
+  if (d && d.ok && d.importants && d.importants.length) {
+    const box = el('div');
+    for (const m of d.importants) {
+      const c = el('div', 'offre nouvelle');
+      c.append(el('div', 'titre', m.sujet || '(sans sujet)'), el('div', 'meta', `${m.expediteur || ''} · ${m.date || ''} · ${m.categorie || ''}`));
+      box.append(c);
+    }
+    parts.push(bloc(`Mails importants (${d.importants.length})`, box));
+  } else if (d && d.ok) parts.push(el('p', 'aide', "Aucun mail jugé important cette fois."));
+  parts.push(el('p', 'aide', "Lecture seule : aucun mail n'est ouvert, marqué comme lu, envoyé ni supprimé. Une vérification se fait uniquement quand tu le demandes (jamais en tâche de fond), et seulement si Brave est fermé."));
+  $('#mail').replaceChildren(...parts.filter(Boolean));
+}
+
+// ---------- Automatisation : N8N en local, démarré à la demande (jamais en tâche de fond, la RAM du PC est limitée) ----------
+let autoEtat = null;
+async function chargerAutomatisation() {
+  try { autoEtat = await api('/api/automatisation'); if (sectionCourante === 'automatisation') dessinerAutomatisation(); }
+  catch (e) { $('#automatisation').textContent = e.message; }
+}
+async function autoDemarrer() {
+  try { const r = await api('/api/automatisation/demarrer', {}); if (!r.ok) return toast(r.message, true); toast(r.message); }
+  catch (e) { toast(e.message, true); }
+  chargerAutomatisation();
+}
+async function autoArreter() {
+  try { const r = await api('/api/automatisation/arreter', {}); toast(r.message); }
+  catch (e) { toast(e.message, true); }
+  const f = $('#autoFrame'); if (f) f.remove();
+  chargerAutomatisation();
+}
+function dessinerAutomatisation() {
+  const carte = $('#automatisation'); const e = autoEtat || {};
+  if (!e.installe) { carte.replaceChildren(el('p', 'aide', "N8N n'est pas installé.")); return; }
+  let bar = $('#autoBarre');
+  if (!bar) {
+    bar = el('div', 'sec-statut'); bar.id = 'autoBarre';
+    const zone = el('div'); zone.id = 'autoZone';
+    carte.replaceChildren(bar, zone);
+  }
+  const LIB = { arrete: '⚪ Arrêté', demarrage: '🟡 Démarrage…', en_marche: '🟢 En marche', erreur: '🔴 Erreur' };
+  const b = el('button', 'btn gold', e.statut === 'en_marche' ? 'Arrêter N8N' : e.statut === 'demarrage' ? '⏳ Démarrage…' : 'Démarrer N8N');
+  b.disabled = e.statut === 'demarrage'; b.onclick = e.statut === 'en_marche' ? autoArreter : autoDemarrer;
+  const ligne = el('div', 'l'); if (e.statut === 'erreur' && e.erreur) ligne.textContent = e.erreur;
+  bar.replaceChildren(el('div', 'v', LIB[e.statut] || e.statut), ligne, b);
+  const zone = $('#autoZone');
+  if (e.statut === 'en_marche') {
+    let f = $('#autoFrame');
+    if (!f) { f = el('iframe'); f.id = 'autoFrame'; f.title = 'N8N'; f.style.cssText = 'width:100%;height:75vh;border:0;border-radius:12px;margin-top:12px;background:#fff'; zone.replaceChildren(f); }
+    if (!f.getAttribute('src')) f.src = 'http://localhost:' + e.port + '/';
+  } else {
+    const fExist = $('#autoFrame'); if (fExist) fExist.remove();
+    zone.replaceChildren(el('p', 'aide', "Démarre N8N pour construire tes automatisations (veille d'emploi élargie, rapports groupés…). Ça prend 10 à 20 secondes, et ça ne tourne que pendant que c'est ouvert ici."));
+  }
+}
+
+// ---------- Overview : petit résumé de chaque section, cliquable pour aller au détail ----------
+async function chargerOverview() {
+  try { const o = await api('/api/overview'); if (sectionCourante === 'overview') dessinerOverview(o); }
+  catch (e) { $('#overview').textContent = e.message; }
+}
+function carteOverview(titre, versSection) {
+  const c = el('button', 'carte'); c.type = 'button'; c.onclick = () => afficherSection(versSection);
+  c.append(el('div', 'carte-tete', titre));
+  return c;
+}
+function dessinerOverview(o) {
+  const grille = $('#overview'); const parts = [];
+
+  const cTrading = carteOverview('📈 Trading démo', 'trading');
+  const tt = el('div', 'tuiles');
+  if (o.trading) {
+    const or = o.trading['XAUUSD.vx'], btc = o.trading['BTCUSD.vx'];
+    tt.append(tuile('Or (once)', or ? num2(or.bid) + ' $' : '—', or ? '' : 'ko'), tuile('Bitcoin', btc ? num2(btc.bid) + ' $' : '—', btc ? '' : 'ko'));
+  } else tt.append(tuile('État', 'MetaTrader indisponible', 'ko'));
+  cTrading.append(tt);
+  parts.push(cTrading);
+
+  const cProjets = carteOverview('📁 Projets', 'projets');
+  const tp = el('div', 'tuiles');
+  const nTerminer = o.projets ? o.projets.a_terminer.length : 0;
+  tp.append(tuile('À commencer', String(o.projets ? o.projets.a_commencer : 0)), tuile('À terminer', String(nTerminer), nTerminer ? 'att' : 'ok'));
+  cProjets.append(tp);
+  if (nTerminer) {
+    const l = el('div', 'apercu-liste');
+    for (const p of o.projets.a_terminer.slice(0, 4)) l.append(el('div', 'apercu-ligne', `${p.nom} · ${p.taches_ouvertes} tâche(s) ouverte(s)`));
+    cProjets.append(l);
+  }
+  parts.push(cProjets);
+
+  const cEmploi = carteOverview('💼 Emploi', 'emploi');
+  if (o.emploi) {
+    const te = el('div', 'tuiles'); te.append(tuile('Meilleur score', '★' + o.emploi.score, o.emploi.score >= 6 ? 'ok' : 'att'));
+    cEmploi.append(te, el('div', 'apercu-ligne', `${o.emploi.titre} · ${o.emploi.societe}`));
+  } else cEmploi.append(el('div', 'aide', "Aucune offre à candidater pour l'instant."));
+  parts.push(cEmploi);
+
+  const cAgenda = carteOverview('📅 Aujourd\'hui', 'agenda');
+  const nAgenda = (o.agenda || []).length;
+  const ta = el('div', 'tuiles'); ta.append(tuile('Évènement(s)', String(nAgenda), nAgenda ? 'att' : 'ok'));
+  cAgenda.append(ta);
+  if (nAgenda) {
+    const l = el('div', 'apercu-liste');
+    for (const e of o.agenda.slice(0, 5)) l.append(el('div', 'apercu-ligne', `${e.heure || 'journée'} · ${e.titre}`));
+    cAgenda.append(l);
+  }
+  parts.push(cAgenda);
+
+  const cMail = carteOverview('📬 Mail', 'mail');
+  if (o.mail && o.mail.verifie) {
+    const tm = el('div', 'tuiles'); tm.append(tuile('Important(s)', String(o.mail.nb_importants), o.mail.nb_importants ? 'att' : 'ok'));
+    cMail.append(tm);
+    if (o.mail.top) cMail.append(el('div', 'apercu-ligne', `${o.mail.top.sujet || '(sans sujet)'} · ${o.mail.top.expediteur || ''}`));
+  } else cMail.append(el('div', 'aide', "Pas encore vérifié : dis « vérifie mes mails »."));
+  parts.push(cMail);
+
+  const cSeo = carteOverview('🔍 SEO', 'seo');
+  if (o.seo && o.seo.total) {
+    const ts = el('div', 'tuiles'); ts.append(tuile('Prospects trouvés', String(o.seo.total)));
+    cSeo.append(ts);
+    const l = el('div', 'apercu-liste');
+    for (const p of o.seo.derniers) l.append(el('div', 'apercu-ligne', `${p.score != null ? p.score + '/100 · ' : ''}${p.nom}${p.metiers ? ' · ' + p.metiers.join(', ') + (p.ville ? ' à ' + p.ville : '') : ''}`));
+    cSeo.append(l);
+  } else cSeo.append(el('div', 'aide', "Aucune recherche encore : dis « cherche des [métier] à [ville] »."));
+  parts.push(cSeo);
+
+  const cMusique = carteOverview('🎵 Musique', 'musique');
+  if (o.musique) {
+    const row = el('div', 'apercu-musique');
+    if (o.musique.image) { const img = el('img'); img.src = o.musique.image; img.alt = ''; row.append(img); }
+    const txt = el('div');
+    txt.append(el('div', 'apercu-ligne', `${o.musique.en_lecture ? '▶' : '⏸'} ${o.musique.titre}`), el('div', 'apercu-ligne', o.musique.artistes));
+    row.append(txt);
+    cMusique.append(row);
+  } else cMusique.append(el('div', 'aide', 'Rien en ce moment.'));
+  parts.push(cMusique);
+
+  grille.replaceChildren(...parts);
+}
+
+// ---------- Notes : tout ce qu'Atlas retient tout seul en conversation (idées, décisions...), pour ne rien perdre de ce qui se dit à la voix ----------
+async function chargerNotes() {
+  try { const d = await api('/api/notes'); if (sectionCourante === 'notes') dessinerNotes(d.notes); }
+  catch (e) { $('#notes').textContent = e.message; }
+}
+function dessinerNotes(notes) {
+  const c = $('#notes');
+  if (!notes || !notes.length) { c.replaceChildren(el('p', 'aide', "Rien de noté pour l'instant : ce qu'Atlas retient en conversation (idées, décisions, tâches faites…) apparaîtra ici tout seul.")); return; }
+  const parts = [];
+  let jourCourant = '';
+  for (const n of notes) {
+    if (n.date !== jourCourant) {
+      jourCourant = n.date;
+      parts.push(el('h4', '', new Date(n.date + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })));
+    }
+    parts.push(el('div', 'apercu-ligne', '• ' + n.texte));
+  }
+  c.replaceChildren(...parts);
+}
+
+// ---------- Paramètres : micro utilisé, redémarrage de l'écoute, choix d'un micro précis ----------
+let microsCache = null;
+async function chargerParametres() {
+  try {
+    const etat = await api('/ecoute/etat');
+    if (!microsCache) microsCache = await api('/api/micros').catch(() => null);
+    if (sectionCourante === 'parametres') dessinerParametres(etat, microsCache);
+  } catch (e) { $('#parametres').textContent = e.message; }
+}
+async function redemarrerEcouteBtn() {
+  try { const r = await api('/api/ecoute/redemarrer', {}); toast(r.message); }
+  catch (e) { toast(e.message, true); }
+}
+async function choisirMicro(nom) {
+  try { const r = await api('/api/micro', { micro: nom }); toast(r.message); }
+  catch (e) { toast(e.message, true); }
+  setTimeout(chargerParametres, 1500);
+}
+async function basculerMicro(coupe) {
+  try { const r = await api('/api/micro/coupe', { coupe }); toast(coupe ? 'Micro coupé : plus de mot d\'éveil (jusqu\'à 10 s pour prendre effet).' : 'Micro réactivé (jusqu\'à 10 s pour prendre effet).'); }
+  catch (e) { toast(e.message, true); }
+  setTimeout(chargerParametres, 1500);
+}
+function dessinerParametres(etat, micros) {
+  const c = $('#parametres'); const parts = [];
+  const okEcoute = etat.vue >= 0 && etat.vue <= 40;
+  const carte = el('div', 'sec-statut ' + (etat.micro_coupe ? 'ko' : okEcoute && !etat.micro_muet ? 'ok' : 'ko'));
+  carte.append(el('div', 'v', etat.micro_coupe ? '⚪ Micro coupé manuellement (aucun mot d\'éveil)' : !okEcoute ? '🔴 Écoute arrêtée ou ne répond plus' : etat.micro_muet ? '🟠 Écoute active, mais micro muet (aucun son capté)' : '🟢 Écoute active'));
+  carte.append(el('div', 'l', `Micro actuellement utilisé : ${etat.micro || 'inconnu'}`));
+  parts.push(carte);
+
+  const lig = el('div', 'ligne'); lig.style.marginTop = '8px';
+  const bCoupe = el('button', 'btn ' + (etat.micro_coupe ? 'gold' : ''), etat.micro_coupe ? '🔇 Réactiver le micro' : '🎙️ Couper le micro');
+  bCoupe.onclick = () => basculerMicro(!etat.micro_coupe);
+  lig.append(bCoupe);
+  const b = el('button', 'btn', '🔄 Redémarrer l\'écoute'); b.onclick = redemarrerEcouteBtn;
+  lig.append(b); parts.push(lig);
+  parts.push(el('p', 'aide', "Couper le micro arrête juste la détection du mot d'éveil (fini les faux réveils) : les rappels programmés continuent d'être dits à voix haute."));
+
+  if (micros && micros.ok) {
+    const box = el('div');
+    for (const m of micros.micros) {
+      const ligneM = el('div', 'carte'); ligneM.style.cssText = 'flex-direction:row;align-items:center;justify-content:space-between;min-height:0;padding:12px 16px';
+      ligneM.append(el('div', '', m.nom + (m.defaut ? ' (par défaut Windows)' : '')));
+      const choisir = el('button', 'btn', m.nom === etat.micro ? '✓ En cours' : 'Utiliser celui-ci');
+      choisir.disabled = m.nom === etat.micro; choisir.onclick = () => choisirMicro(m.nom);
+      ligneM.append(choisir);
+      box.append(ligneM);
+    }
+    parts.push(bloc('Microphones disponibles', box));
+  } else if (micros) {
+    parts.push(el('p', 'aide', 'Impossible de lister les micros : ' + (micros.raison || 'erreur')));
+  }
+  parts.push(el('p', 'aide', "Choisir un micro ici force Atlas à toujours utiliser celui-là, même si Windows change de périphérique par défaut. L'écoute redémarre automatiquement après le choix (15 à 20 secondes)."));
+  c.replaceChildren(...parts);
+}
+
+// ---------- Emploi : offres à distance trouvées chaque jour par Atlas ----------
+let emp = null, empFiltre = 'nouvelles', empSig = '';
+async function chargerEmploi(leger) {
+  try {
+    emp = await api('/api/emploi');
+    badgeEmploi = { n: emp.nouvelles }; appliquerBadges();
+    if (leger !== true && sectionCourante === 'emploi') dessinerEmploi();
+  } catch { /* facultatif */ }
+}
+async function empAction(chemin, corps, msg) {
+  if (msg) toast(msg);
+  try { const r = await api(chemin, corps); if (r && r.message) toast(r.message.split('\n')[0].replace(/^[^A-Za-zÀ-ÿ0-9]+/, ''), r.ok === false); } catch (e) { toast(e.message, true); }
+  empSig = ''; chargerEmploi();
+}
+const ilYa = (t) => { const j = Math.floor((Date.now() - t) / 86400000); return !t ? '' : j < 1 ? "aujourd'hui" : j === 1 ? 'hier' : `il y a ${j} j`; };
+let candCourante = null;
+function boutonsCand(actifs) { for (const id of ['candCopier', 'candSauver', 'candRegen', 'candPostulee']) $('#' + id).disabled = !actifs; }
+async function ouvrirCandidature(o, regenerer) {
+  const dlg = $('#dlgCand');
+  candCourante = { id: o.id, url: o.url, titre: o.titre };
+  $('#candInfo').textContent = `${o.titre} — ${o.societe}`;
+  $('#candSujet').value = ''; $('#candTexte').value = ''; $('#candSignature').textContent = '';
+  $('#candEtat').textContent = regenerer ? 'Nouvelle rédaction en cours (10 à 40 secondes)…' : 'Préparation en cours (10 à 40 secondes)…'; boutonsCand(false);
+  if (!dlg.open) dlg.showModal();
+  try {
+    let r = await api('/api/emploi/candidature', { id: o.id, regenerer: !!regenerer });
+    if (!r.ok && r.adequation === false) {
+      if (!confirm(r.message + '\n\nLa préparer quand même ?')) { $('#candEtat').textContent = '⚠ ' + r.message; return; }
+      $('#candEtat').textContent = 'Préparation en cours (10 à 40 secondes)…'; r = await api('/api/emploi/candidature', { id: o.id, regenerer: !!regenerer, forcer: true });
+    }
+    if (!r.ok) { $('#candEtat').textContent = '⚠ ' + r.message; return; }
+    $('#candSujet').value = r.sujet; $('#candTexte').value = r.texte; $('#candSignature').textContent = r.signature;
+    $('#candEtat').textContent = (r.statut === 'postulee' ? '✔ Marquée comme envoyée. ' : '') + (r.fichier ? 'Brouillon enregistré dans ' + r.fichier : 'Brouillon prêt (pas enregistré en fichier).') + (r.projets && r.projets.length ? ' Projets cités : ' + r.projets.map((p) => p.nom).join(', ') + '.' : '');
+    boutonsCand(true);
+  } catch (e) { $('#candEtat').textContent = '⚠ ' + e.message; }
+  empSig = ''; chargerEmploi();
+}
+$('#dlgCand').addEventListener('close', () => {                    // tes corrections ne se perdent jamais : elles sont enregistrées à la fermeture
+  if (candCourante && !$('#candSauver').disabled && $('#candTexte').value.trim()) api('/api/emploi/candidature/maj', { id: candCourante.id, sujet: $('#candSujet').value, texte: $('#candTexte').value }).catch(() => {});
+});
+$('#candCopier').onclick = async () => {
+  const corps = $('#candTexte').value.trim(), sep = /(regards|cordialement|sincèrement|sincerely|cheers|salutations)[,.]?\s*$/i.test(corps) ? '\n' : '\n\n';   // « Best regards, » puis la signature juste dessous
+  const t = `Objet : ${$('#candSujet').value}\n\n${corps}${sep}${$('#candSignature').textContent}`;
+  try { await navigator.clipboard.writeText(t); toast('Copié : colle-le dans ton message.'); } catch { toast('Copie impossible : sélectionne le texte.', true); }
+};
+$('#candSauver').onclick = async () => {
+  if (!candCourante) return;
+  try { const r = await api('/api/emploi/candidature/maj', { id: candCourante.id, sujet: $('#candSujet').value, texte: $('#candTexte').value }); toast(r.ok ? 'Corrections enregistrées.' : r.message, !r.ok); } catch (e) { toast(e.message, true); }
+};
+$('#candRegen').onclick = () => { if (!candCourante) return; if (!confirm('Atlas va réécrire le brouillon : tes corrections seront remplacées. Continuer ?')) return; const o = (emp && emp.offres.find((x) => x.id === candCourante.id)) || { id: candCourante.id, url: candCourante.url, titre: candCourante.titre, societe: '' }; ouvrirCandidature(o, true); };
+$('#candOuvrir').onclick = () => { if (candCourante && /^https?:\/\//.test(candCourante.url)) window.open(candCourante.url, '_blank', 'noopener,noreferrer'); };
+$('#candPostulee').onclick = async () => {
+  if (!candCourante) return;
+  try { await api('/api/emploi/candidature/maj', { id: candCourante.id, sujet: $('#candSujet').value, texte: $('#candTexte').value }); const r = await api('/api/emploi/statut', { id: candCourante.id, statut: 'postulee' }); toast(r.ok ? 'Noté : candidature envoyée.' : r.message, !r.ok); } catch (e) { toast(e.message, true); }
+  $('#dlgCand').close(); empSig = ''; chargerEmploi();
+};
+async function analyserCv() {
+  toast('Atlas lit ton CV (10 à 40 secondes)…');
+  try { const r = await api('/api/emploi/analyse', {}); toast(r.ok ? 'Analyse terminée.' : r.message, !r.ok); } catch (e) { toast(e.message, true); }
+  empSig = ''; chargerEmploi();
+}
+function blocRegard() {
+  const a = emp.analyse, box = el('div', 'sec-statut ' + (a ? 'ok' : ''));
+  box.append(el('div', 'v', a ? `🧭 Le regard de Atlas sur mon CV — niveau estimé : ${a.niveau}` : '🧭 Le regard de Atlas sur mon CV'));
+  const lig = el('div', 'ligne'); lig.style.marginTop = '6px';
+  const b = el('button', 'btn gold', emp.analyse_en_cours ? '⏳ Analyse en cours…' : a ? "↻ Refaire l'analyse" : '🔍 Analyser mon CV'); b.disabled = !!emp.analyse_en_cours || !emp.cv_present; b.onclick = analyserCv; lig.append(b); box.append(lig);
+  if (!emp.cv_present) box.append(el('div', 'l', `Dépose ton CV (PDF) ici, sous le nom cv.pdf : ${emp.cv_chemin || ''}`));
+  else if (!a) box.append(el('div', 'l', "Atlas lit ton CV sur ce PC, retire ton e-mail et ton téléphone AVANT d'envoyer le texte à l'IA, puis te dit ce qui est bon, ce qui l'est moins, quels postes viser et lesquels éviter."));
+  if (a) {
+    box.append(el('div', 'l', a.resume));
+    const liste = (titre, l) => { if (!l || !l.length) return; const d = document.createElement('details'); const sm = document.createElement('summary'); sm.textContent = `${titre} (${l.length})`; d.append(sm); for (const x of l) d.append(el('div', 'aide', '• ' + x)); box.append(d); };
+    liste('✅ Points forts', a.points_forts); liste('⚠ Points faibles', a.points_faibles); liste('↔ Écarts entre mon CV et mon profil', a.ecarts_profil); liste('🎯 Postes à viser', a.postes_cibles);
+    liste('🚫 Mots à éviter dans un intitulé', a.postes_a_eviter); liste('🔎 Mots-clés de recherche', a.mots_cles); liste('📝 Conseils pour mon CV', a.conseils_cv); liste('✉ Conseils pour mes candidatures', a.conseils_candidature);
+    box.append(el('div', 'aide', `Analysé le ${new Date(a.le).toLocaleString('fr-FR')} · ${a.cv}${a.fichier ? ' · résumé dans ' + a.fichier : ''}. Les offres dont l'intitulé contient un de ces mots sont signalées « niveau trop haut » et Atlas ne prépare pas de candidature pour elles sauf si tu insistes.`));
+  }
+  return box;
+}
+function dessinerEmploi() {
+  if (!emp) return;
+  const sig = JSON.stringify([emp.offres.map((o) => [o.id, o.statut, o.brouillon, o.niveau_ko]), emp.derniere, emp.en_cours, empFiltre, emp.erreurs, emp.stats, emp.analyse, emp.analyse_en_cours, emp.cv_present]);
+  if (sig === empSig && $('#emploi').children.length > 1) return; empSig = sig;
+  const parts = [];
+  const tete = el('div', 'sec-statut ' + (Object.keys(emp.erreurs || {}).length ? '' : 'ok'));
+  const q = emp.derniere ? new Date(emp.derniere).toLocaleString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) : 'jamais';
+  tete.append(el('div', 'v', emp.actif ? `💼 Dernière veille : ${q}` : '💼 Veille désactivée (config.json > emploi > actif)'),
+    el('div', 'l', [emp.stats ? `${emp.stats.lues} offres lues, ${emp.stats.gardees} nouvelle${emp.stats.gardees > 1 ? 's' : ''} retenue${emp.stats.gardees > 1 ? 's' : ''}` : '', emp.actif ? `prochaine veille chaque jour à ${emp.heure}` : '', `sources : ${emp.sources.join(', ')}`].filter(Boolean).join(' · ')));
+  const pannes = Object.entries(emp.erreurs || {});
+  if (pannes.length) tete.append(el('div', 'l', '⚠ Injoignable : ' + pannes.map(([k, v]) => `${k} (${v})`).join(' · ')));
+  const lig = el('div', 'ligne'); lig.style.marginTop = '8px';
+  const bc = el('button', 'btn gold', emp.en_cours ? '⏳ Recherche en cours…' : '🔎 Chercher maintenant'); bc.disabled = !!emp.en_cours;
+  bc.onclick = () => empAction('/api/emploi/chercher', {}, 'Recherche en cours (quelques secondes)…');
+  lig.append(bc);
+  if (emp.nouvelles) { const bv = el('button', 'btn', `Tout marquer comme vu (${emp.nouvelles})`); bv.onclick = () => empAction('/api/emploi/vues', {}); lig.append(bv); }
+  const sel = el('select'); sel.setAttribute('aria-label', 'Filtrer les offres'); sel.style.maxWidth = '230px';
+  for (const [v, l] of [['nouvelles', 'Nouvelles'], ['interessantes', 'Intéressantes'], ['postulees', 'Postulées'], ['toutes', 'Toutes (sauf écartées)'], ['ecartees', 'Écartées']]) sel.append(new Option(l, v));
+  sel.value = empFiltre; sel.onchange = () => { empFiltre = sel.value; empSig = ''; dessinerEmploi(); }; lig.append(sel);
+  tete.append(lig); parts.push(tete);
+  parts.push(blocRegard());
+  const liste = emp.offres.filter((o) => empFiltre === 'nouvelles' ? o.statut === 'nouvelle' : empFiltre === 'interessantes' ? o.statut === 'interessante' : empFiltre === 'postulees' ? o.statut === 'postulee' : empFiltre === 'ecartees' ? o.statut === 'ecartee' : o.statut !== 'ecartee');
+  const box = el('div', 'offres');
+  if (!liste.length) box.append(el('p', 'aide', empFiltre === 'nouvelles' ? (emp.derniere ? "Rien de nouveau pour l'instant : les offres déjà vues sont dans « Toutes »." : 'Aucune recherche faite : touche « Chercher maintenant ».') : 'Aucune offre dans cette liste.'));
+  for (const o of liste.slice(0, 80)) {
+    const c = el('div', 'offre ' + o.statut);
+    const haut = el('div', 'haut'), ok = /^https?:\/\//.test(o.url);
+    const t = ok ? el('a', 'titre', o.titre) : el('span', 'titre', o.titre);
+    if (ok) { t.href = o.url; t.target = '_blank'; t.rel = 'noopener noreferrer'; t.onclick = () => { if (o.statut === 'nouvelle') api('/api/emploi/statut', { id: o.id, statut: 'vue' }).catch(() => {}); }; }
+    haut.append(t, el('span', 'chip score', '★ ' + o.score)); if (o.niveau_ko) haut.append(el('span', 'chip', '⚠ niveau trop haut : ' + o.niveau_ko)); if (o.statut === 'postulee') haut.append(el('span', 'chip score', '✔ postulée')); else if (o.brouillon) haut.append(el('span', 'chip', '✉ brouillon prêt')); c.append(haut);
+    c.append(el('div', 'meta', [o.societe, o.lieu || 'lieu non précisé', o.source, ilYa(o.date), o.salaire].filter(Boolean).join(' · ')));
+    if (o.raisons && o.raisons.length) { const ch = el('div', 'chips'); o.raisons.forEach((r) => ch.append(el('span', 'chip', r))); c.append(ch); }
+    if (o.extrait) c.append(el('div', 'aide', o.extrait));
+    const act = el('div', 'ligne');
+    const fav = el('button', 'btn small' + (o.statut === 'interessante' ? ' gold' : ''), o.statut === 'interessante' ? '★ Intéressante' : '☆ Intéressante'); fav.onclick = () => empAction('/api/emploi/statut', { id: o.id, statut: o.statut === 'interessante' ? 'vue' : 'interessante' });
+    const ec = el('button', 'btn small', o.statut === 'ecartee' ? '↩ Restaurer' : '✖ Écarter'); ec.onclick = () => empAction('/api/emploi/statut', { id: o.id, statut: o.statut === 'ecartee' ? 'vue' : 'ecartee' });
+    const cd = el('button', 'btn small gold', o.brouillon ? '✉ Voir ma candidature' : '✉ Ma candidature'); cd.onclick = () => ouvrirCandidature(o);
+    act.append(cd, fav, ec);
+    if (ok) { const v = el('a', 'btn small', '↗ Voir l\'offre'); v.href = o.url; v.target = '_blank'; v.rel = 'noopener noreferrer'; act.append(v); }
+    c.append(act); box.append(c);
+  }
+  parts.push(box);
+  parts.push(el('p', 'aide', "Atlas lit seulement des flux PUBLICS (RemoteOK, We Work Remotely, Remotive, Himalayas, Jobicy) : aucun compte, aucune connexion. Fiverr et Upwork n'ont pas de flux public (leurs offres sont réservées aux comptes connectés) : pour eux, active leurs alertes par e-mail. Les mots-clés, les exclusions, le niveau (junior), le score minimum et l'heure se règlent dans config.json > emploi. « Ma candidature » prépare un brouillon à relire : rien n'est envoyé sans toi."));
+  $('#emploi').replaceChildren(...parts);
+}
+
+// ---------- Musique (Spotify) ----------
+let mus = null, musT0 = 0, musDrag = false, musSig = '';
+const mmss = (ms) => { const t = Math.max(0, Math.round(ms / 1000)); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
+async function musCmd(cmd, valeur) {
+  try { const r = await api('/api/musique/commande', { cmd, valeur }); toast(r.message || (r.ok ? 'Fait.' : 'Refusé.'), !r.ok); } catch (e) { toast(e.message, true); }
+  setTimeout(chargerMusique, 700);                                               // Spotify met un instant à refléter la commande
+}
+async function chargerMusique() {
+  try { mus = await api('/api/musique/etat'); musT0 = Date.now(); dessinerLecteur(); dessinerListes(); }
+  catch (e) { $('#musLecteur').textContent = e.message; }
+}
+function dessinerLecteur() {
+  if (musDrag) return;
+  const box = $('#musLecteur'); box.replaceChildren();
+  if (!mus.ok) { box.append(el('p', 'aide', mus.message)); return; }
+  if (!mus.connecte) {
+    box.append(el('p', '', "Spotify n'est pas encore connecté à Atlas."));
+    const b = el('button', 'btn gold', 'Connecter Spotify');
+    b.onclick = () => { fetch('/spotify/ouvrir', { headers: { Authorization: 'Bearer ' + token } }).catch(() => {}); toast("La page d'autorisation Spotify s'ouvre dans Firefox sur le PC."); };
+    box.append(b); return;
+  }
+  const l = mus.lecture;
+  if (mus.avertissement) box.append(el('p', 'aide', mus.avertissement));
+  if (!l) {
+    box.append(el('p', '', 'Rien ne joue en ce moment.'));
+    const r = el('div', 'ligne'), o = el('button', 'btn', "Ouvrir l'appli Spotify"), p = el('button', 'btn gold', '▶ Reprendre');
+    o.onclick = () => musCmd('ouvrir'); p.onclick = () => musCmd('reprendre'); r.append(o, p); box.append(r); return;
+  }
+  const carte = el('div', 'mus-carte');
+  if (l.image) { const im = el('img'); im.src = l.image; im.alt = ''; im.referrerPolicy = 'no-referrer'; carte.append(im); }
+  const d = el('div', 'mus-info');
+  d.append(el('div', 'mus-titre', l.titre), el('div', 'mus-art', l.artistes + (l.album ? ' · ' + l.album : '')));
+  const barre = el('div', 'jauge'), bi = el('i'); bi.id = 'musBarre'; barre.append(bi); d.append(barre);
+  const tps = el('div', 'legende'); tps.id = 'musTemps'; d.append(tps);
+  const ctl = el('div', 'mus-ctl');
+  const bt = (txt, titre, f, cls) => { const b = el('button', 'btn ' + (cls || ''), txt); b.title = titre; b.onclick = f; return b; };
+  ctl.append(bt('⏮', 'Précédent', () => musCmd('precedent')), bt(l.en_lecture ? '⏸' : '▶', l.en_lecture ? 'Pause' : 'Lecture', () => musCmd(l.en_lecture ? 'pause' : 'reprendre'), 'gold'),
+    bt('⏭', 'Suivant', () => musCmd('suivant')), bt('🔀', 'Lecture aléatoire ' + (l.aleatoire ? '(activée)' : '(désactivée)'), () => musCmd('aleatoire', !l.aleatoire), l.aleatoire ? 'actif' : ''));
+  if (l.volume != null) {
+    const v = el('input'); v.type = 'range'; v.min = 0; v.max = 100; v.value = l.volume; v.className = 'mus-vol'; v.setAttribute('aria-label', 'Volume'); v.title = 'Volume ' + l.volume + ' %';
+    v.onpointerdown = () => { musDrag = true; }; v.onchange = () => { musDrag = false; musCmd('volume', Number(v.value)); };
+    ctl.append(v);
+  }
+  d.append(ctl); if (l.appareil) d.append(el('div', 'legende', 'Lu sur : ' + l.appareil));
+  carte.append(d); box.append(carte);
+  tickMusique();
+}
+function tickMusique() {
+  const l = mus && mus.lecture, b = $('#musBarre'); if (!l || !b) return;
+  const p = Math.min(l.duree, l.progression + (l.en_lecture ? Date.now() - musT0 : 0));
+  b.style.width = (l.duree ? 100 * p / l.duree : 0) + '%';
+  const t = $('#musTemps'); if (t) t.textContent = mmss(p) + ' / ' + mmss(l.duree);
+}
+function dessinerListes() {
+  const g = $('#musListes'), tete = $('#musListesTete');
+  if (!mus || !mus.connecte) { g.replaceChildren(); tete.hidden = true; musSig = ''; return; }
+  tete.hidden = false;
+  const q = $('#musRecherche').value.trim().toLowerCase(), l = (mus.playlists || []).filter((x) => !q || x.nom.toLowerCase().includes(q));
+  const sig = q + '|' + l.map((x) => x.uri).join(',');
+  if (sig === musSig) return; musSig = sig;                                       // pas de redessin (ni clignotement) si la liste n'a pas changé
+  g.replaceChildren(...l.map((x) => {
+    const c = el('button', 'carte pl'); c.type = 'button'; c.title = 'Lancer cette playlist';
+    if (x.image) { const im = el('img'); im.src = x.image; im.alt = ''; im.loading = 'lazy'; im.referrerPolicy = 'no-referrer'; c.append(im); }
+    c.append(el('h3', '', x.nom), el('div', 'sous', x.nb + ' titre(s)'));
+    c.onclick = () => musCmd('jouer_playlist', x.uri);
+    return c;
+  }));
+  if (!l.length) g.append(el('p', 'aide', 'Aucune playlist.'));
+}
+$('#musRecherche').oninput = dessinerListes;
+
+// ---------- Journal : les trous à compléter, les confirmations, le journal du jour ----------
+let jrn = null, jrnSig = '', jrnJour = '';
+async function chargerJournal(leger) {
+  try {
+    jrn = await api('/api/journal' + (jrnJour ? '?jour=' + jrnJour : '') + (leger === true ? (jrnJour ? '&' : '?') + 'leger=1' : ''));
+    badgeJournal = { n: jrn.trous.filter((t) => t.statut === 'vide').length }; appliquerBadges();
+    if (leger !== true && sectionCourante === 'journal') dessinerJournal();
+  } catch { /* facultatif */ }
+}
+async function jrnAction(chemin, corps) {
+  try { const r = await api(chemin, corps); toast(r.message || (r.ok ? 'Fait.' : 'Refusé.'), !r.ok); } catch (e) { toast(e.message, true); }
+  jrnSig = ''; chargerJournal();
+}
+// ----- Ce que Atlas apprend de toi : horaires de calme (nuit) et façon de répondre aux petits points -----
+const fmtH = (h) => { const x = ((h % 24) + 24) % 24; return String(Math.floor(x)).padStart(2, '0') + ':' + String(Math.round((x % 1) * 60)).padStart(2, '0'); };
+function boiteHabitudes(h) {
+  const box = el('div', 'habitudes'); box.id = 'habitudes'; box.append(H4('Ce que Atlas apprend de toi'));
+  if (!h.actif) { box.append(el('p', 'aide', "L'apprentissage est désactivé (config.json > habitudes > actif).")); return box; }
+  const n = h.nuit, a = h.actuel;
+  const nuit = el('div', 'suivi'); nuit.style.display = 'block';
+  if (!n.nuits) nuit.append(el('div', '', '🌙 Je commence à observer tes périodes de calme : aucune nuit complète pour l\'instant (il en faut 5 pour être fiable).'));
+  else nuit.append(el('div', '', `🌙 Calme habituel : ${fmtH(n.debut)} → ${fmtH(n.fin)} (≈ ${String(n.duree_h).replace('.', ',')} h) · ${n.nuits} nuit${n.nuits > 1 ? 's' : ''} observée${n.nuits > 1 ? 's' : ''}${n.declarees ? ` (dont ${n.declarees} annoncée${n.declarees > 1 ? 's' : ''} par toi)` : ''}${n.fiable ? '' : ' · pas encore fiable (5 minimum)'}`));
+  nuit.append(el('div', 'aide', `Appels bloqués en ce moment : de ${fmtH(a.debut)} à ${fmtH(a.fin)} (${a.personnalise ? 'réglé sur tes horaires' : 'réglage par défaut'}). Tu restes joignable si tu viens de parler à Atlas.`));
+  const lig = el('div', 'ligne'); lig.style.marginTop = '8px';
+  if (n.fiable) { const b = el('button', 'btn gold', `Pas d'appel de ${fmtH(n.appels_debut)} à ${fmtH(n.appels_fin)}`); b.title = "Règle les appels de nuit d'après tes horaires appris"; b.onclick = () => jrnAction('/api/habitudes/appliquer', {}); lig.append(b); }
+  if (a.personnalise) { const b = el('button', 'btn', 'Revenir au défaut (22:30 → 08:00)'); b.onclick = () => jrnAction('/api/habitudes/appliquer', { defaut: true }); lig.append(b); }
+  if (lig.children.length) nuit.append(lig);
+  box.append(nuit);
+  const p = h.points, pt = el('div', 'suivi'); pt.style.display = 'block';
+  if (!p.n) pt.append(el('div', '', '💬 Pas encore de « petit point » observé.'));
+  else {
+    pt.append(el('div', '', `💬 ${p.n} petit${p.n > 1 ? 's' : ''} point${p.n > 1 ? 's' : ''} : tu as répondu à ${p.taux} % ${p.delai_median_min != null ? '· en ' + (p.delai_median_min < 1 ? 'moins d\'1' : Math.round(p.delai_median_min)) + ' min (médiane)' : ''}`));
+    pt.append(el('div', 'aide', `Répondu sans relance : ${p.par_etape[0]} · après la 1re relance : ${p.par_etape[1]} · après la 2e : ${p.par_etape[2]} · après la 3e : ${p.par_etape[3]}. Matin ${p.periodes.matin.repondus}/${p.periodes.matin.n} · après-midi ${p.periodes.apres_midi.repondus}/${p.periodes.apres_midi.n} · soir ${p.periodes.soir.repondus}/${p.periodes.soir.n}.`));
+  }
+  box.append(pt);
+  box.append(el('p', 'aide', "Je ne vois que ce que tu fais avec Atlas et le clavier / la souris du PC : le calme n'est pas forcément du sommeil. Rien ne change sans que tu appuies sur un bouton."));
+  return box;
+}
+function dessinerJournal() {
+  const saisie = document.activeElement && document.activeElement.closest && document.activeElement.closest('#journal') && /^(TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
+  const brouillon = [...document.querySelectorAll('#journal .trou textarea')].some((t) => t.value.trim());
+  const sig = JSON.stringify([jrn.trous.map((t) => [t.id, t.statut]), jrn.suivis.map((x) => [x.id, x.statut, x.essai]), jrn.jour, jrn.texte.length, jrn.habitudes && [jrn.habitudes.nuit, jrn.habitudes.actuel, jrn.habitudes.points.n, jrn.habitudes.points.repondus]]);
+  if ((sig === jrnSig || saisie || brouillon) && $('#journal').children.length > 1) return; jrnSig = sig;      // pas de redessin pendant que tu écris
+  const parts = [];
+  const aCompleter = jrn.trous.filter((t) => t.statut === 'vide' || t.statut === 'attente');
+  const bt = el('div'); bt.append(H4(`À compléter${aCompleter.length ? ' (' + aCompleter.length + ')' : ''}`));
+  bt.append(el('p', 'aide', "Quand Atlas prend de tes nouvelles et que tu ne peux pas répondre (ni à lui, ni à ses appels), il garde un vide ici. Remplis-le quand tu peux : ce que tu écris va dans ton journal du jour et ton rapport."));
+  if (!aCompleter.length) bt.append(el('p', '', '✔ Rien à compléter.'));
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  for (const t of aCompleter) {
+    const c = el('div', 'trou');
+    c.append(el('div', 'quand', `${t.quand}${t.statut === 'attente' ? ' · relances en cours' : ''}${t.type === 'confirmation' ? ' · confirmation' : ''}`), el('div', 'q', t.question));
+    const ta = el('textarea'); ta.placeholder = "Ce que tu faisais, ce qui s'est passé…"; ta.maxLength = 2000; ta.setAttribute('aria-label', 'Complément pour ' + t.quand); c.append(ta);
+    const r = el('div', 'ligne');
+    const ok = el('button', 'btn gold', 'Enregistrer'); ok.onclick = () => { if (!ta.value.trim()) return toast('Écris ou dicte quelque chose.', true); jrnAction('/api/trous/remplir', { id: t.id, texte: ta.value }); };
+    r.append(ok);
+    if (SR) {
+      const mic = el('button', 'btn', '🎙 Dicter'); let rec = null;
+      mic.onclick = () => {
+        if (rec) { rec.stop(); return; }
+        rec = new SR(); rec.lang = 'fr-FR'; rec.continuous = true; rec.interimResults = false;
+        rec.onresult = (e) => { for (let i = e.resultIndex; i < e.results.length; i++) if (e.results[i].isFinal) ta.value = (ta.value + ' ' + e.results[i][0].transcript).trim(); };
+        rec.onend = () => { rec = null; mic.textContent = '🎙 Dicter'; mic.classList.remove('actif'); };
+        rec.onerror = () => { toast('Dictée indisponible ici : écris le texte.', true); };
+        rec.start(); mic.textContent = '⏹ Arrêter'; mic.classList.add('actif');
+      };
+      r.append(mic);
+    }
+    const ig = el('button', 'btn', 'Ignorer'); ig.title = 'Ce moment ne compte pas'; ig.onclick = () => jrnAction('/api/trous/ignorer', { id: t.id }); r.append(ig);
+    c.append(r); bt.append(c);
+  }
+  parts.push(bt);
+  if (jrn.suivis.length) {
+    const box = el('div'); box.append(H4('Confirmations (médicament…)'));
+    for (const x of jrn.suivis) {
+      const l = el('div', 'suivi'), ic = x.statut === 'confirme' ? ['✔ Confirmé', 'ok'] : x.statut === 'echec' ? ['✖ Non confirmé', 'ko'] : ['⏳ En cours', 'att'];
+      l.append(el('span', ic[1], ic[0]), el('span', '', x.texte), el('small', '', `${x.quand} · ${x.essai}/${x.max} essai(s)`)); box.append(l);
+    }
+    parts.push(box);
+  }
+  if (jrn.habitudes) parts.push(boiteHabitudes(jrn.habitudes));
+  const rempli = jrn.trous.filter((t) => t.statut === 'rempli').slice(0, 8);
+  if (rempli.length) {
+    const box = el('div'); box.append(H4('Complétés récemment'));
+    for (const t of rempli) { const l = el('div', 'suivi'); l.append(el('span', 'ok', '✔'), el('span', '', t.rempli), el('small', '', `${t.quand} · « ${t.question.slice(0, 50)} »`)); box.append(l); }
+    parts.push(box);
+  }
+  const bj = el('div'), sel = el('select'); sel.style.maxWidth = '220px'; sel.setAttribute('aria-label', 'Jour du journal');
+  jrn.jours.forEach((j) => sel.append(new Option(j === new Date().toISOString().slice(0, 10) || j === jrn.jour && !jrnJour ? j + ' (aujourd\'hui)' : j, j)));
+  if (!jrn.jours.includes(jrn.jour)) sel.append(new Option(jrn.jour, jrn.jour));
+  sel.value = jrn.jour; sel.onchange = () => { jrnJour = sel.value; jrnSig = ''; chargerJournal(); };
+  const tete = el('div', 'ligne'); tete.append(H4('Journal du jour'), sel); tete.style.justifyContent = 'space-between';
+  bj.append(tete, jrn.texte.trim() ? Object.assign(el('pre', 'jtxt'), { textContent: jrn.texte.trim() }) : el('p', 'aide', 'Rien de noté ce jour-là.'));
+  parts.push(bj);
+  $('#journal').replaceChildren(...parts);
+}
+
+// ---------- Présence : où es-tu ? ----------
+let pres = null, sessionTel = null;
+const PRES_LIBELLES = { devant_pc: ['💻 Devant le PC', 'ok'], incertain: ['🏠 Chez toi, probablement devant le PC', 'ok'], maison_hors_pc: ['🏠 Chez toi, pas devant le PC', 'ok'], absent: ['🚶 Parti', 'ko'], inconnu: ['❔ Inconnu (aucun signal de l\'iPhone)', ''] };
+async function chargerPresence() {
+  try {
+    pres = await api('/api/presence');
+    const b = document.querySelector('#presBtn .pt'); if (b) { b.className = 'pt' + (pres.etat === 'absent' ? ' ko' : pres.etat === 'inconnu' ? '' : ' ok'); b.textContent = ''; }
+    const pb = $('#presBtn'); if (pb) pb.title = 'Présence : ' + (PRES_LIBELLES[pres.etat] || [pres.etat])[0];
+    if ($('#dlgPres').open) { dessinerPresence(); chargerTelephone(); }
+  } catch { /* facultatif */ }
+}
+// ----- Mon iPhone : dernière position connue (envoyée par OwnTracks ou un Raccourci) -----
+let tel = null;
+const dureeFr = (s) => (s < 90 ? `${s} s` : s < 5400 ? `${Math.round(s / 60)} min` : s < 129600 ? `${Math.round(s / 3600)} h` : `${Math.round(s / 86400)} j`);
+async function chargerTelephone() { try { tel = await api('/api/telephone'); dessinerTelephone(); } catch { /* facultatif */ } }
+function dessinerTelephone() {
+  if (!tel) return;
+  const box = $('#telEtat'), t = tel.position, m = tel.maison;
+  $('#telCarte').hidden = !t; $('#telMaison').textContent = m ? '🏠 Redéfinir la maison ici' : '🏠 Ma maison est ici';
+  if (!t) {
+    box.className = 'sec-statut'; box.replaceChildren(el('div', 'v', '❔ Aucune position reçue'), el('div', 'l', "Installe l'application OwnTracks (guide ci-dessous) pour que Atlas sache toujours où est ton iPhone."));
+    return;
+  }
+  const vieux = t.age_s > 2 * 3600, faible = t.batt != null && t.batt <= 15;
+  box.className = 'sec-statut ' + (vieux || faible ? 'ko' : t.age_s < 900 ? 'ok' : '');
+  const d = t.distance_maison_m;
+  box.replaceChildren(el('div', 'v', `📱 Position il y a ${dureeFr(t.age_s)}`),
+    el('div', 'l', [d != null ? (d <= ((m && m.rayon_m) || 150) ? `Dans la zone de la maison (≈ ${d} m du centre)` : `À ≈ ${d >= 1000 ? (d / 1000).toFixed(1) + ' km' : d + ' m'} de la maison`) : 'Maison non réglée (bouton « Ma maison est ici », chez toi)',
+      t.prec != null ? `précision ±${t.prec} m` : '', t.batt != null ? `🔋 ${t.batt} %${faible ? ' (faible)' : ''}` : ''].filter(Boolean).join(' · ')));
+  if (vieux) box.append(el('div', 'l', "⚠ Position ancienne : iPhone éteint, sans réseau, ou OwnTracks fermé ? Essaie « Localiser » (Apple) : il garde la dernière position même à la batterie vide."));
+}
+// Carte : intégrée à l'interface (OpenStreetMap, sans compte). Se rafraîchit toute seule tant qu'elle est ouverte.
+let carteMinuteur = 0, carteVue = '';
+function urlCarte(t) {
+  const d = Math.max(0.0015, ((t.prec || 30) * 4) / 111000);
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${(t.lon - d * 1.6).toFixed(6)},${(t.lat - d).toFixed(6)},${(t.lon + d * 1.6).toFixed(6)},${(t.lat + d).toFixed(6)}&layer=mapnik&marker=${t.lat},${t.lon}`;
+}
+function dessinerCarte() {
+  const t = tel && tel.position; if (!t) return;
+  const box = $('#carteEtat'), src = $('#telEtat'); box.className = src.className; box.replaceChildren(...[...src.children].map((c) => c.cloneNode(true)));
+  const cle = `${t.lat},${t.lon},${t.prec}`;
+  if (cle !== carteVue) { carteVue = cle; $('#carteFrame').src = urlCarte(t); }          // la carte ne se recharge que si la position a changé (pas de clignotement)
+}
+async function ouvrirCarte() {
+  if (!(tel && tel.position)) { toast("Aucune position reçue pour l'instant.", true); return; }
+  carteVue = ''; dessinerCarte(); $('#dlgCarte').showModal();
+  clearInterval(carteMinuteur); carteMinuteur = setInterval(async () => { if (!$('#dlgCarte').open) { clearInterval(carteMinuteur); return; } await chargerTelephone(); dessinerCarte(); }, 15000);
+}
+$('#dlgCarte').addEventListener('close', () => { clearInterval(carteMinuteur); $('#carteFrame').src = 'about:blank'; carteVue = ''; });
+$('#carteActu').onclick = async () => { await chargerTelephone(); dessinerCarte(); toast('Carte actualisée.'); };
+$('#carteExterne').onclick = () => { if (tel && tel.position) window.open(tel.position.carte, '_blank', 'noopener'); };
+// Page « Localiser » d'Apple : ne peut pas être affichée dans une autre page (interdit par Apple) : petite fenêtre d'application Edge, sur le PC ; ailleurs, simple lien.
+async function localiserApple() {
+  try { const r = await api('/api/telephone/localiser', {}); if (!r.ok) { if (/Réservé au PC/.test(r.message || '')) window.open('https://www.icloud.com/find', '_blank', 'noopener'); else toast(r.message || 'Impossible.', true); } else toast('Page « Localiser » ouverte : touche « Lire un son ».'); }
+  catch (e) { toast(e.message, true); }
+}
+$('#telCarte').onclick = ouvrirCarte;
+$('#telSonner').onclick = localiserApple; $('#carteSonner').onclick = localiserApple;
+$('#telMaison').onclick = async () => {
+  if (!confirm("Ton iPhone est bien chez toi, là, maintenant ?\n\nSa position actuelle deviendra le centre de ta maison (rayon 150 m).")) return;
+  try { const r = await api('/api/telephone/maison', { rayon_m: 150 }); toast(r.ok ? 'Maison enregistrée.' : r.message, !r.ok); } catch (e) { toast(e.message, true); }
+  chargerTelephone(); chargerPresence();
+};
+const EVT_LIB = { arrive: "L'iPhone arrive à la maison", quitte: "L'iPhone quitte la maison", wifi_connecte: 'Wi-Fi de la maison connecté', wifi_deconnecte: 'Wi-Fi de la maison perdu', position: 'Position reçue' };
+function dessinerPresence() {
+  if (!pres) return;
+  const [lib, niv] = PRES_LIBELLES[pres.etat] || [pres.etat, ''];
+  const box = $('#presEtat'); box.className = 'sec-statut ' + (niv === 'ko' ? 'ko' : niv === 'ok' ? 'ok' : '');
+  box.replaceChildren(el('div', 'v', lib));
+  const detail = [pres.source === 'manuel' ? 'Ordre manuel' + (pres.jusqu ? ' jusqu\'à ' + new Date(pres.jusqu).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '') : 'Détection automatique',
+    { wifi_maison: 'iPhone sur le Wi-Fi de la maison', zone_maison: 'iPhone dans la zone de la maison (pas sur le Wi-Fi)', dehors: 'iPhone hors de la maison', inconnu: "iPhone : aucun signal reçu" }[pres.lieu],
+    pres.pc_inactif_s != null ? `PC : inactif depuis ${pres.pc_inactif_s < 90 ? pres.pc_inactif_s + ' s' : Math.round(pres.pc_inactif_s / 60) + ' min'}` : 'PC : activité inconnue'].filter(Boolean);
+  box.append(el('div', 'l', detail.join(' · ')));
+  const cb = $('#calmeEtat');
+  if (pres.calme) { cb.className = 'sec-statut ok'; cb.replaceChildren(el('div', 'v', `🌙 Calme jusqu'à ${new Date(pres.calme.jusqu).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} (${pres.calme.motif})`), el('div', 'l', "Pas de voix sur le PC, pas de prise de nouvelles, pas d'appel de relance.")); }
+  else { cb.className = 'sec-statut'; cb.replaceChildren(el('div', 'v', '☀️ Inactif'), el('div', 'l', 'Atlas se comporte normalement.')); }
+  const regle = { devant_pc: "Les rappels sont dits sur le PC ; l'appel n'arrive que si tu ne réagis pas.", incertain: "Rappels dits sur le PC ; appel après une minute sans réaction.", maison_hors_pc: 'Rien à voix haute sur le PC (vie privée) : Telegram et appel directs, relances plus rapides.', absent: 'Rien à voix haute sur le PC : Telegram et appel directs, relances plus rapides.', inconnu: 'Comportement habituel : voix sur le PC, Telegram et appel.' }[pres.etat];
+  if (regle) box.append(el('div', 'l', '→ ' + regle));
+  $('#presHist').replaceChildren(...(pres.hist.length ? pres.hist : [{ t: 0, evt: '', source: '' }]).map((h) => {
+    const li = el('li'); li.append(el('span', 't', h.t ? `${new Date(h.t).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })} · ${EVT_LIB[h.evt] || h.evt.replace('manuel:', 'Ordre : ')} (${h.source})` : "Aucun signal pour l'instant.")); return li;
+  }));
+}
+function ligneCopie(texte) {
+  const d = el('div', 'copie'), c = el('code', '', texte), b = el('button', 'btn small', 'Copier');
+  b.onclick = async () => { try { await navigator.clipboard.writeText(texte); toast('Copié.'); } catch { toast('Copie impossible : sélectionne le texte.', true); } };
+  d.append(c, b); return d;
+}
+async function preparerGuide() {
+  if (!sessionTel) { try { const r = await fetch('/session'); if (r.ok) sessionTel = await r.json(); } catch { /* hors du PC */ } }
+  const base = ((sessionTel && sessionTel.url_telephone) || (pres && pres.url_telephone) || 'https://TON-PC.ton-reseau.ts.net').replace(/\/$/, '');
+  const e = (t, ...enfants) => { const li = el('li'); li.append(t, ...enfants); return li; };
+  // Sur iPhone, le corps "JSON" se remplit avec des CHAMPS (clé + valeur de type Texte) : on ne peut pas coller du JSON brut.
+  const evt = (nom) => { const d = el('div'); d.append(el('div', 'aide', 'Corps de la requête : JSON → « Ajouter un nouveau champ » → type Texte. Clé :'), ligneCopie('evenement'), el('div', 'aide', 'Valeur :'), ligneCopie(nom)); return d; };
+  $('#presEtapes').replaceChildren(
+    e("Sur l'iPhone : Réglages → Confidentialité et sécurité → Service de localisation → Raccourcis → « Toujours » + « Position exacte ». Ouvre aussi Tailscale et laisse-le connecté (comme pour ton raccourci Siri)."),
+    e("Ouvre l'app Raccourcis → onglet « Automatisation » → « + » → « Créer une automatisation personnelle »."),
+    e('1re automatisation, « Arrivée » : choisis le lieu = ta maison, « N\'importe quand » + « Exécuter immédiatement » → Suivant → touche « Créer un raccourci » (surtout pas ton raccourci « Atlas » : c\'est un autre) → « Ajouter une action » → cherche « Obtenir le contenu de l\'URL ». Règle-la ainsi :',
+      el('div', 'aide', 'URL :'), ligneCopie(base + '/presence'), el('div', 'aide', 'Méthode : POST · En-tête « Authorization » :'), ligneCopie('Bearer ' + token), evt('arrive'),
+      el('div', 'aide', 'Ensuite : touche « OK » (en haut à droite) pour enregistrer. Les autres automatisations : mêmes réglages, seule la valeur change.')),
+    e('2e automatisation, « Départ » (même lieu), même action avec ce corps :', evt('quitte')),
+    e('3e automatisation, « Wi-Fi » : réseau = celui de ta maison, « Est connecté » (même action), corps :', evt('wifi_connecte')),
+    e('4e automatisation, « Wi-Fi » : le même réseau, « N\'est plus connecté », corps :', evt('wifi_deconnecte')),
+    e("C'est tout. Test : coupe puis remets le Wi-Fi de l'iPhone, l'indicateur ci-dessus doit réagir dans les secondes qui suivent. Le Wi-Fi donne la précision « à quelques mètres du PC » ; l'arrivée / le départ couvrent le reste (4G / 5G)."));
+  guideOwnTracks(base);
+}
+function guideOwnTracks(base) {
+  const e = (t, ...enfants) => { const li = el('li'); li.append(t, ...enfants); return li; };
+  $('#otEtapes').replaceChildren(
+    e("App Store → « OwnTracks » (gratuite) → installe-la, ouvre-la et accepte la localisation « Toujours », « Position exacte » et l'actualisation en arrière-plan."),
+    e("Dans OwnTracks : Réglages → Mode → « HTTP ». (Les noms exacts peuvent varier un peu d'une version à l'autre : cherche l'option équivalente.)"),
+    e('Réglages → Configuration : URL, puis Authentification activée avec ces valeurs :',
+      el('div', 'aide', 'URL :'), ligneCopie(base + '/owntracks'), el('div', 'aide', 'Identifiant (UserID) :'), ligneCopie('youssef'),
+      el('div', 'aide', 'Mot de passe (le jeton de Atlas, ne le partage jamais) :'), ligneCopie(token), el('div', 'aide', 'Device ID :'), ligneCopie('iphone')),
+    e("Mode de localisation : « Significatif » pour commencer (économe : une position à chaque déplacement notable). « Déplacement » est plus précis mais consomme davantage la batterie."),
+    e("Régions → « + » → nom exact « maison » → position actuelle (chez toi), rayon 100 à 150 m. Ça donne des entrées / sorties fiables, en plus des Raccourcis."),
+    e("Test : dans OwnTracks, envoie ta position (bouton de localisation en haut). Le bloc « Mon iPhone » ci-dessus l'affiche en quelques secondes. Une fois chez toi, touche « Ma maison est ici »."),
+    e("Pour retrouver un iPhone perdu (sous un coussin, éteint...) : sur l'iPhone, Réglages → [ton nom] → Localiser → Localiser mon iPhone : active « Localiser en réseau » et « Envoyer la dernière position ». Sur ce PC, connecte-toi une fois à icloud.com/find en cochant « Faire confiance à ce navigateur » : sinon, avec l'iPhone perdu, tu ne recevras pas le code de vérification."));
+}
+async function presenceManuelle(mode) {
+  try { const r = await api('/api/presence/manuel', { mode }); toast(r.ok ? 'Noté.' : r.message, !r.ok); } catch (e) { toast(e.message, true); }
+  chargerPresence();
+}
+function ouvrirPresence() { fermerMenu(); dessinerPresence(); dessinerTelephone(); $('#dlgPres').showModal(); chargerPresence(); chargerTelephone(); preparerGuide(); }
+document.querySelectorAll('#dlgPres [data-mode]').forEach((b) => { b.onclick = () => presenceManuelle(b.dataset.mode); });
+document.querySelectorAll('#dlgPres [data-calme]').forEach((b) => {
+  b.onclick = async () => {
+    try { const r = await api('/api/calme', b.dataset.calme === 'fin' ? { fin: true } : { jusqu: b.dataset.calme }); toast(r.message ? r.message.replace(/^[^A-Za-zÀ-ÿ]+/, '') : 'Fait.', !r.ok); } catch (e) { toast(e.message, true); }
+    chargerPresence();
+  };
+});
+
+// ---------- Sécurité ----------
+let sec = null, secSig = '';
+const LIBELLES = { NOTE: 'Ajouter une note au carnet', RAPPEL: 'Créer un rappel', AGENDA_AJOUT: 'Ajouter un rendez-vous', AGENDA_MODIF: 'Modifier un rendez-vous', AGENDA_SUPPR: 'Supprimer un rendez-vous', PAUSE: 'Poser un jour de pause',
+  PROSPECT: 'Gérer les prospects', DOC: 'Créer devis et factures', APPEL: "T'appeler au téléphone", OUVRIR: 'Ouvrir une page dans Firefox', APP: 'Ouvrir une application', EMPLOI: "Chercher des offres d'emploi", CALME: 'Mode ne pas déranger', PRESENCE: 'Noter où tu es', TELEPHONE: 'Retrouver ton iPhone', SPOTIFY: 'Piloter Spotify', PERSO: 'Changer sa personnalité', NOM: 'Changer son nom',
+  PROJET_AJOUT: 'Créer un projet', PROJET_MODIF: 'Modifier un projet', TACHE_AJOUT: 'Ajouter une tâche', TACHE_FAIT: 'Cocher une tâche', PROJET_NOTE: 'Ajouter une note à un projet', PROJET_SUPPR: 'Supprimer un projet' };
+async function chargerSecurite() {
+  try { sec = await api('/securite/etat?n=60'); majBadgeSecu(); if (sectionCourante === 'securite') dessinerSecurite(); } catch { /* facultatif */ }
+}
+function majBadgeSecu() {
+  if (!sec) return;
+  badgeSecu = { n: sec.en_attente.length, suspendu: !!sec.suspendu }; appliquerBadges();
+}
+async function secAction(chemin, corps) {
+  try { const r = await api(chemin, corps); toast(r.message || (r.ok === false ? 'Refusé.' : 'Fait.'), r.ok === false); } catch (e) { toast(e.message, true); }
+  secSig = ''; chargerSecurite();
+}
+function dessinerSecurite() {
+  const sig = JSON.stringify([sec.apps_autorisees, sec.suspendu, sec.en_attente.map((x) => x.id), sec.dernieres[0] && sec.dernieres[0].t, sec.dernieres.length]);
+  if (sig === secSig && $('#securite').children.length > 1) return; secSig = sig;
+  const parts = [];
+  const st = el('div', 'sec-statut ' + (sec.suspendu ? 'ko' : 'ok'));
+  st.append(el('div', 'v', sec.suspendu ? '⛔ Actions de Atlas SUSPENDUES' : '✔ Actions de Atlas actives'),
+    el('div', 'l', sec.suspendu ? 'Atlas répond, mais ne déclenche plus rien tant que tu ne reprends pas.' : "Les actions libres s'exécutent (et sont notées au journal) ; les autres attendent ton accord."));
+  const bt = el('button', 'btn ' + (sec.suspendu ? 'gold' : 'danger'), sec.suspendu ? 'Reprendre les actions' : "Suspendre en urgence"); bt.onclick = () => secAction('/securite/suspendre', { suspendu: !sec.suspendu });
+  st.append(bt); parts.push(st);
+  if (sec.en_attente.length) {
+    const b = el('div'); b.append(H4('En attente de ton accord'));
+    for (const x of sec.en_attente) {
+      const c = el('div', 'conf'); c.append(el('strong', '', x.resume)); if (x.details) c.append(el('div', 'aide', x.details));
+      const r = el('div', 'ligne'), ok = el('button', 'btn gold', 'Confirmer'), no = el('button', 'btn', 'Refuser');
+      ok.onclick = () => secAction('/securite/confirmer', { id: x.id }); no.onclick = () => secAction('/securite/refuser', { id: x.id }); r.append(ok, no); c.append(r); b.append(c);
+    }
+    parts.push(b);
+  }
+  const libres = Object.entries(sec.niveaux).filter(([, n]) => n === 'libre').map(([k]) => LIBELLES[k] || k), conf = Object.entries(sec.niveaux).filter(([, n]) => n === 'confirmer').map(([k]) => LIBELLES[k] || k);
+  const v = el('div', 'verdict');
+  for (const [cls, titre, items, note] of [['marche', '✔ Atlas le fait seul', libres, "« Te téléphoner » et « ouvrir une page » demandent quand même ton accord si la réponse vient d'internet."], ['afaire', '⏳ Il attend ton accord', conf, 'Carte de confirmation dans Atlas et sur Telegram (jamais à la voix).'], ['eviter', '⛔ Jamais', ['Toute action inconnue', 'Lire ou envoyer un secret (clés, config, mots de passe, .env, .ovpn…)', 'Écrire un programme (.exe, .bat, .ps1…)', 'Agir en administrateur'], '']]) {
+    const c = el('div', 'vcol ' + cls); c.append(el('h5', '', titre)); const ul = el('ul'); items.forEach((x) => ul.append(el('li', '', x))); c.append(ul); if (note) c.append(el('div', 'legende', note)); v.append(c);
+  }
+  parts.push(bloc('Ce que Atlas peut faire', v));
+  const d = el('div', 'bloc-info');
+  d.append(el('div', '', 'Peut lire (noms de fichiers seulement) : ' + (sec.dossiers_lecture.length ? sec.dossiers_lecture.join('   ·   ') : 'aucun dossier')));
+  d.append(el('div', '', 'Peut écrire : ' + (sec.dossiers_ecriture.length ? sec.dossiers_ecriture.join('   ·   ') : "nulle part pour l'instant")));
+  d.append(el('div', 'aide', `${sec.nb_exclusions} exclusion(s) personnelle(s) et ${sec.nb_exceptions} exception(s) : elles se règlent à la main dans config.json (Atlas ne peut pas modifier ce fichier).`));
+  parts.push(bloc('Dossiers', d));
+  const ap = el('div');
+  ap.append(el('p', 'aide', "Applications que Atlas peut ouvrir sans te redemander (tu les as validées une fois). Les consoles, PowerShell et l'éditeur du registre ne s'ouvrent jamais."));
+  if (!(sec.apps_autorisees || []).length) ap.append(el('p', '', 'Aucune pour l\'instant : dis « ouvre la calculatrice » et valide.'));
+  for (const a of sec.apps_autorisees || []) {
+    const l = el('div', 'app-ligne'); l.append(el('span', '', '🖥️ ' + a.nom));
+    const b = el('button', 'btn small', 'Retirer'); b.onclick = () => secAction('/api/apps/oublier', { appid: a.appid, nom: a.nom }); l.append(b); ap.append(l);
+  }
+  parts.push(bloc('Applications autorisées', ap));
+  const j = el('div', 'journal');
+  if (!sec.dernieres.length) j.append(el('p', 'aide', 'Aucune action enregistrée.'));
+  for (const e of sec.dernieres) {
+    const lg = el('div', 'lg'), niv = /exécutée|confirmée et exécutée|reprises/.test(e.statut) ? 'ok' : /attente/.test(e.statut) ? 'att' : 'ko';
+    lg.append(el('span', '', new Date(e.t).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })), el('span', '', `${e.source} · ${LIBELLES[e.action] || e.action}`));
+    const w = el('span', niv, e.statut); if (e.resume) w.append(el('small', '', e.resume)); lg.append(w); j.append(lg);
+  }
+  parts.push(bloc('Journal des actions (60 dernières)', j));
+  $('#securite').replaceChildren(...parts);
+}
+construireNav();
+
+// ---------- Atlas intégré (PC, grand écran) ----------
+// Le chat de Atlas s'affiche à droite du tableau de bord ; la petite fenêtre Atlas est fermée par le serveur. "← Atlas" la remet (coin bas-droite) et ferme le tableau de bord.
+async function initPanneau() {
+  if (window.innerWidth < 1000) return;                       // téléphone / petite fenêtre : pas de panneau, le lien "← Atlas" est un lien normal
+  try { const r = await fetch('/session'); if (!r.ok) return; token = token || (await r.json()).token; } catch { return; }   // /session n'existe que depuis le PC lui-même
+  document.documentElement.classList.add('avec-jarvis');
+  const panneau = $('#jarvisPanel'), cadre = $('#jarvisFrame');
+  let cache = false; try { cache = localStorage.getItem('projets_panneau') === '0'; } catch {}
+  const afficher = (v) => { panneau.hidden = !v; if (v && !cadre.src) cadre.src = '/?integre=1'; try { localStorage.setItem('projets_panneau', v ? '1' : '0'); } catch {} };
+  afficher(!cache);
+  $('#btnPanneau').onclick = () => afficher(panneau.hidden);
+  // signe de vie : tant que cette page est ouverte, le serveur amène CETTE fenêtre devant (et non la petite fenêtre Atlas)
+  let version = null;
+  const battement = () => fetch('/projets/actif', { headers: { Authorization: 'Bearer ' + token } }).then((r) => r.text()).then((v) => {
+    if (version !== null && v !== version && !document.querySelector('dialog[open]')) location.reload();   // page mise à jour : rechargement (pas pendant que tu édites une fiche)
+    if (version === null) version = v;
+  }).catch(() => {});
+  battement(); setInterval(battement, 5000);
+  addEventListener('pagehide', () => { try { navigator.sendBeacon('/projets/quitte?t=' + encodeURIComponent(token)); } catch {} });
+  $('#retourAtlas').addEventListener('click', async (e) => {
+    e.preventDefault();
+    try { const r = await fetch('/projets/retour', { headers: { Authorization: 'Bearer ' + token } }); if (!r.ok) throw new Error(); } catch { location.href = '/'; }
+  });
+}
+
+$('#q').oninput = dessiner; $('#type').onchange = dessiner; $('#tri').onchange = dessiner;
+$('#btnActu').onclick = async () => { toast('Actualisation…'); await chargerExt(true); };
+(async () => {
+  if (!token) { try { const r = await fetch('/session'); if (r.ok) { token = (await r.json()).token; localStorage.setItem('jarvis_token', token); } } catch {} }
+  if (!token) { $('#resume').textContent = 'Ouvre cette page depuis l\'appli Atlas (ou avec le lien du téléphone).'; return; }
+  initPanneau();
+  const dem = location.hash.replace('#', '');                       // lien depuis Atlas : /projets#agenda, #presence...
+  if (dem === 'presence') { afficherSection(sectionCourante); ouvrirPresence(); }
+  else if (dem === 'carte') { afficherSection(sectionCourante); chargerTelephone().then(ouvrirCarte); }             // lien direct : la carte de l'iPhone
+  else afficherSection(SECTIONS.some(([v]) => v === dem) && dem !== 'fichiers' ? dem : sectionCourante);
+  chargerSecurite(); setInterval(chargerSecurite, 4000);
+  chargerPresence(); setInterval(chargerPresence, 8000);
+  chargerEmploi(true); setInterval(() => { if (sectionCourante !== 'emploi') chargerEmploi(true); }, 60000);      // pastille « nouvelles offres » sur Emploi
+  chargerJournal(true); setInterval(() => { if (sectionCourante !== 'journal') chargerJournal(true); }, 10000);      // pastille "à compléter" sur Journal       // pastille rouge/dorée sur "Sécurité" (confirmation en attente, actions suspendues)
+  await charger();
+  try { history.scrollRestoration = 'manual'; } catch {}
+  $('#contenu').scrollTop = 0; scrollTo(0, 0);                 // Edge peut restaurer la position de la fenêtre précédente : on repart toujours du haut
+  chargerExt();
+  setInterval(() => { if (!document.hidden) chargerExt(); }, 300000);
+  setInterval(() => { if (!document.hidden && !$('#dlgImport').open && !$('#dlgNouveau').open) charger(); }, 15000);
+})();
+</script>
+</body>
+</html>

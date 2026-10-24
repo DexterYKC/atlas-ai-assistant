@@ -1,0 +1,1152 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#131A2E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Atlas">
+<title>Atlas</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Chakra+Petch:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #131A2E;
+    --surface: #1C2440;
+    --line: #2C3658;
+    --gold: #E2B04A;
+    --gold-deep: #B8872C;
+    --gold-soft: rgba(226, 176, 74, 0.13);
+    --text: #EEF0F6;
+    --muted: #EEF0F6;
+    --red: #E0503F;
+    --red-soft: rgba(224, 80, 63, 0.12);
+    --display: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
+    --body: "Barlow", "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 400 17px/1.5 var(--body);
+    display: flex;
+    flex-direction: column;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  button:focus-visible, textarea:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+  /* En-tête */
+  header {
+    display: flex; align-items: center; gap: 12px;
+    padding: calc(env(safe-area-inset-top) + 12px) 16px 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .sigil { width: 30px; height: 30px; flex: none; }
+  .who { flex: 1; min-width: 0; }
+  .who h1 { margin: 0; font: 600 20px/1.1 var(--display); letter-spacing: 0.02em; }
+  .who p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
+  .who p.off { color: var(--red); }
+  .icon-btn {
+    width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line);
+    background: transparent; display: grid; place-items: center;
+  }
+  .icon-btn[aria-pressed="true"] { border-color: var(--gold); color: var(--gold); background: var(--gold-soft); }
+  .icon-btn svg { width: 22px; height: 22px; }
+
+  /* Fil */
+  /* Mes deux essais précédents n'ont pas marché : au lieu de deviner encore ce qui fait varier la hauteur, la barre est maintenant simplement invisible (le défilement, lui, marche toujours). */
+  main { flex: 1; overflow-y: auto; padding: 20px 16px 8px; scrollbar-width: none; -ms-overflow-style: none; }
+  main::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+  /* Barre de défilement : fine, fond transparent, discrète (dorée comme le reste de l'interface) */
+  html { color-scheme: dark; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; background: transparent; }
+  ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(226, 176, 74, 0.28); border-radius: 6px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(226, 176, 74, 0.55); }
+  ::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+  @supports not selector(::-webkit-scrollbar) { * { scrollbar-width: thin; scrollbar-color: rgba(226, 176, 74, 0.35) transparent; } }
+  .feed { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+  .msg { max-width: 86%; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .msg.moi {
+    align-self: flex-end; background: var(--gold-soft); border: 1px solid rgba(226, 176, 74, 0.35);
+    border-radius: 16px 16px 4px 16px; padding: 10px 14px;
+  }
+  .msg.jarvis { align-self: flex-start; padding: 2px 0 2px 14px; border-left: 2px solid var(--line); }
+  .msg.jarvis.alerte { border-left-color: var(--red); background: var(--red-soft); padding: 10px 14px; border-radius: 0 12px 12px 0; }
+  .msg.jarvis.plan { border-left-color: var(--gold); }
+  .msg .tag { display: block; font: 600 13px/1.3 var(--display); letter-spacing: 0.03em; margin-bottom: 4px; }
+  .alerte .tag { color: var(--red); }
+  .plan .tag, .rappel .tag { color: var(--gold); }
+  .msg time { display: block; font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .msg.moi time { text-align: right; }
+  .thinking { align-self: flex-start; color: var(--muted); font-size: 15px; padding-left: 16px; }
+  .empty { text-align: center; color: var(--muted); margin-top: 18vh; }
+  .empty strong { display: block; color: var(--text); font: 600 22px/1.3 var(--display); margin-bottom: 6px; }
+
+  /* Barre de saisie */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 12px 16px calc(env(safe-area-inset-bottom) + 12px);
+  }
+  .dock { max-width: 720px; margin: 0 auto; display: flex; align-items: flex-end; gap: 12px; }
+  textarea {
+    flex: 1; resize: none; max-height: 160px; min-height: 52px;
+    background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 14px;
+    padding: 14px 14px; font: 400 17px/1.4 var(--body);
+  }
+  textarea::placeholder { color: var(--muted); }
+  .status { max-width: 720px; margin: 0 auto 8px; font-size: 14px; line-height: 1.5; color: var(--gold); min-height: 44px; display: flex; align-items: center; }
+  .status:empty { display: none; }
+
+  /* Le bouton principal : un réacteur */
+  .reactor {
+    width: 64px; height: 64px; flex: none; border-radius: 50%; border: none; position: relative;
+    background: radial-gradient(circle at 50% 50%, #F4D48A 0 18%, var(--gold) 19% 44%, var(--bg) 45% 55%, var(--gold-deep) 56% 70%, #3A3220 71%);
+    box-shadow: 0 0 0 1px rgba(226, 176, 74, 0.5), 0 0 22px rgba(226, 176, 74, 0.28);
+    display: grid; place-items: center;
+  }
+  .reactor svg { width: 22px; height: 22px; color: #1A1406; position: relative; z-index: 1; }
+  .reactor .ico { display: none; }
+  .reactor[data-state="micro"] .i-mic,
+  .reactor[data-state="envoyer"] .i-send,
+  .reactor[data-state="stop"] .i-stop,
+  .reactor[data-state="attente"] .i-wait { display: block; }
+  .reactor[data-state="stop"] { background: radial-gradient(circle, #FF9C8C 0 18%, var(--red) 19% 44%, var(--bg) 45% 55%, #9E3025 56% 70%, #3A1C18 71%); box-shadow: 0 0 0 1px rgba(224, 80, 63, 0.6), 0 0 26px rgba(224, 80, 63, 0.45); }
+  .reactor[data-state="stop"]::after {
+    content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--red);
+    animation: pulse 1.2s ease-out infinite;
+  }
+  .reactor[data-state="attente"] .i-wait { animation: spin 1s linear infinite; }
+  .reactor:disabled { cursor: default; }
+  @keyframes pulse { from { transform: scale(0.92); opacity: 0.9; } to { transform: scale(1.25); opacity: 0; } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  /* Téléphone : l'en-tête n'a plus que le nom, la voix et ☰ ; agenda, business, projets, sécurité... sont dans le tiroir */
+  #menuBtn { display: none; position: relative; }
+  #menuBtn[data-alerte="1"]::after, #menuBtn[data-alerte="2"]::after { content: ""; position: absolute; top: 6px; right: 6px; width: 11px; height: 11px; border-radius: 50%; background: var(--gold); }
+  #menuBtn[data-alerte="2"]::after { background: var(--red); }
+  #tiroir { display: none; position: fixed; top: 0; bottom: 0; left: 0; width: min(84vw, 320px); z-index: 60; flex-direction: column; gap: 4px; overflow-y: auto; background: var(--bg); border-right: 1px solid var(--line);
+    padding: calc(env(safe-area-inset-top) + 14px) 12px calc(env(safe-area-inset-bottom) + 14px); transform: translateX(-105%); transition: transform .2s ease; }
+  #voile { display: none; position: fixed; inset: 0; z-index: 55; background: rgba(5, 8, 18, 0.6); }
+  .ti { position: relative; display: flex; align-items: center; gap: 16px; padding: 14px 12px; border-radius: 12px; border: 1px solid transparent; color: var(--muted); text-decoration: none; font-size: 19px; white-space: nowrap; }
+  .ti svg { width: 24px; height: 24px; flex: none; } .ti[aria-current="page"] { color: var(--gold); background: var(--gold-soft); border-color: rgba(226, 176, 74, 0.35); }
+  .ti.bas { margin-top: auto; } .ti .b { margin-left: auto; min-width: 22px; padding: 0 6px; height: 22px; line-height: 22px; text-align: center; border-radius: 11px; font-size: 13px; color: #1a1405; background: var(--gold); } .ti .b.ko { background: var(--red); color: #fff; }
+  @media (max-width: 480px) {
+    html:not(.integre) #menuBtn { display: grid; }
+    html:not(.integre) #phoneBtn, html:not(.integre) #agendaBtn, html:not(.integre) #bizBtn, html:not(.integre) #projBtn, html:not(.integre) #secBtn { display: none !important; }
+    html:not(.integre) #tiroir { display: flex; }
+    html.menu-ouvert #tiroir { transform: none; box-shadow: 10px 0 40px rgba(0, 0, 0, 0.6); } html.menu-ouvert #voile { display: block; }
+    header { gap: 10px; } .who h1, .who p { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  }
+  /* Intégré dans le tableau de bord (?integre=1) : le bouton Projets n'a plus de sens, on est déjà dedans */
+  html.integre #projBtn { display: none; }
+  html.plein header, html.plein footer, html.plein #feed { display: none !important; }
+  html.plein main { padding-top: 16px; }
+  html.plein .agenda, html.plein .biz { max-width: 900px; margin: 0 auto; }
+  html.integre .who p { display: none; } html.integre header { gap: 8px; } html.integre .icon-btn { width: 40px; height: 40px; }
+  @media (prefers-reduced-motion: reduce) {
+    .reactor[data-state="stop"]::after, .reactor[data-state="attente"] .i-wait { animation: none; }
+  }
+
+  /* Fenêtres */
+  dialog {
+    background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 18px;
+    padding: 22px; width: min(420px, calc(100vw - 32px));
+  }
+  dialog::backdrop { background: rgba(8, 11, 20, 0.7); }
+  dialog h2 { margin: 0 0 8px; font: 600 20px/1.2 var(--display); }
+  dialog p { margin: 0 0 14px; color: var(--muted); font-size: 15px; }
+  dialog input {
+    width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--text); font: 400 16px var(--body); margin-bottom: 14px;
+  }
+  .row { display: flex; gap: 10px; justify-content: flex-end; }
+  .btn { border-radius: 10px; padding: 10px 16px; border: 1px solid var(--line); background: transparent; }
+  .btn.primary { background: var(--gold); border-color: var(--gold); color: #1A1406; font-weight: 600; }
+  #qr { background: #fff; padding: 12px; border-radius: 12px; width: fit-content; margin: 0 auto 14px; }
+  #qr img, #qr canvas { display: block; }
+  .steps { margin: 0 0 14px; padding-left: 20px; color: var(--muted); font-size: 15px; }
+  .hidden { display: none !important; }
+
+  /* Agenda */
+  .agenda { max-width: 720px; margin: 0 auto; }
+  .day { margin-bottom: 22px; }
+  .day h2 { margin: 0 0 8px; font: 600 16px/1.3 var(--display); letter-spacing: 0.02em; color: var(--muted); }
+  .day.today h2 { color: var(--gold); }
+  .ev { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .ev:last-child { border-bottom: none; }
+  .ev .when { width: 64px; flex: none; font: 500 15px/1.2 var(--display); color: var(--gold); }
+  .ev .what { flex: 1; min-width: 0; }
+  .ev .what small { display: block; color: var(--muted); font-size: 13px; }
+  .ev.pause { background: var(--gold-soft); border-radius: 12px; padding: 12px; border-bottom: none; margin-bottom: 6px; }
+  .ev.rappel .when { color: var(--muted); }
+  .ev button { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: transparent; color: var(--muted); flex: none; }
+  .agenda .hint, .biz .hint { color: var(--muted); font-size: 15px; margin: 0 0 20px; }
+
+  /* Business */
+  .biz { max-width: 720px; margin: 0 auto; }
+  .money { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 26px; }
+  .money div { border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+  .money span { display: block; font-size: 13px; color: var(--muted); }
+  .money strong { font: 600 20px/1.3 var(--display); }
+  .money .due strong { color: var(--red); }
+  .money .play strong { color: var(--gold); }
+  .biz h2 { margin: 0 0 6px; font: 600 16px/1.3 var(--display); color: var(--muted); letter-spacing: 0.02em; }
+  .biz section { margin-bottom: 26px; }
+  .line { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .line:last-child { border-bottom: none; }
+  .line .what { flex: 1; min-width: 0; }
+  .line .what small { display: block; color: var(--muted); font-size: 13px; }
+  .line .amount { font: 500 15px/1.2 var(--display); white-space: nowrap; }
+  .stage { font-size: 12px; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+  .line select {
+    background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 10px;
+    padding: 8px; font: 400 14px var(--body); max-width: 118px;
+  }
+  .line .open { height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--gold); background: transparent; color: var(--gold); flex: none; }
+  .late { color: var(--red); }
+  .biz details { margin-bottom: 14px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .biz details .line { padding: 10px 14px; margin: 0; }
+  .biz summary { cursor: pointer; padding: 12px 14px; font: 600 14px/1.3 var(--display); list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .biz summary::-webkit-details-marker { display: none; }
+  .biz summary .n { color: var(--muted); font: 400 13px var(--body); }
+  .biz details[open] summary { border-bottom: 1px solid var(--line); }
+  .biz .rowbtns { display: flex; align-items: center; gap: 8px; }
+  .biz .urgent { border: 1px solid var(--red); background: var(--red-soft); border-radius: 14px; padding: 12px 14px; margin-bottom: 18px; }
+  .biz .urgent h3 { margin: 0 0 4px; font: 600 14px/1.3 var(--display); color: var(--red); }
+  .biz .urgent .line { border-bottom: 1px solid rgba(224, 80, 63, 0.25); }
+  .biz .urgent .line:last-child { border-bottom: none; }
+  .biz .urgent .btns { display: flex; gap: 6px; flex: none; }
+  .biz .urgent .btns button { height: 34px; padding: 0 10px; border-radius: 8px; font-size: 13px; border: 1px solid var(--line); background: transparent; color: var(--text); }
+  .biz .urgent .btns button.ok { border-color: var(--red); color: var(--red); }
+  .biz .autrement { border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; margin-bottom: 18px; }
+  .biz .autrement h3 { margin: 0 0 4px; font: 600 14px/1.3 var(--display); color: var(--text); }
+  .biz .autrement .line { border-bottom: 1px solid var(--line); }
+  .biz .autrement .line:last-child { border-bottom: none; }
+  .biz .autrement .btns { display: flex; gap: 6px; flex: none; }
+  .biz .autrement .btns button { height: 34px; padding: 0 10px; border-radius: 8px; font-size: 13px; border: 1px solid var(--line); background: transparent; color: var(--text); }
+  .line.doc { flex-wrap: wrap; row-gap: 8px; }
+  .line.doc .what { flex-basis: 100%; }
+  .line.doc .amount { margin-right: auto; }
+
+  /* Saisie manuelle */
+  .addbar { display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 18px; }
+  .clickable { cursor: pointer; }
+  dialog.big { max-height: calc(100dvh - 32px); overflow-y: auto; }
+  dialog label { display: block; margin: 0 0 4px; color: var(--muted); font-size: 13px; }
+  dialog select, dialog textarea {
+    width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--text); font: 400 16px var(--body); margin-bottom: 14px;
+  }
+  dialog textarea { min-height: 84px; resize: vertical; }
+  dialog .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  dialog .two > div { min-width: 0; }
+  dialog .err { color: var(--red); margin: 0 0 12px; }
+  .btn.danger { border-color: var(--red); color: var(--red); margin-right: auto; }
+
+  /* Sécurité : cartes de confirmation et journal */
+  .confirm { max-width: 720px; margin: 0 auto 8px; }
+  .confirm .card { border: 1px solid var(--gold); background: var(--gold-soft); border-radius: 14px; padding: 12px 14px; margin-bottom: 8px; }
+  .confirm .card p { margin: 6px 0 10px; overflow-wrap: anywhere; }
+  .confirm .card pre { white-space: pre-wrap; margin: 0 0 10px; font: 400 13px var(--body); color: var(--muted); max-height: 140px; overflow: auto; }
+  .seclog { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .seclog .st { grid-column: 1 / -1; color: var(--gold); font-size: 13px; }
+  .seclog small { grid-column: 1 / -1; color: var(--muted); overflow-wrap: anywhere; }
+  .icon-btn[data-attente="1"] { border-color: var(--gold); color: var(--gold); background: var(--gold-soft); }
+  .icon-btn[data-suspendu="1"] { border-color: var(--red); color: var(--red); background: var(--red-soft); }
+</style>
+</head>
+<body>
+
+<header>
+  <svg class="sigil" viewBox="0 0 32 32" aria-hidden="true">
+    <path fill="#E2B04A" fill-rule="evenodd" d="M16 5 L26.5 27 L21.9 27 L20.1 22.8 L11.9 22.8 L10.1 27 L5.5 27 Z M16 11.5 L13 19 L19 19 Z"/>
+  </svg>
+  <div class="who">
+    <h1 id="name">Atlas</h1>
+    <p id="state">Connexion…</p>
+  </div>
+  <button class="icon-btn hidden" id="phoneBtn" title="Connecter mon téléphone" aria-label="Connecter mon téléphone">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg>
+  </button>
+  <button class="icon-btn" id="agendaBtn" aria-pressed="false" title="Agenda" aria-label="Agenda">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
+  </button>
+  <button class="icon-btn" id="bizBtn" aria-pressed="false" title="Business" aria-label="Business">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M8.5 7V5.5a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2V7M3 12.5h18"/></svg>
+  </button>
+  <a class="icon-btn" id="projBtn" href="/projets" title="Tableau de bord des projets (s'ouvre en grand)" aria-label="Projets" style="color:inherit;text-decoration:none">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><path d="M9 4v16M14.5 9H20M14.5 13H20"/></svg>
+  </a>
+  <button class="icon-btn" id="secBtn" data-suspendu="0" data-attente="0" title="Sécurité : actions et confirmations" aria-label="Sécurité">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9.5 12l2 2 3-3.5"/></svg>
+  </button>
+  <button class="icon-btn" id="voiceBtn" aria-pressed="false" title="Réponses à voix haute" aria-label="Réponses à voix haute">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5v14l-4.5-4.5H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
+  </button>
+  <button class="icon-btn" id="menuBtn" type="button" aria-label="Menu" aria-expanded="false" data-alerte="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+</header>
+
+<main id="scroller">
+  <div class="agenda hidden" id="agenda">
+    <p class="hint">Touchez un rendez-vous pour le corriger, ou dites-le à Atlas : « Déplace le rendez-vous de jeudi à 16h », « Je prends ma journée vendredi ».</p>
+    <div class="addbar"><button class="btn primary" id="evAdd">+ Rendez-vous</button></div>
+    <div id="agendaList"></div>
+  </div>
+  <div class="biz hidden" id="biz">
+    <div class="money">
+      <div class="play"><span>En jeu (prospects)</span><strong id="enJeu">…</strong></div>
+      <div class="due"><span>Impayé</span><strong id="impaye">…</strong></div>
+    </div>
+    <p class="hint">Dites par exemple : « Nouveau prospect Karim, restaurant, trouvé sur Malt », « Fais un devis pour Karim : site vitrine 800 € », « Transforme le devis en facture ».</p>
+    <p class="hint">Touchez un prospect pour le corriger, ou utilisez les boutons ci-dessous.</p>
+    <div id="relancesUrgentes"></div>
+    <div id="aContacterAutrement"></div>
+    <div class="addbar"><button class="btn primary" id="prAdd">+ Prospect</button><button class="btn" id="docAdd">+ Devis / facture</button></div>
+    <section><h2>Prospects</h2><div id="prospects"></div></section>
+    <section><h2>Devis et factures</h2><div id="docs"></div></section>
+  </div>
+  <div class="feed" id="feed">
+    <div class="empty" id="empty"><strong>À vos ordres, Monsieur.</strong>Touchez le réacteur pour parler, ou écrivez.</div>
+  </div>
+</main>
+
+<footer>
+  <div class="confirm hidden" id="confirmBar" role="alert"></div>
+  <div class="status" id="status"></div>
+  <div class="dock">
+    <textarea id="input" rows="1" placeholder="Écrire à Atlas…" aria-label="Message"></textarea>
+    <input type="file" id="pdfFile" accept="application/pdf" hidden>
+    <button class="icon-btn" id="pdfBtn" aria-label="Envoyer un PDF (rapport SEO)" title="Envoyer un PDF (rapport SEO)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.4 11.1l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.2-8.2a3.5 3.5 0 0 1 5 5l-8.3 8.2a2 2 0 0 1-2.8-2.8l7.6-7.6"/></svg>
+    </button>
+    <button class="icon-btn hidden" id="cancelRec" aria-label="Annuler l'enregistrement" title="Annuler (rien n'est envoyé)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <button class="reactor" id="reactor" data-state="micro" aria-label="Parler">
+      <svg class="ico i-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg>
+      <svg class="ico i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg>
+      <svg class="ico i-stop" viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="7" width="10" height="10" rx="2"/></svg>
+      <svg class="ico i-wait" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 4a8 8 0 1 1-8 8"/></svg>
+    </button>
+  </div>
+</footer>
+
+<dialog id="loginDlg">
+  <h2>Connecter cet appareil</h2>
+  <p>Scannez le code affiché sur votre PC (bouton téléphone en haut de l'app), ou collez le jeton ici.</p>
+  <input id="tokenInput" autocomplete="off" placeholder="Jeton">
+  <div class="row"><button class="btn primary" id="tokenSave">Connecter</button></div>
+</dialog>
+
+<dialog id="phoneDlg">
+  <h2>Atlas sur votre téléphone</h2>
+  <div id="phoneReady">
+    <div id="qr"></div>
+    <ol class="steps">
+      <li>Activez Tailscale sur le téléphone.</li>
+      <li>Scannez ce code avec l'appareil photo.</li>
+      <li>Dans Safari : Partager, puis « Sur l'écran d'accueil ».</li>
+    </ol>
+    <p>Ce code donne accès à Atlas. Ne le montrez à personne.</p>
+  </div>
+  <p id="phoneMissing" class="hidden">Adresse du téléphone non réglée. Lancez « tailscale serve --bg 8765 », puis mettez l'adresse https affichée dans config.json, champ url_telephone, et relancez Atlas.</p>
+  <div class="row"><button class="btn" id="phoneClose">Fermer</button></div>
+</dialog>
+
+<dialog id="evDlg">
+  <h2 id="evH">Rendez-vous</h2>
+  <label for="evType">Type</label>
+  <select id="evType"><option value="rdv">Rendez-vous ou tâche</option><option value="pause">Jour de pause</option></select>
+  <label for="evTitre">Titre</label>
+  <input id="evTitre" maxlength="200" autocomplete="off">
+  <div class="two">
+    <div><label for="evDate">Date</label><input id="evDate" type="date"></div>
+    <div id="evHeureBox"><label for="evHeure">Heure (vide = journée)</label><input id="evHeure" type="time"></div>
+  </div>
+  <div id="evDureeBox"><label for="evDuree">Durée en minutes (facultatif)</label><input id="evDuree" type="number" min="0" step="5" inputmode="numeric"></div>
+  <p class="err hidden" id="evErr"></p>
+  <div class="row"><button class="btn danger hidden" id="evDel">Supprimer</button><button class="btn" id="evCancel">Annuler</button><button class="btn primary" id="evSave">Enregistrer</button></div>
+</dialog>
+
+<dialog id="prDlg" class="big">
+  <h2 id="prH">Prospect</h2>
+  <label for="prNom">Nom</label><input id="prNom" maxlength="100" autocomplete="off">
+  <div class="two">
+    <div><label for="prEnt">Entreprise</label><input id="prEnt" autocomplete="off"></div>
+    <div><label for="prSource">Source (Malt, LinkedIn…)</label><input id="prSource" autocomplete="off"></div>
+  </div>
+  <label for="prEtape">Étape</label>
+  <select id="prEtape"><option>contact</option><option>devis envoyé</option><option>négociation</option><option>gagné</option><option>perdu</option></select>
+  <div class="two">
+    <div><label for="prMontant">Montant</label><input id="prMontant" type="number" min="0" step="any" inputmode="decimal"></div>
+    <div><label for="prDevise">Devise</label><input id="prDevise" maxlength="3" placeholder="EUR"></div>
+  </div>
+  <label for="prRelance">Relance le</label><input id="prRelance" type="date">
+  <div class="two">
+    <div><label for="prSite">Site</label><input id="prSite" inputmode="url" placeholder="https://…"></div>
+    <div><label for="prEmail">Email</label><input id="prEmail" type="email" autocomplete="off"></div>
+  </div>
+  <label for="prNotes">Notes</label><textarea id="prNotes" maxlength="300"></textarea>
+  <p class="err hidden" id="prErr"></p>
+  <div class="row"><button class="btn danger hidden" id="prDel">Supprimer</button><button class="btn" id="prCancel">Annuler</button><button class="btn primary" id="prSave">Enregistrer</button></div>
+</dialog>
+
+<dialog id="docDlg" class="big">
+  <h2 id="docH">Devis ou facture</h2>
+  <div id="docTypeBox"><label for="docType">Type</label><select id="docType"><option value="devis">Devis</option><option value="facture">Facture</option></select></div>
+  <label for="docClient">Client</label><input id="docClient" maxlength="500" autocomplete="off">
+  <label for="docObjet">Objet</label><input id="docObjet" maxlength="500" autocomplete="off">
+  <div class="two">
+    <div><label for="docEch">Échéance</label><input id="docEch" type="date"></div>
+    <div><label for="docDevise">Devise</label><input id="docDevise" maxlength="3" placeholder="EUR"></div>
+  </div>
+  <label for="docLignes">Lignes : description ; quantité ; prix unitaire (une par ligne)</label>
+  <textarea id="docLignes" placeholder="Site vitrine 5 pages ; 1 ; 800"></textarea>
+  <label for="docNotes">Notes</label><textarea id="docNotes" maxlength="500"></textarea>
+  <p class="err hidden" id="docErr"></p>
+  <div class="row"><button class="btn danger hidden" id="docDel">Supprimer</button><button class="btn" id="docCancel">Annuler</button><button class="btn primary" id="docSave">Enregistrer</button></div>
+</dialog>
+
+<dialog id="secDlg" class="big">
+  <h2>Sécurité</h2>
+  <p id="secEtat"></p>
+  <div class="row" style="justify-content:flex-start; margin-bottom:14px"><button class="btn" id="secSuspend"></button></div>
+  <h2 style="font-size:16px">Dernières actions</h2>
+  <div id="secLog"></div>
+  <div class="row" style="margin-top:14px"><button class="btn" id="secClose">Fermer</button></div>
+</dialog>
+
+<div id="voile"></div>
+<aside id="tiroir" aria-label="Menu"></aside>
+<audio id="player" playsinline></audio>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+if (new URLSearchParams(location.search).get('integre')) document.documentElement.classList.add('integre');
+// ?plein=agenda|biz : l'écran de l'agenda ou du business seul, pour le centre du tableau de bord (pas de chat, pas de voix : ceux du panneau de droite suffisent)
+const plein = ['agenda', 'biz'].includes(new URLSearchParams(location.search).get('plein')) ? new URLSearchParams(location.search).get('plein') : '';
+if (plein) document.documentElement.classList.add('integre', 'plein');
+const $ = (s) => document.querySelector(s);
+const feedEl = $('#feed'), scroller = $('#scroller'), input = $('#input'), reactor = $('#reactor');
+const statusEl = $('#status'), stateEl = $('#state'), player = $('#player'), cancelBtn = $('#cancelRec');
+let micMuet = false;   // le micro du PC ne capte que du silence (signalé par l'écoute vocale)
+let pcVivant = false;   // l'écoute vocale du PC tourne : c'est ELLE qui parle pour les alertes et rappels (jamais deux voix)
+let pcEtat = 'repos', statusPc = false; // état de l'écoute "Hey Atlas" du PC : repos | ecoute | reflechit | parle
+
+let token = '';
+try { token = localStorage.getItem('jarvis_token') || ''; } catch {}
+const fromHash = new URLSearchParams(location.hash.slice(1)).get('t');
+if (fromHash) { token = fromHash; saveToken(); history.replaceState(null, '', location.pathname); }
+
+let voiceOn = false;
+try { voiceOn = localStorage.getItem('jarvis_voice') === '1'; } catch {}
+let lastT = 0, busy = false, rec = null, firstLoad = true, session = null;
+
+function saveToken() { try { localStorage.setItem('jarvis_token', token); } catch {} }
+
+async function api(path, opts = {}) {
+  const r = await fetch(path, { ...opts, headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' } });
+  if (r.status === 401) { $('#loginDlg').showModal(); throw new Error('Accès refusé'); }
+  return r;
+}
+
+/* ---------- Fil ---------- */
+const hidden = new Set(['[Point de contrôle]', '[Demande du plan du jour]', '[Point sur les projets dev]', '[Point de la journée]', '[Rapport de la journée]']);
+const tags = { alerte: 'Alerte', plan: 'Plan du jour', rappel: 'Rappel', point: 'Point', rapport: 'Rapport du jour' };
+
+function render(e) {
+  if (e.de === 'moi' && hidden.has(e.texte)) return;
+  $('#empty')?.remove();
+  const el = document.createElement('div');
+  el.className = `msg ${e.de} ${e.type || ''}`;
+  if (tags[e.type]) { const t = document.createElement('span'); t.className = 'tag'; t.textContent = tags[e.type]; el.append(t); }
+  const body = document.createElement('span');
+  body.textContent = e.de === 'moi' && /^\[Vocal/.test(e.texte) ? '🎙️ Message vocal' : e.texte;
+  el.append(body);
+  const time = document.createElement('time');
+  time.textContent = new Date(e.t).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  el.append(time);
+  feedEl.insertBefore(el, $('.thinking'));
+}
+function toBottom() { scroller.scrollTop = scroller.scrollHeight; }
+
+async function pullFeed() {
+  try {
+    const r = await api('/feed?since=' + lastT);
+    const data = await r.json();
+    $('#name').textContent = data.nom || 'Atlas';
+    document.title = data.nom || 'Atlas';
+    setOnline(true);
+    for (const e of data.items) {
+      render(e);
+      lastT = Math.max(lastT, e.t);
+      if (!firstLoad && e.de === 'jarvis' && (e.type === 'alerte' || e.type === 'rappel') && voiceOn && !(session && pcVivant)) speak(e.texte);   // sur le PC, l'écoute vocale les dit déjà : sinon deux voix en même temps
+    }
+    if (data.items.length) toBottom();
+    firstLoad = false;
+  } catch (err) {
+    if (err.message !== 'Accès refusé') setOnline(false);
+  }
+}
+function setOnline(ok) {
+  stateEl.textContent = ok ? 'En ligne' : 'Hors ligne. Le PC est-il allumé ?';
+  stateEl.classList.toggle('off', !ok);
+}
+
+/* ---------- Envoi ---------- */
+function thinking(on) {
+  $('.thinking')?.remove();
+  if (on) { const t = document.createElement('div'); t.className = 'thinking'; t.textContent = 'Atlas réfléchit…'; feedEl.append(t); toBottom(); }
+}
+function setReactor() {
+  cancelBtn.classList.toggle('hidden', !rec);
+  if (busy) return (reactor.dataset.state = 'attente', reactor.disabled = true, reactor.setAttribute('aria-label', 'Patientez'));
+  reactor.disabled = false;
+  if (rec) return (reactor.dataset.state = 'stop', reactor.setAttribute('aria-label', 'Envoyer le message vocal'));
+  const hasText = input.value.trim().length > 0;
+  // Atlas écoute, réfléchit ou parle sur le PC : le bouton devient un bouton rouge d'arrêt
+  if (!hasText && pcEtat !== 'repos') return (reactor.dataset.state = 'stop', reactor.setAttribute('aria-label', "Arrêter Atlas (annuler l'écoute)"));
+  reactor.dataset.state = hasText ? 'envoyer' : 'micro';
+  reactor.setAttribute('aria-label', hasText ? 'Envoyer' : 'Parler');
+}
+
+async function send(payload) {
+  busy = true; setReactor(); statusEl.textContent = '';
+  setTimeout(pullFeed, 400);
+  thinking(true);
+  try {
+    const r = await api('/ask?format=json', { method: 'POST', body: JSON.stringify({ ...payload, source: 'app', mode: 'ecrit' }) });
+    if (!r.ok) throw new Error(await r.text());
+    const data = await r.json();
+    thinking(false);
+    await pullFeed();
+    if (view === 'agenda') loadAgenda();
+    if (view === 'biz') loadBiz();
+    if (voiceOn) speak(data.reponse);
+  } catch (err) {
+    thinking(false);
+    statusEl.textContent = err.message === 'Failed to fetch' ? 'Atlas ne répond pas. Vérifiez que le PC est allumé.' : err.message;
+  } finally {
+    busy = false; setReactor();
+  }
+}
+
+/* ---------- Envoi d'un PDF (rapport SEO) : enregistré puis évalué tout de suite, la réponse arrive dans le fil comme un message normal ---------- */
+const pdfBtn = $('#pdfBtn'), pdfFile = $('#pdfFile');
+pdfBtn.addEventListener('click', () => pdfFile.click());
+pdfFile.addEventListener('change', async () => {
+  const f = pdfFile.files[0]; pdfFile.value = '';
+  if (!f) return;
+  if (f.type !== 'application/pdf' && !/\.pdf$/i.test(f.name)) { statusEl.textContent = 'Ce fichier n\'est pas un PDF.'; return; }
+  if (f.size > 10e6) { statusEl.textContent = 'PDF trop lourd (10 Mo maximum).'; return; }
+  render({ de: 'moi', texte: '📄 PDF envoyé : ' + f.name, t: Date.now() }); toBottom();
+  busy = true; setReactor(); thinking(true);
+  try {
+    const data = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1] || ''); r.onerror = rej; r.readAsDataURL(f); });
+    const r = await api('/api/seo/pdf', { method: 'POST', body: JSON.stringify({ nom: f.name, data }) });
+    if (!r.ok) throw new Error(await r.text());
+    thinking(false); await pullFeed();
+  } catch (err) {
+    thinking(false);
+    statusEl.textContent = err.message === 'Failed to fetch' ? 'Atlas ne répond pas.' : err.message;
+  } finally { busy = false; setReactor(); }
+});
+
+/* ---------- Voix ---------- */
+function unlockAudio() {
+  player.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+  player.play().catch(() => {});
+}
+async function speak(text) {
+  const clean = String(text).split('\n\n📝')[0].split('\n\n🔗')[0];
+  try {
+    const r = await api('/tts', { method: 'POST', body: JSON.stringify({ text: clean }) });
+    if (!r.ok) throw new Error();
+    player.src = URL.createObjectURL(await r.blob());
+    await player.play();
+  } catch { /* la voix est un bonus : le texte reste affiché */ }
+}
+
+/* Enregistrement en WAV 16 kHz (compris par Gemini sur PC, iPhone et Android) */
+async function startRec() {
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } });
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const src = ctx.createMediaStreamSource(stream);
+  const proc = ctx.createScriptProcessor(4096, 1, 1);
+  const chunks = [];
+  proc.onaudioprocess = (e) => chunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+  src.connect(proc); proc.connect(ctx.destination);
+  rec = { stream, ctx, src, proc, chunks, rate: ctx.sampleRate, started: Date.now() };
+  statusEl.textContent = 'Je vous écoute, Monsieur. Touchez pour envoyer.';
+  setReactor();
+}
+function stopRec() {
+  const r = rec; rec = null;
+  r.proc.disconnect(); r.src.disconnect(); r.stream.getTracks().forEach((t) => t.stop()); r.ctx.close();
+  statusEl.textContent = '';
+  if (Date.now() - r.started < 700) { setReactor(); return null; }
+  return wav(r.chunks, r.rate, 16000);
+}
+function wav(chunks, inRate, outRate) {
+  const len = chunks.reduce((a, c) => a + c.length, 0);
+  const data = new Float32Array(len); let o = 0;
+  for (const c of chunks) { data.set(c, o); o += c.length; }
+  const ratio = inRate / outRate, n = Math.floor(len / ratio), pcm = new Int16Array(n);
+  for (let i = 0; i < n; i++) { const s = Math.max(-1, Math.min(1, data[Math.floor(i * ratio)])); pcm[i] = s < 0 ? s * 0x8000 : s * 0x7fff; }
+  const buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
+  const w = (off, str) => { for (let i = 0; i < str.length; i++) v.setUint8(off + i, str.charCodeAt(i)); };
+  w(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); w(8, 'WAVE'); w(12, 'fmt ');
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, outRate, true); v.setUint32(28, outRate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  w(36, 'data'); v.setUint32(40, n * 2, true);
+  new Int16Array(buf, 44).set(pcm);
+  const bytes = new Uint8Array(buf); let bin = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+
+const MSG_PC = {
+  ecoute: 'Atlas vous écoute sur le PC… touchez le bouton rouge pour annuler.',
+  reflechit: 'Atlas réfléchit… touchez le bouton rouge pour annuler.',
+  parle: 'Atlas parle… touchez le bouton rouge pour le couper.',
+};
+async function pullEtat() {
+  try {
+    const d = await (await api('/ecoute/etat')).json();
+    const e = MSG_PC[d.etat] ? d.etat : 'repos';
+    pcVivant = d.vue >= 0 && d.vue <= 40;
+    if (d.micro_muet !== micMuet) { micMuet = !!d.micro_muet; if (!rec && !busy && pcEtat === 'repos') statusEl.textContent = micMuet ? '🎙️ Le micro du PC ne capte aucun son : Atlas ne peut pas vous entendre.' : ''; }
+    if (e === pcEtat) return;
+    pcEtat = e;
+    if (e !== 'repos' && !rec && !busy) { statusEl.textContent = MSG_PC[e]; statusPc = true; }
+    else if (e === 'repos' && statusPc) { statusEl.textContent = ''; statusPc = false; }
+    setReactor();
+  } catch {}
+}
+cancelBtn.addEventListener('click', () => { if (rec) { stopRec(); setReactor(); } }); // annule l'enregistrement de l'appli sans rien envoyer
+
+reactor.addEventListener('click', async () => {
+  if (!rec && !busy && !input.value.trim() && pcEtat !== 'repos') { // l'écoute du PC est en cours : on la coupe
+    pcEtat = 'repos'; statusPc = false; statusEl.textContent = ''; setReactor();
+    try { await api('/ecoute/annuler', { method: 'POST', body: '{}' }); } catch {}
+    return;
+  }
+  if (busy) return;
+  unlockAudio();
+  if (rec) { const audio = stopRec(); if (audio) send({ audio, mime: 'audio/wav' }); return; }
+  const text = input.value.trim();
+  if (text) { input.value = ''; autosize(); send({ text }); return; }
+  try { await startRec(); }
+  catch { statusEl.textContent = "Micro refusé. Autorisez le micro pour cette app dans les réglages du navigateur."; }
+});
+
+function autosize() { input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 160) + 'px'; setReactor(); }
+input.addEventListener('input', autosize);
+input.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey && !('ontouchstart' in window)) { e.preventDefault(); reactor.click(); }
+});
+
+/* ---------- Agenda ---------- */
+let agendaOn = false;
+const agendaBtn = $('#agendaBtn');
+function dayLabel(d, today) {
+  const t = new Date(today + 'T12:00:00'), x = new Date(d + 'T12:00:00');
+  const diff = Math.round((x - t) / 86400000);
+  if (diff === 0) return "Aujourd'hui";
+  if (diff === 1) return 'Demain';
+  if (diff === -1) return 'Hier';
+  const s = x.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+async function loadAgenda() {
+  try {
+    const data = await (await api('/agenda')).json();
+    const items = data.events.map((e) => ({ ...e, sort: e.date + (e.heure || '00:00') }));
+    for (const r of data.rappels) {
+      const d = new Date(r.at), date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const heure = d.toTimeString().slice(0, 5);
+      items.push({ date, heure, titre: r.text, type: 'rappel', sort: date + heure });
+    }
+    items.sort((a, b) => a.sort.localeCompare(b.sort));
+    const list = $('#agendaList'); list.innerHTML = '';
+    if ((data.routines || []).length) {                     // rappels et appels RÉPÉTÉS (tous les jours à 21h...)
+      const box = document.createElement('section'); box.className = 'day';
+      const h = document.createElement('h2'); h.textContent = 'Routines (répétées)'; box.append(h);
+      for (const r of data.routines) {
+        const row = document.createElement('div'); row.className = 'ev routine';
+        const when = document.createElement('span'); when.className = 'when'; when.textContent = '🔁 ' + r.heure.replace(':', 'h');
+        const what = document.createElement('span'); what.className = 'what'; what.textContent = r.texte;
+        const sm = document.createElement('small'); sm.textContent = `${r.libelle.split(' — ')[0].replace(/ à \d+h\d*$/, '')} · ${r.mode === 'appel' ? 'appel' : 'rappel'}${r.derniere ? ' · dernière fois ' + r.derniere : ''}`; what.append(sm);
+        const del = document.createElement('button'); del.setAttribute('aria-label', 'Supprimer la routine'); del.textContent = '✕';
+        del.addEventListener('click', async () => {
+          if (!confirm('Supprimer la routine « ' + r.texte + ' » ?')) return;
+          await api('/routines/suppr', { method: 'POST', body: JSON.stringify({ id: r.id }) });
+          loadAgenda();
+        });
+        row.append(when, what, del); box.append(row);
+      }
+      list.append(box);
+    }
+    if (!items.length) {
+      list.innerHTML = '<p class="hint">Rien de prévu. Dites par exemple : « Rendez-vous client jeudi à 14h ».</p>';
+      return;
+    }
+    let current = null, box = null;
+    for (const e of items) {
+      if (e.date !== current) {
+        current = e.date;
+        box = document.createElement('section');
+        box.className = 'day' + (e.date === data.aujourdhui ? ' today' : '');
+        const h = document.createElement('h2'); h.textContent = dayLabel(e.date, data.aujourdhui); box.append(h);
+        list.append(box);
+      }
+      const row = document.createElement('div');
+      row.className = `ev ${e.type}`;
+      const when = document.createElement('span'); when.className = 'when';
+      when.textContent = e.type === 'pause' ? 'Pause' : e.type === 'rappel' ? '⏰ ' + e.heure.replace(':', 'h') : (e.heure ? e.heure.replace(':', 'h') : 'Journée');
+      const what = document.createElement('span'); what.className = 'what'; what.textContent = e.titre;
+      if (e.duree) { const sm = document.createElement('small'); sm.textContent = `${e.duree} min`; what.append(sm); }
+      row.append(when, what);
+      if (e.id) {
+        for (const x of [when, what]) { x.classList.add('clickable'); x.addEventListener('click', () => openEvent(e)); }
+        const del = document.createElement('button'); del.setAttribute('aria-label', 'Supprimer ' + e.titre); del.textContent = '✕';
+        del.addEventListener('click', async () => {
+          if (!confirm('Supprimer « ' + e.titre + ' » ?')) return;
+          await api('/agenda/suppr', { method: 'POST', body: JSON.stringify({ id: e.id }) });
+          loadAgenda();
+        });
+        row.append(del);
+      }
+      box.append(row);
+    }
+  } catch {}
+}
+/* ---------- Vues : fil / agenda / business ---------- */
+let view = 'feed';
+const relancesIgnorees = new Set();   // "Pas encore" : masque la relance de la session en cours, sans toucher à la date (elle revient au prochain chargement/demain)
+const bizBtn = $('#bizBtn');
+function setView(v) {
+  view = view === v ? 'feed' : v;
+  agendaOn = view === 'agenda';
+  agendaBtn.setAttribute('aria-pressed', String(view === 'agenda'));
+  bizBtn.setAttribute('aria-pressed', String(view === 'biz'));
+  $('#agenda').classList.toggle('hidden', view !== 'agenda');
+  $('#biz').classList.toggle('hidden', view !== 'biz');
+  feedEl.classList.toggle('hidden', view !== 'feed');
+  if (view === 'agenda') loadAgenda();
+  if (view === 'biz') loadBiz();
+  if (view === 'feed') toBottom(); else scroller.scrollTop = 0;
+}
+agendaBtn.addEventListener('click', () => setView('agenda'));
+bizBtn.addEventListener('click', () => setView('biz'));
+
+function money(n, dev) {
+  try { return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: dev || 'EUR' }).format(n || 0); }
+  catch { return `${n || 0} ${dev}`; }
+}
+const frDate = (d) => d ? new Date(d + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '';
+const JOURS_NOMS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+function prochaineOccurrence(jourNom) {
+  const idx = JOURS_NOMS.indexOf(jourNom), d = new Date();
+  let delta = (idx - d.getDay() + 7) % 7; if (delta === 0) delta = 7;
+  d.setDate(d.getDate() + delta);
+  return d;
+}
+function el(tag, cls, text) { const x = document.createElement(tag); if (cls) x.className = cls; if (text !== undefined) x.textContent = text; return x; }
+
+function ligneProspect(p, today) {
+  const row = el('div', 'line');
+  const what = el('span', 'what', p.nom + (p.entreprise && p.entreprise !== p.nom ? ' — ' + p.entreprise : ''));
+  const info = [p.cree ? 'créé ' + frDate(p.cree) : '', p.relance ? 'relance ' + frDate(p.relance) : ''].filter(Boolean).join(' · ');
+  if (info) what.append(el('small', p.relance && p.relance <= today ? 'late' : '', info));
+  if (p.site || p.email) what.append(el('small', '', [p.site, p.email].filter(Boolean).join(' · ')));
+  what.classList.add('clickable'); what.addEventListener('click', () => openProspect(p));
+  const col = el('div', 'rowbtns');
+  col.append(el('span', 'stage', p.etape));
+  if (p.montant) col.append(el('span', 'amount', money(p.montant, p.devise)));
+  const bDevis = el('button', 'open', 'Devis');
+  bDevis.addEventListener('click', (ev) => { ev.stopPropagation(); openDocPourProspect(p); });
+  col.append(bDevis);
+  row.append(what, col);
+  return row;
+}
+function openDocPourProspect(p) { openDoc(null); setv('docClient', p.entreprise || p.nom); }
+
+async function loadBiz() {
+  try {
+    const data = await (await api('/business')).json();
+    $('#enJeu').textContent = data.en_jeu;
+    $('#impaye').textContent = data.impaye;
+    const today = new Date().toISOString().slice(0, 10);
+
+    // Relances dues, en évidence au-dessus de + Prospect / + Devis-facture — seulement le jour de relance fixé
+    // (config.json > business.jour_relance), ou la veille si activé : les autres jours, une ligne discrète suffit.
+    const ub = $('#relancesUrgentes'); ub.innerHTML = '';
+    const jourDuJour = JOURS_NOMS[new Date().getDay()];
+    const estJourRelance = jourDuJour === data.jour_relance;
+    const estVeille = JOURS_NOMS[(new Date().getDay() + 1) % 7] === data.jour_relance;
+    const urgents = data.prospects.filter((p) => p.email && p.relance && p.relance <= today && !relancesIgnorees.has(p.id))
+      .sort((a, b) => a.relance.localeCompare(b.relance));
+    if ((estJourRelance || (estVeille && data.veille_bandeau)) && urgents.length) {
+      const box = el('div', 'urgent');
+      box.append(el('h3', '', estJourRelance ? `🔴 ${urgents.length} relance${urgents.length > 1 ? 's' : ''} à faire` : `🟠 ${urgents.length} relance${urgents.length > 1 ? 's' : ''} à préparer pour demain`));
+      for (const p of urgents) {
+        const row = el('div', 'line');
+        const what = el('span', 'what', p.nom + (p.entreprise && p.entreprise !== p.nom ? ' — ' + p.entreprise : ''));
+        what.append(el('small', 'late', 'relance ' + frDate(p.relance) + (p.source ? ' · ' + p.source : '')));
+        const btns = el('div', 'btns');
+        const bOk = el('button', 'ok', '✅ Relancé');
+        bOk.addEventListener('click', async () => {
+          bOk.disabled = true;
+          try { await post('/business/prospect/relance', { id: p.id }); } catch {}
+          loadBiz();
+        });
+        const bNon = el('button', '', '⏳ Pas encore');
+        bNon.addEventListener('click', () => { relancesIgnorees.add(p.id); loadBiz(); });
+        btns.append(bOk, bNon);
+        row.append(what, btns); box.append(row);
+      }
+      ub.append(box);
+    } else {
+      // Pas le jour de relance : une ligne discrète plutôt que le bandeau rouge en continu.
+      const prochaine = prochaineOccurrence(data.jour_relance || 'mardi');
+      const prochaineISO = prochaine.toISOString().slice(0, 10);
+      const aVenir = data.prospects.filter((p) => p.email && p.relance && p.relance <= prochaineISO && !['perdu', 'sans réponse'].includes(p.etape));
+      if (aVenir.length) ub.append(el('p', 'hint', `Prochaine session de relance : ${data.jour_relance || 'mardi'} ${frDate(prochaineISO)} (${aVenir.length} prospect${aVenir.length > 1 ? 's' : ''})`));
+    }
+
+    // Prospects sans email : pas de relance possible par ce canal — liste séparée, sans bandeau rouge.
+    const ac = $('#aContacterAutrement'); ac.innerHTML = '';
+    const autrement = data.prospects.filter((p) => !p.email && !p.contacteAutrementLe && !['perdu', 'sans réponse'].includes(p.etape));
+    if (autrement.length) {
+      const box = el('div', 'autrement');
+      box.append(el('h3', '', `📵 ${autrement.length} à contacter autrement (formulaire / téléphone)`));
+      for (const p of autrement) {
+        const row = el('div', 'line');
+        const what = el('span', 'what', p.nom + (p.entreprise && p.entreprise !== p.nom ? ' — ' + p.entreprise : ''));
+        what.append(el('small', '', [p.site, p.telephone].filter(Boolean).join(' · ') || 'ni site ni téléphone connu'));
+        const btns = el('div', 'btns');
+        const bContacte = el('button', '', '✅ Contacté');
+        bContacte.addEventListener('click', async () => {
+          const canal = prompt('Par quel canal ? (ex. formulaire, téléphone)', 'formulaire');
+          if (canal === null) return;
+          bContacte.disabled = true;
+          try { await post('/business/prospect/contacte-autrement', { id: p.id, canal }); } catch {}
+          loadBiz();
+        });
+        const bAbandon = el('button', '', '🗑️ Abandonner');
+        bAbandon.addEventListener('click', async () => {
+          bAbandon.disabled = true;
+          try {
+            await post('/business/prospect', { id: p.id, nom: p.nom, entreprise: p.entreprise, contact: p.contact, source: p.source,
+              etape: 'perdu', montant: p.montant, devise: p.devise, relance: '', notes: p.notes, site: p.site, email: p.email });
+          } catch {}
+          loadBiz();
+        });
+        btns.append(bContacte, bAbandon);
+        row.append(what, btns); box.append(row);
+      }
+      ac.append(box);
+    }
+
+    const pl = $('#prospects'); pl.innerHTML = '';
+    if (!data.prospects.length) pl.append(el('p', 'hint', 'Aucun prospect pour l\'instant.'));
+    // 2 vues par campagne (classées par date de création) : Assistant IA (en cours) puis Prospection SEO (chapitre fermé, gardé pour l'historique)
+    const VUES = [
+      { test: (s) => /assist.*ia|ia.*telephon/i.test(s || ''), lib: 'Assistant IA téléphonique' },
+      { test: (s) => /seo/i.test(s || ''), lib: 'Prospection SEO (fermée)' },
+    ];
+    const dejaVus = new Set();
+    for (const vue of VUES) {
+      const liste = data.prospects.filter((p) => vue.test(p.source));
+      liste.forEach((p) => dejaVus.add(p.id));
+      liste.sort((a, b) => (b.cree || '').localeCompare(a.cree || '') || b.id - a.id);
+      if (!liste.length) continue;
+      const det = el('details'); det.open = true;
+      const sum = el('summary'); sum.append(el('span', '', vue.lib), el('span', 'n', String(liste.length)));
+      det.append(sum);
+      for (const p of liste) det.append(ligneProspect(p, today));
+      pl.append(det);
+    }
+    const reste = data.prospects.filter((p) => !dejaVus.has(p.id)).sort((a, b) => (b.cree || '').localeCompare(a.cree || '') || b.id - a.id);
+    if (reste.length) {
+      const det = el('details'); det.open = true;
+      const sum = el('summary'); sum.append(el('span', '', 'Autres'), el('span', 'n', String(reste.length)));
+      det.append(sum);
+      for (const p of reste) det.append(ligneProspect(p, today));
+      pl.append(det);
+    }
+
+    const dl = $('#docs'); dl.innerHTML = '';
+    const docs = data.docs.slice().reverse();
+    if (!docs.length) dl.append(el('p', 'hint', 'Aucun devis ni facture.'));
+    for (const d of docs) {
+      const row = el('div', 'line doc');
+      const what = el('span', 'what', `${d.numero} — ${d.client || 'client ?'}`);
+      what.append(el('small', d.statut === 'en retard' ? 'late' : '', `${d.type === 'facture' ? 'Facture' : 'Devis'} du ${frDate(d.date)}${d.echeance ? ', échéance ' + frDate(d.echeance) : ''}`));
+      const sel = el('select'); sel.setAttribute('aria-label', 'Statut de ' + d.numero);
+      for (const st of data.statuts[d.type]) { const o = el('option', '', st); o.value = st; if (st === d.statut) o.selected = true; sel.append(o); }
+      sel.addEventListener('change', async () => {
+        await api('/business/statut', { method: 'POST', body: JSON.stringify({ id: d.id, statut: sel.value }) });
+        loadBiz();
+      });
+      const open = el('button', 'open', 'Ouvrir');
+      open.addEventListener('click', () => window.open(`/doc?id=${d.id}&t=${encodeURIComponent(token)}`, '_blank'));
+      const edit = el('button', 'open', 'Modifier');
+      edit.addEventListener('click', () => openDoc(d));
+      row.append(what, el('span', 'amount', money(d.total, d.devise)), sel, edit, open);
+      dl.append(row);
+    }
+  } catch {}
+}
+
+/* ---------- Saisie manuelle : agenda, prospects, devis et factures ---------- */
+const val = (id) => $('#' + id).value;
+const setv = (id, v) => { $('#' + id).value = v ?? ''; };
+const localDate = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+function showErr(id, m) { const p = $('#' + id); p.textContent = m || ''; p.classList.toggle('hidden', !m); }
+async function post(path, body) {
+  const r = await api(path, { method: 'POST', body: JSON.stringify(body) });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+// Rendez-vous
+let evEditId = null;
+function evToggle() {
+  const pause = val('evType') === 'pause';
+  $('#evHeureBox').classList.toggle('hidden', pause);
+  $('#evDureeBox').classList.toggle('hidden', pause);
+}
+function openEvent(e) {
+  evEditId = e && e.id ? e.id : null;
+  $('#evH').textContent = e ? 'Modifier' : 'Nouveau rendez-vous';
+  setv('evType', e && e.type === 'pause' ? 'pause' : 'rdv');
+  setv('evTitre', e && e.titre); setv('evDate', (e && e.date) || localDate());
+  setv('evHeure', e && e.heure); setv('evDuree', e && e.duree ? e.duree : '');
+  $('#evDel').classList.toggle('hidden', !evEditId);
+  showErr('evErr'); evToggle(); $('#evDlg').showModal();
+}
+$('#evAdd').addEventListener('click', () => openEvent(null));
+$('#evType').addEventListener('change', evToggle);
+$('#evCancel').addEventListener('click', () => $('#evDlg').close());
+$('#evSave').addEventListener('click', async () => {
+  try {
+    await post('/agenda/save', { id: evEditId, type: val('evType'), titre: val('evTitre'), date: val('evDate'), heure: val('evHeure'), duree: val('evDuree') });
+    $('#evDlg').close(); loadAgenda();
+  } catch (e) { showErr('evErr', 'Vérifiez le titre, la date et l\'heure.'); }
+});
+$('#evDel').addEventListener('click', async () => {
+  if (!confirm('Supprimer « ' + val('evTitre') + ' » ?')) return;
+  try { await post('/agenda/suppr', { id: evEditId }); $('#evDlg').close(); loadAgenda(); } catch { showErr('evErr', 'Suppression impossible.'); }
+});
+
+// Prospects
+let prEditId = null;
+function openProspect(p) {
+  prEditId = p && p.id ? p.id : null;
+  $('#prH').textContent = p ? 'Modifier le prospect' : 'Nouveau prospect';
+  setv('prNom', p && p.nom); setv('prEnt', p && p.entreprise); setv('prSource', p && p.source);
+  setv('prEtape', (p && p.etape) || 'contact'); setv('prMontant', p && p.montant ? p.montant : '');
+  setv('prDevise', (p && p.devise) || 'EUR'); setv('prRelance', p && p.relance); setv('prNotes', p && p.notes);
+  setv('prSite', p && p.site); setv('prEmail', p && p.email);
+  $('#prDel').classList.toggle('hidden', !prEditId);
+  showErr('prErr'); $('#prDlg').showModal();
+}
+$('#prAdd').addEventListener('click', () => openProspect(null));
+$('#prCancel').addEventListener('click', () => $('#prDlg').close());
+$('#prSave').addEventListener('click', async () => {
+  if (!val('prNom').trim()) return showErr('prErr', 'Le nom est obligatoire.');
+  try {
+    await post('/business/prospect', { id: prEditId, nom: val('prNom'), entreprise: val('prEnt'), source: val('prSource'), etape: val('prEtape'),
+      montant: val('prMontant'), devise: val('prDevise'), relance: val('prRelance'), notes: val('prNotes'), site: val('prSite'), email: val('prEmail') });
+    $('#prDlg').close(); loadBiz();
+  } catch { showErr('prErr', 'Enregistrement impossible.'); }
+});
+$('#prDel').addEventListener('click', async () => {
+  if (!confirm('Supprimer « ' + val('prNom') + ' » ?')) return;
+  try { await post('/business/prospect/suppr', { id: prEditId }); $('#prDlg').close(); loadBiz(); } catch { showErr('prErr', 'Suppression impossible.'); }
+});
+
+// Devis et factures
+let docEditId = null;
+const num = (s) => parseFloat(String(s).replace(/\s/g, '').replace(',', '.'));
+function lignesDepuisTexte(t) {
+  return String(t).split('\n').map((l) => l.trim()).filter(Boolean).map((l) => {
+    const p = l.split(';').map((x) => x.trim());
+    if (p.length >= 3) return { desc: p[0], qte: num(p[1]) || 1, prix: num(p[2]) || 0 };
+    if (p.length === 2) return { desc: p[0], qte: 1, prix: num(p[1]) || 0 };
+    return { desc: p[0], qte: 1, prix: 0 };
+  });
+}
+function openDoc(d) {
+  docEditId = d && d.id ? d.id : null;
+  $('#docH').textContent = d ? `Modifier ${d.numero}` : 'Nouveau devis ou facture';
+  $('#docTypeBox').classList.toggle('hidden', !!d);
+  setv('docType', 'devis'); setv('docClient', d && d.client); setv('docObjet', d && d.objet);
+  setv('docEch', d && d.echeance); setv('docDevise', (d && d.devise) || 'EUR'); setv('docNotes', d && d.notes);
+  setv('docLignes', ((d && d.lignes) || []).map((l) => `${l.desc} ; ${l.qte} ; ${l.prix}`).join('\n'));
+  $('#docDel').classList.toggle('hidden', !docEditId);
+  showErr('docErr'); $('#docDlg').showModal();
+}
+$('#docAdd').addEventListener('click', () => openDoc(null));
+$('#docCancel').addEventListener('click', () => $('#docDlg').close());
+$('#docSave').addEventListener('click', async () => {
+  const lignes = lignesDepuisTexte(val('docLignes'));
+  if (!docEditId && !lignes.length) return showErr('docErr', 'Ajoutez au moins une ligne (description ; quantité ; prix).');
+  try {
+    await post('/business/doc', { id: docEditId, type: val('docType'), client: val('docClient'), objet: val('docObjet'),
+      echeance: val('docEch'), devise: val('docDevise'), notes: val('docNotes'), lignes });
+    $('#docDlg').close(); loadBiz();
+  } catch { showErr('docErr', 'Enregistrement impossible.'); }
+});
+$('#docDel').addEventListener('click', async () => {
+  if (!confirm('Supprimer ce document ?')) return;
+  try { await post('/business/doc/suppr', { id: docEditId }); $('#docDlg').close(); loadBiz(); } catch { showErr('docErr', 'Suppression impossible.'); }
+});
+
+/* ---------- Sécurité : confirmations et journal des actions ---------- */
+const confirmBar = $('#confirmBar'), secBtn = $('#secBtn');
+let secEtat = { suspendu: false, en_attente: [], dernieres: [] }, lastSecSig = '';
+function renderConfirm() {
+  confirmBar.innerHTML = '';
+  for (const p of secEtat.en_attente) {
+    const c = el('div', 'card');
+    c.append(el('strong', '', 'Confirmation requise'), el('p', '', p.resume));
+    if (p.details) c.append(el('pre', '', p.details));
+    const row = el('div', 'row'), non = el('button', 'btn', 'Refuser'), oui = el('button', 'btn primary', 'Confirmer');
+    for (const [b, chemin] of [[non, '/securite/refuser'], [oui, '/securite/confirmer']]) {
+      b.addEventListener('click', async () => { non.disabled = oui.disabled = true; try { await post(chemin, { id: p.id }); } catch {} pullSecu(); });
+    }
+    row.append(non, oui); c.append(row); confirmBar.append(c);
+  }
+  confirmBar.classList.toggle('hidden', !secEtat.en_attente.length);
+  secBtn.dataset.suspendu = secEtat.suspendu ? '1' : '0';
+  secBtn.dataset.attente = secEtat.en_attente.length ? '1' : '0';
+}
+function renderSecDlg() {
+  $('#secSuspend').textContent = secEtat.suspendu ? 'Reprendre les actions' : 'Suspendre les actions (urgence)';
+  $('#secEtat').textContent = secEtat.suspendu
+    ? "⏸️ Les actions sont suspendues : Atlas répond toujours, mais l'IA ne peut plus rien déclencher."
+    : '▶️ Actions actives. Les actions importantes demandent ta confirmation.';
+  const l = $('#secLog'); l.innerHTML = '';
+  if (!secEtat.dernieres.length) l.append(el('p', '', 'Aucune action enregistrée.'));
+  for (const e of secEtat.dernieres) {
+    const r = el('div', 'seclog');
+    r.append(el('span', '', new Date(e.t).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })), el('span', '', `${e.source} · ${e.action}`), el('span', 'st', e.statut));
+    if (e.resume) r.append(el('small', '', e.resume));
+    l.append(r);
+  }
+}
+async function pullSecu() {
+  try {
+    const d = await (await api('/securite/etat')).json();
+    const sig = JSON.stringify([d.suspendu, d.en_attente.map((p) => p.id)]);
+    const change = sig !== lastSecSig; secEtat = d; lastSecSig = sig;
+    if (change) renderConfirm();
+    majMenuBadge();
+    if ($('#secDlg').open) renderSecDlg();
+  } catch {}
+}
+secBtn.addEventListener('click', () => { renderSecDlg(); $('#secDlg').showModal(); });
+$('#secClose').addEventListener('click', () => $('#secDlg').close());
+$('#secSuspend').addEventListener('click', async () => { try { await post('/securite/suspendre', { suspendu: !secEtat.suspendu }); } catch {} pullSecu(); });
+
+/* ---------- Réglages ---------- */
+const voiceBtn = $('#voiceBtn');
+function setVoice(on) { voiceOn = on; voiceBtn.setAttribute('aria-pressed', String(on)); try { localStorage.setItem('jarvis_voice', on ? '1' : '0'); } catch {} }
+voiceBtn.addEventListener('click', () => { unlockAudio(); setVoice(!voiceOn); });
+setVoice(voiceOn);
+
+$('#tokenSave').addEventListener('click', () => {
+  // Tolère un "Bearer " collé par erreur devant le jeton (ex. copié depuis le message de config Siri, qui l'inclut exprès) :
+  // sinon l'en-tête devient "Bearer Bearer xxx" et l'accès est refusé sans explication.
+  token = $('#tokenInput').value.trim().replace(/^Bearer\s+/i, ''); saveToken(); $('#loginDlg').close(); pullFeed();
+});
+
+$('#phoneBtn').addEventListener('click', () => {
+  const url = session?.url_telephone;
+  $('#phoneReady').classList.toggle('hidden', !url);
+  $('#phoneMissing').classList.toggle('hidden', !!url);
+  if (url) {
+    $('#qr').innerHTML = '';
+    new QRCode($('#qr'), { text: `${url.replace(/\/$/, '')}/#t=${token}`, width: 200, height: 200 });
+  }
+  $('#phoneDlg').showModal();
+});
+$('#phoneClose').addEventListener('click', () => $('#phoneDlg').close());
+
+/* ---------- Projets : sur le PC, s'ouvre dans une grande fenêtre d'application ; sur le téléphone, dans la page ---------- */
+$('#projBtn').addEventListener('click', async (e) => {
+  if (!session) return;                       // pas sur le PC : le lien normal ouvre la page
+  e.preventDefault();
+  try { await api('/projets/ouvrir'); } catch { location.href = '/projets'; }
+});
+
+/* ---------- Téléphone : menu ☰ (tiroir) ---------- */
+const MENU = [
+  ['jarvis', 'Atlas', '/', '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3" fill="currentColor"/>'],
+  ['projets', 'Projets', '/projets#projets', '<rect x="3.5" y="4" width="17" height="16" rx="2.5"/><path d="M9 4v16M14.5 9H20M14.5 13H20"/>'],
+  ['agenda', 'Agenda', '/projets#agenda', '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'],
+  ['emploi', 'Emploi', '/projets#emploi', '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5M11 8v6M8 11h6"/>'],
+  ['trading', 'Trading', '/projets#trading', '<path d="M3.5 18l5-6 4 3 7-9"/><path d="M15 6h4.5v4.5"/>'],
+  ['mail', 'Mail', '/projets#mail', '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5"/>'],
+  ['business', 'Business', '/projets#business', '<rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M8.5 7V5.5a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2V7M3 12.5h18"/>'],
+  ['journal', 'Journal', '/projets#journal', '<path d="M6 3.5h9.5L19 7v13.5H6z"/><path d="M15 3.5V7h4M9 11h7M9 14.5h7M9 18h4"/>'],
+  ['musique', 'Musique', '/projets#musique', '<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>'],
+  ['securite', 'Sécurité', '/projets#securite', '<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9.5 12l2 2 3-3.5"/>'],
+  ['presence', 'Présence', '/projets#presence', '<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/>', 'bas'],
+];
+(function () {
+  const t = $('#tiroir'); if (!t) return;
+  for (const [id, lib, href, ico, cls] of MENU) {
+    const a = document.createElement('a'); a.className = 'ti' + (cls ? ' ' + cls : ''); a.href = href; a.dataset.id = id;
+    a.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ico}</svg><span>${lib}</span>`;
+    if (id === 'jarvis') a.setAttribute('aria-current', 'page');
+    a.addEventListener('click', () => document.documentElement.classList.remove('menu-ouvert'));
+    t.append(a);
+  }
+  const mb = $('#menuBtn');
+  mb.addEventListener('click', () => { const o = document.documentElement.classList.toggle('menu-ouvert'); mb.setAttribute('aria-expanded', String(o)); });
+  $('#voile').addEventListener('click', () => { document.documentElement.classList.remove('menu-ouvert'); mb.setAttribute('aria-expanded', 'false'); });
+})();
+function majMenuBadge() {                        // pastille sur ☰ et sur "Sécurité" : confirmation en attente / actions suspendues
+  const mb = $('#menuBtn'); if (!mb || !secEtat) return;
+  const n = secEtat.en_attente.length; mb.dataset.alerte = secEtat.suspendu ? '2' : n ? '1' : '0';
+  const a = document.querySelector('#tiroir .ti[data-id="securite"]'); if (!a) return;
+  a.querySelector('.b')?.remove();
+  if (n || secEtat.suspendu) { const b = document.createElement('span'); b.className = 'b' + (secEtat.suspendu ? ' ko' : ''); b.textContent = secEtat.suspendu ? '!' : String(n); a.append(b); }
+}
+
+/* ---------- Démarrage ---------- */
+(async () => {
+  try {
+    const r = await fetch('/session');
+    if (r.ok) { session = await r.json(); token = session.token; saveToken(); $('#phoneBtn').classList.remove('hidden'); }
+  } catch {}
+  if (!token) { $('#loginDlg').showModal(); return; }
+  if (plein) {                                   // écran seul : on affiche la vue demandée, on la rafraîchit, et c'est tout
+    setView(plein);
+    const rafraichir = () => { if (view === 'agenda') loadAgenda(); if (view === 'biz') loadBiz(); };
+    setInterval(rafraichir, 20000);
+    addEventListener('message', (e) => { if (e.origin === location.origin && e.data === 'rafraichir') rafraichir(); });
+    return;
+  }
+  await pullFeed();
+  setInterval(pullFeed, 4000);
+  setInterval(pullEtat, 1000);
+  pullSecu(); setInterval(pullSecu, 2000);
+  setInterval(() => { if (view === 'agenda') loadAgenda(); if (view === 'biz') loadBiz(); }, 20000);
+})();
+</script>
+</body>
+</html>

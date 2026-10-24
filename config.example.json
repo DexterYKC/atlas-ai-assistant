@@ -1,0 +1,254 @@
+{
+  "nom": "Atlas",
+  "business": {
+    "jour_relance": "tuesday",
+    "veille_bandeau": true
+  },
+  "telegram_token": "YOUR_BOTFATHER_TOKEN",
+  "gemini_key": "YOUR_GEMINI_API_KEY",
+  "allowed_user_id": "YOUR_TELEGRAM_USER_ID",
+  "brief_hour": 8,
+  "brief_minute": 0,
+  "models": [
+    "gemini-3-flash-preview",
+    "gemini-flash-lite-latest",
+    "gemini-flash-latest",
+    "gemini-3.8-flash",
+    "gemini-3.6-flash",
+    "gemini-3.5-flash",
+    "gemini-3.1-flash-lite"
+  ],
+  "dossiers_dev": [],
+  "_exemple_dossiers_dev": "Empty by default: set e.g. [\"C:/dev\"] the day you want Jarvis to know about your code projects.",
+  "recherche_web": true,
+  "recherche_web_vocal": false,
+  "models_vocal": [
+    "gemini-flash-lite-latest",
+    "gemini-3.1-flash-lite",
+    "gemini-3.6-flash",
+    "gemini-3-flash-preview",
+    "gemini-3.8-flash",
+    "gemini-3.5-flash"
+  ],
+  "_aide_models_vocal": "Models tried in this order for the PC voice assistant: fastest first. A saturated/slow model is skipped for a few minutes. Empty = same models as text messages.",
+  "voix_verif": {
+    "actif": true,
+    "mode": "strict",
+    "seuil": 0.4
+  },
+  "_aide_voix_verif": "Speaker verification. Inactive until voix/enregistrer-ma-voix-jarvis.bat has recorded your voice profile. mode: 'apprentissage' = logs scores to voix/ecoute_debug.log without blocking; 'strict' = ignores other voices. seuil: higher = stricter (0.35 to 0.8).",
+  "reveil_reponse": "Yes, Sir?",
+  "_aide_reveil": "reveil_reponse: what Jarvis says right after waking up (\"\" = a simple beep). recherche_web_vocal:false = no web search for PC voice (faster); typed messages, Telegram and the app keep web search.",
+  "voice_port": 8765,
+  "voice_token": "YOUR_RANDOM_API_TOKEN",
+  "wake_model": "voix/modeles/atlas_fr.onnx",
+  "wake_seuil": 0.25,
+  "wake_models": [
+    "voix/modeles/atlas_fr.onnx"
+  ],
+  "wake_seuils": {
+    "atlas_fr": 0.985
+  },
+  "_aide_wake": "wake_models: active wake words (custom-trained openWakeWord model). wake_seuils: sensitivity (lower = more sensitive, more false wake-ups).",
+  "attente_parole_s": 10,
+  "fin_phrase_s": 2,
+  "speculatif": true,
+  "speculatif_s": 0.5,
+  "_aide_speculatif": "Faster replies: after speculatif_s seconds of silence, Jarvis starts thinking and preparing its voice while still waiting for the end of your sentence (fin_phrase_s). If you resume talking, it discards everything. speculatif:false to disable.",
+  "_aide_ecoute": "attente_parole_s = seconds given to start speaking after the beep; fin_phrase_s = silence (seconds) that ends your sentence.",
+  "conversation": {
+    "actif": true,
+    "question": "",
+    "attente_s": 10,
+    "attente_suite_s": 7,
+    "signal": "",
+    "tours_max": 12
+  },
+  "_aide_conversation": "After its reply, Jarvis keeps listening without needing the wake word again. attente_s: time given to answer a question from Jarvis; attente_suite_s: time to keep going after a simple reply; question: optional fixed follow-up phrase; signal: 'bip' for short beeps, '' for silence. Also stops if you say 'no thanks'.",
+  "picovoice": {
+    "access_key": "",
+    "mot": "voix/picovoice/mon-mot.ppn",
+    "modele": "voix/picovoice/porcupine_params_fr.pv",
+    "nom": "custom wake word",
+    "sensibilite": 0.6
+  },
+  "_aide_picovoice": "Optional second wake word (Picovoice Porcupine). Paste your access_key and put your .ppn file in voix/picovoice/. Leave access_key empty to disable; the primary wake word stays active.",
+  "controles": [
+    11,
+    15,
+    18
+  ],
+  "annonces_pc": true,
+  "voix": "fr-CH-FabriceNeural",
+  "voix_pitch": "-12Hz",
+  "reponses_vocales": "vocal",
+  "python": "python",
+  "_aide_reponses_vocales": "vocal = replies by voice when you spoke by voice; toujours = always; jamais = never",
+  "appels": {
+    "actif": true,
+    "api_id": "YOUR_TELEGRAM_API_ID",
+    "api_hash": "YOUR_TELEGRAM_API_HASH",
+    "delai_minutes": 10
+  },
+  "voice_host": "127.0.0.1",
+  "url_telephone": "https://your-machine.your-tailnet.ts.net",
+  "_aide_url_telephone": "Tailscale address of this PC, e.g. https://my-pc.tailnet1234.ts.net",
+  "agenda_rappel_minutes": 15,
+  "github_token": "YOUR_GITHUB_PAT",
+  "netlify_token": "YOUR_NETLIFY_TOKEN",
+  "secours_prioritaire": false,
+  "_aide_secours_prioritaire": "Tries Groq BEFORE Gemini when true (useful if your Gemini quota is exhausted).",
+  "secours": {
+    "url": "https://api.groq.com/openai/v1",
+    "key": "YOUR_GROQ_API_KEY",
+    "model": "openai/gpt-oss-120b",
+    "models": [
+      "openai/gpt-oss-120b",
+      "openai/gpt-oss-20b",
+      "qwen/qwen3.8-27b"
+    ],
+    "whisper": "whisper-large-v3-turbo"
+  },
+  "local": {
+    "actif": true,
+    "url": "http://127.0.0.1:11434",
+    "model": "gemma3:4b",
+    "num_ctx": 4096,
+    "timeout_s": 240
+  },
+  "_aide_local": "Last-resort fallback when both Gemini AND Groq are unavailable: local Ollama model (gemma3:4b). TEXT ONLY: its action tags are ignored by the code. actif:false to disable.",
+  "_aide_secours": "Fallback AI if Gemini is unavailable (Groq, OpenAI-compatible). Leave key empty to disable.",
+  "entreprise": {
+    "nom": "Your Company Name",
+    "contact": "Your Name",
+    "adresse": "Your City, Your Country",
+    "email": "",
+    "telephone": "",
+    "matricule_fiscal": "",
+    "iban": "",
+    "tva_taux": 19,
+    "timbre": 2,
+    "mentions_devis": "Quote valid for 30 days. 30% deposit on order.",
+    "mentions_facture": "Payment due on receipt."
+  },
+  "_aide_entreprise": "Check VAT, stamp duty and mandatory mentions with your accountant (these defaults are France/Tunisia-specific examples).",
+  "bilan_jour": 0,
+  "bilan_heure": 19,
+  "spotify": {
+    "client_id": "YOUR_SPOTIFY_CLIENT_ID",
+    "redirect": "http://127.0.0.1:8765/spotify/callback"
+  },
+  "securite": {
+    "actions_par_minute": 20,
+    "confirmation_expire_s": 300,
+    "dossiers_lecture": [
+      "C:\\dev",
+      "C:\\Users\\you\\Desktop"
+    ],
+    "dossiers_ecriture": [
+      "C:\\dev\\atlas-data"
+    ],
+    "dossier_jarvis": "C:\\dev\\atlas-data",
+    "exclusions_perso": [
+      "\\secrets\\",
+      "\\.ssh\\"
+    ],
+    "exceptions": []
+  },
+  "_aide_securite": "dossiers_lecture / dossiers_ecriture: the only folders Jarvis can see / modify. exclusions_perso: path fragments that are always forbidden. exceptions: EXACT file paths you allow by hand here (Jarvis itself can never touch this file).",
+  "widget_devant": true,
+  "fenetre": {
+    "largeur": 516,
+    "hauteur": 560,
+    "coin": "bas-droite"
+  },
+  "_aide_fenetre": "Default window size (pixels) when Jarvis opens its own window; Edge refuses a width under ~516. coin: bas-droite/haut-droite/bas-gauche/haut-gauche/centre.",
+  "points": {
+    "actif": true,
+    "debut": 9,
+    "fin": 20,
+    "toutes_les_heures": 2,
+    "telegram": false
+  },
+  "_aide_points": "Spoken check-in every N hours between debut and fin (even on rest days). Logged in journal/. telegram:true = also send the check-in on Telegram.",
+  "rapport_jour_heure": 21,
+  "presence": {
+    "maison": {
+      "lat": 0.0,
+      "lon": 0.0,
+      "rayon_m": 150
+    }
+  },
+  "trading": {
+    "executeur": {
+      "actif": true,
+      "positions_max": 6,
+      "ordres_max_jour": 24
+    }
+  },
+  "interruption_actif": true,
+  "_aide_interruption": "Say the wake word WHILE Jarvis is talking to interrupt it: it listens right away. 'Continue' resumes exactly where it stopped. Anything else is treated as a new request. interruption_actif:false to disable (useful if the mic picks up its own voice from speakers and cuts itself off).",
+  "mail": {
+    "model": "qwen3:4b",
+    "num_ctx": 2048
+  },
+  "_aide_mail": "Mail triage (Mail section): dedicated LIGHTWEIGHT Ollama model (qwen3:4b, ~2.5GB, smaller than gemma3:4b used for conversation) with a smaller context window: less RAM needed.",
+  "micro_peripherique": "",
+  "seo": {
+    "url": "https://your-seo-tool.example.com",
+    "nuit": {
+      "actif": false,
+      "heure": "03:00",
+      "metiers": [
+        "locksmith",
+        "real estate agency",
+        "renovation company"
+      ],
+      "villes": [
+        "Lyon",
+        "Le Havre",
+        "Caen"
+      ],
+      "indexVille": 0
+    }
+  },
+  "_aide_seo": "SEO audit + prospecting tool (separately deployed, e.g. on Netlify): seo.url is the base used by the AUDIT_SEO and RECHERCHE_SEO actions. Read-only, no email is ever sent by this code.",
+  "agentsIA": {
+    "metiers": [
+      "locksmith",
+      "plumber",
+      "electrician",
+      "glazier",
+      "heating engineer",
+      "roofer",
+      "auto repair",
+      "veterinarian",
+      "dentist",
+      "physiotherapist",
+      "hairdresser",
+      "beauty salon",
+      "driving school",
+      "mover",
+      "landscaper",
+      "funeral home"
+    ],
+    "villes": [
+      "Paris",
+      "Marseille",
+      "Lyon",
+      "Toulouse",
+      "Nice",
+      "Nantes"
+    ],
+    "indexVille": 0,
+    "nuit": {
+      "actif": true,
+      "heure": "03:00"
+    }
+  },
+  "_aide_agentsia": "Business prospecting for a given product/service: RECHERCHE_ARTISANS searches the given trades/cities (or rotates through the configured list if none given by voice). Results without a findable email are discarded automatically. agentsIA.nuit: one silent automatic search per night, with a reminder after wake-up.",
+  "automatisation": {
+    "api_key": "YOUR_N8N_API_KEY"
+  },
+  "_aide_automatisation": "api_key: your local n8n public API key (Settings > n8n API), used by AUTOMATISATION_CREER to create workflows — always created disabled (active:false), the code never turns them on itself."
+}

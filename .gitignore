@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+
+# Real secrets / local runtime data — never commit these, only the .example.json templates above
+config.json
+mcp/zoho_config.json
+mcp/zoho_token_cache.json
+spotify.json
+securite_etat.json
+.env
+
+# Personal / runtime data this project generates locally (never meant to be committed)
+business.json
+state.json
+agenda.json
+projets.json
+notes.md
+personnalite.md
+journal/
+*.session
+*.log

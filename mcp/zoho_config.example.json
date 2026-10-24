@@ -1,0 +1,5 @@
+{
+  "client_id": "YOUR_ZOHO_CLIENT_ID",
+  "client_secret": "YOUR_ZOHO_CLIENT_SECRET",
+  "refresh_token": "YOUR_ZOHO_REFRESH_TOKEN"
+}
