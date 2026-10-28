@@ -644,7 +644,7 @@
       <div class="pres-boutons" style="margin-top:8px">
         <button class="btn" data-calme="+60">🌙 1 h</button><button class="btn" data-calme="+180">🌙 3 h</button><button class="btn" data-calme="fin">☀️ Terminer</button>
       </div>
-      <p class="aide" style="margin:8px 0 0">Ou dis à Atlas « je dors jusqu'à 10 h », « je fais une sieste d'une heure », « réveille-moi à 9 h » (il t'appelle), ou « je suis réveillé ». Tes routines (médicament…) et tes rappels restent actifs.</p>
+      <p class="aide" style="margin:8px 0 0">Ou dis à Atlas « je dors jusqu'à 10 h », « je fais une sieste d'une heure », « réveille-moi à 9 h » (il t'appelle), ou « je suis réveillé ». Tes routines (importantes ou non) et tes rappels restent actifs.</p>
     </section>
     <section id="telBloc"><h4>Mon iPhone</h4>
       <div class="sec-statut" id="telEtat"></div>
@@ -2375,7 +2375,7 @@ function dessinerJournal() {
   }
   parts.push(bt);
   if (jrn.suivis.length) {
-    const box = el('div'); box.append(H4('Confirmations (médicament…)'));
+    const box = el('div'); box.append(H4('Confirmations (routines importantes…)'));
     for (const x of jrn.suivis) {
       const l = el('div', 'suivi'), ic = x.statut === 'confirme' ? ['✔ Confirmé', 'ok'] : x.statut === 'echec' ? ['✖ Non confirmé', 'ko'] : ['⏳ En cours', 'att'];
       l.append(el('span', ic[1], ic[0]), el('span', '', x.texte), el('small', '', `${x.quand} · ${x.essai}/${x.max} essai(s)`)); box.append(l);
@@ -2510,7 +2510,7 @@ function guideOwnTracks(base) {
     e("App Store → « OwnTracks » (gratuite) → installe-la, ouvre-la et accepte la localisation « Toujours », « Position exacte » et l'actualisation en arrière-plan."),
     e("Dans OwnTracks : Réglages → Mode → « HTTP ». (Les noms exacts peuvent varier un peu d'une version à l'autre : cherche l'option équivalente.)"),
     e('Réglages → Configuration : URL, puis Authentification activée avec ces valeurs :',
-      el('div', 'aide', 'URL :'), ligneCopie(base + '/owntracks'), el('div', 'aide', 'Identifiant (UserID) :'), ligneCopie('youssef'),
+      el('div', 'aide', 'URL :'), ligneCopie(base + '/owntracks'), el('div', 'aide', 'Identifiant (UserID) :'), ligneCopie('utilisateur'),
       el('div', 'aide', 'Mot de passe (le jeton de Atlas, ne le partage jamais) :'), ligneCopie(token), el('div', 'aide', 'Device ID :'), ligneCopie('iphone')),
     e("Mode de localisation : « Significatif » pour commencer (économe : une position à chaque déplacement notable). « Déplacement » est plus précis mais consomme davantage la batterie."),
     e("Régions → « + » → nom exact « maison » → position actuelle (chez toi), rayon 100 à 150 m. Ça donne des entrées / sorties fiables, en plus des Raccourcis."),

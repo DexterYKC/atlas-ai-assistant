@@ -257,7 +257,7 @@ server.registerTool('marquer_candidature_envoyee', {
 
 server.registerTool('marquer_candidature_reponse', {
   title: 'Marquer une réponse reçue',
-  description: "Enregistre qu'une réponse a été reçue pour une candidature (section Emploi) : arrête les relances automatiques pour cette offre. N'enregistre ni ne lit jamais le contenu d'un mail — un simple marqueur, posé par Youssef.",
+  description: "Enregistre qu'une réponse a été reçue pour une candidature (section Emploi) : arrête les relances automatiques pour cette offre. N'enregistre ni ne lit jamais le contenu d'un mail — un simple marqueur, posé par l'utilisateur.",
   inputSchema: { id: z.string().trim().min(1).describe("Id de l'offre Emploi (voir lister_candidatures_a_relancer).") },
 }, async ({ id }) => {
   try { return texte(await marquerCandidatureReponse(id)); }

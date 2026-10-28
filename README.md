@@ -92,11 +92,13 @@ Every action the LLM proposes is decided **by code, never by the prompt**:
 
 `config.example.json` and `mcp/zoho_config.example.json` are included to show the full shape of the configuration (every setting is commented in French, matching the rest of the codebase) — not as a setup guide. This repo is for reading, not for running: see the note at the top.
 
+**Secrets never live in `config.json`.** Every API key/token field in `config.example.json` is intentionally empty; real values come from environment variables at runtime (`.env`, see `.env.example` — no extra dependency, parsed by a dozen lines in `jarvis.js`). A missing variable disables its feature with a clear startup message instead of failing silently later.
+
 ## What's excluded — why
 
 | Excluded | Reason |
 |---|---|
-| `config.json`, `mcp/zoho_config.json`, `mcp/zoho_token_cache.json`, `spotify.json` | Real API keys/tokens — `*.example.json` templates are provided instead |
+| `config.json`, `mcp/zoho_config.json`, `mcp/zoho_token_cache.json`, `spotify.json`, `.env` | Real API keys/tokens — `*.example.json` and `.env.example` templates are provided instead |
 | `business.json`, `state.json`, `agenda.json`, `projets.json`, `journal/` | Real prospect data and personal data generated at runtime |
 | `appel/` | Depends on a Telegram user-session file (as sensitive as a password) |
 | `voix/` | Voice-biometric profile and trained wake-word binaries, not code |

@@ -1,11 +1,12 @@
 {
+  "_aide_secrets": "Every secret field below is intentionally empty: real values come from environment variables (.env at the repo root — see .env.example), never from this file. jarvis.js overlays them onto this config at startup; a field here is only used as a fallback if its env var isn't set.",
   "nom": "Atlas",
   "business": {
     "jour_relance": "tuesday",
     "veille_bandeau": true
   },
-  "telegram_token": "YOUR_BOTFATHER_TOKEN",
-  "gemini_key": "YOUR_GEMINI_API_KEY",
+  "telegram_token": "",
+  "gemini_key": "",
   "allowed_user_id": "YOUR_TELEGRAM_USER_ID",
   "brief_hour": 8,
   "brief_minute": 0,
@@ -40,7 +41,7 @@
   "reveil_reponse": "Yes, Sir?",
   "_aide_reveil": "reveil_reponse: what Jarvis says right after waking up (\"\" = a simple beep). recherche_web_vocal:false = no web search for PC voice (faster); typed messages, Telegram and the app keep web search.",
   "voice_port": 8765,
-  "voice_token": "YOUR_RANDOM_API_TOKEN",
+  "voice_token": "",
   "wake_model": "voix/modeles/atlas_fr.onnx",
   "wake_seuil": 0.25,
   "wake_models": [
@@ -94,13 +95,13 @@
   "url_telephone": "https://your-machine.your-tailnet.ts.net",
   "_aide_url_telephone": "Tailscale address of this PC, e.g. https://my-pc.tailnet1234.ts.net",
   "agenda_rappel_minutes": 15,
-  "github_token": "YOUR_GITHUB_PAT",
-  "netlify_token": "YOUR_NETLIFY_TOKEN",
+  "github_token": "",
+  "netlify_token": "",
   "secours_prioritaire": false,
   "_aide_secours_prioritaire": "Tries Groq BEFORE Gemini when true (useful if your Gemini quota is exhausted).",
   "secours": {
     "url": "https://api.groq.com/openai/v1",
-    "key": "YOUR_GROQ_API_KEY",
+    "key": "",
     "model": "openai/gpt-oss-120b",
     "models": [
       "openai/gpt-oss-120b",
@@ -157,7 +158,7 @@
   "bilan_jour": 0,
   "bilan_heure": 19,
   "spotify": {
-    "client_id": "YOUR_SPOTIFY_CLIENT_ID",
+    "client_id": "",
     "redirect": "http://127.0.0.1:8765/spotify/callback"
   },
   "securite": {
@@ -270,7 +271,7 @@
   },
   "_aide_agentsia": "Business prospecting for a given product/service: RECHERCHE_ARTISANS searches the given trades/cities (or rotates through the configured list if none given by voice). Results without a findable email are discarded automatically. agentsIA.nuit: one silent automatic search per night, with a reminder after wake-up.",
   "automatisation": {
-    "api_key": "YOUR_N8N_API_KEY"
+    "api_key": ""
   },
   "_aide_automatisation": "api_key: your local n8n public API key (Settings > n8n API), used by AUTOMATISATION_CREER to create workflows — always created disabled (active:false), the code never turns them on itself."
 }

@@ -1,8 +1,9 @@
-// Lecture SEULE de l'emploi du temps Amilcar University ("classrooms.amilcar-university.com"), via un navigateur
-// Edge headless dédié (profil vide, jamais le profil perso de l'utilisateur) : la page est une SPA (rien en HTML
-// brut sans JS), donc impossible à lire avec un simple fetch. On se connecte avec les identifiants fournis, puis
-// on relit la grille "Emploi du temps" semaine par semaine (le site accepte une date dans l'URL de la vue semaine).
-const BASE = 'https://classrooms.amilcar-university.com/espace';
+// Lecture SEULE de l'emploi du temps d'un portail tiers (identité volontairement omise : n'importe quel portail avec
+// connexion email/mot de passe et sans API publique), via un navigateur Edge headless dédié (profil vide, jamais le
+// profil perso de l'utilisateur) : la page est une SPA (rien en HTML brut sans JS), donc impossible à lire avec un
+// simple fetch. On se connecte avec les identifiants fournis, puis on relit la grille "Emploi du temps" semaine par
+// semaine (le site accepte une date dans l'URL de la vue semaine).
+const BASE = process.env.FAC_BASE_URL || 'https://exemple-portail.invalid/espace';
 
 function lundiDe(d) {
   const x = new Date(d);

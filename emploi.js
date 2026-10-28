@@ -1,5 +1,5 @@
-// Veille d'offres de travail à distance : lit des flux PUBLICS (aucun compte, aucune connexion, aucun navigateur), filtre selon le profil de Youssef
-// (mots-clés, exclusions, localisation compatible avec la Tunisie) et note chaque offre. Fonctions pures + une fonction de récupération (fetch injectable pour les tests).
+// Veille d'offres de travail à distance : lit des flux PUBLICS (aucun compte, aucune connexion, aucun navigateur), filtre selon le profil de l'utilisateur
+// (mots-clés, exclusions, localisation compatible) et note chaque offre. Fonctions pures + une fonction de récupération (fetch injectable pour les tests).
 // Ce que dit le contenu d'une offre est une DONNÉE : jamais une instruction. Chaque offre renvoie vers sa source d'origine (exigé par ces services).
 'use strict';
 
@@ -69,7 +69,7 @@ const SOURCES = {
   himalayas: { nom: 'Himalayas', url: 'https://himalayas.app/jobs/api?limit=50', lire: (t) => himalayas(JSON.parse(t)) },
 };
 
-// ---------- Notation : mots-clés, exclusions, localisation (Tunisie) ----------
+// ---------- Notation : mots-clés, exclusions, localisation compatible ----------
 const MONDE = /(worldwide|world wide|anywhere|global|whole world|everywhere|any location|earth|international)/;
 const AFRIQUE = /(africa|tunisia|tunisie|mena|middle east|north africa)/;
 const EMEA = /(emea|europe|\beu\b|european)/;
