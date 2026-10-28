@@ -11,12 +11,15 @@
 // web, et seulement vers l'URL de site déjà enregistrée pour le prospect demandé — jamais une URL fournie en paramètre.
 // creer_brouillon et creer_relance passent par l'API officielle Zoho Mail (OAuth, mcp/zoho_config.json) et n'enregistrent
 // jamais que des BROUILLONS : aucune fonction d'envoi n'existe dans ce code (voir zoho.js).
+// Donne aussi accès aux candidatures de la section Emploi (marquer « postulée », réponse reçue, relance) : mêmes
+// garanties (API locale d'Atlas uniquement, jamais d'écriture directe dans state.json) — voir emploi.js.
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { atlas, BASE_URL } from './atlas.js';
 import { creerBrouillon } from './zoho.js';
 import { listerRelances, marquerRelance, creerRelance, listerAContacterAutrement, listerBusiness, marquerContacte } from './relances.js';
+import { listerCandidaturesARelancer, marquerCandidatureEnvoyee, marquerCandidatureReponse, marquerCandidatureRelancee } from './emploi.js';
 
 // Jamais sur stdout : le transport stdio s'en sert pour le protocole MCP. Tous les logs vont sur stderr.
 const log = (...a) => console.error('[atlas-prospects-mcp]', ...a);
@@ -228,6 +231,45 @@ server.registerTool('creer_relance', {
   },
 }, async ({ id, corps_html }) => {
   try { return texte(await creerRelance(id, corps_html)); }
+  catch (e) { return erreur(e); }
+});
+
+server.registerTool('lister_candidatures_a_relancer', {
+  title: 'Lister les candidatures à relancer',
+  description: "Liste les offres de la section Emploi marquées « postulée » depuis au moins le délai configuré (config.json > emploi.relance_jours, en jours OUVRÉS — 10 par défaut) sans réponse enregistrée. Pour chacune : id (celui de l'offre, pas d'un prospect Business), titre, société, url, date réelle d'envoi, date de relance prévue, nombre de relances déjà faites. Au-delà de 2 relances sans réponse, une offre n'apparaît plus ici (plus de relance automatique).",
+  inputSchema: {},
+}, async () => {
+  try { return texte(await listerCandidaturesARelancer()); }
+  catch (e) { return erreur(e); }
+});
+
+server.registerTool('marquer_candidature_envoyee', {
+  title: 'Marquer une candidature comme envoyée',
+  description: "Marque une offre de la section Emploi comme « postulée » (même effet que le bouton « ✔ Marquer postulée » du tableau de bord), avec la date RÉELLE d'envoi du mail — à utiliser quand le mail part réellement, pas quand le brouillon est rédigé (souvent plusieurs jours avant). Programme automatiquement la prochaine relance (config.json > emploi.relance_jours, jours ouvrés) si aucune réponse n'est enregistrée d'ici là.",
+  inputSchema: {
+    id: z.string().trim().min(1).describe("Id de l'offre Emploi (pas un id de prospect Business)."),
+    date_envoi: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Format attendu : AAAA-MM-JJ').optional().describe("Date réelle d'envoi, si ce n'est pas aujourd'hui (ex. dit après coup). Omis = aujourd'hui."),
+  },
+}, async ({ id, date_envoi }) => {
+  try { return texte(await marquerCandidatureEnvoyee(id, date_envoi)); }
+  catch (e) { return erreur(e); }
+});
+
+server.registerTool('marquer_candidature_reponse', {
+  title: 'Marquer une réponse reçue',
+  description: "Enregistre qu'une réponse a été reçue pour une candidature (section Emploi) : arrête les relances automatiques pour cette offre. N'enregistre ni ne lit jamais le contenu d'un mail — un simple marqueur, posé par Youssef.",
+  inputSchema: { id: z.string().trim().min(1).describe("Id de l'offre Emploi (voir lister_candidatures_a_relancer).") },
+}, async ({ id }) => {
+  try { return texte(await marquerCandidatureReponse(id)); }
+  catch (e) { return erreur(e); }
+});
+
+server.registerTool('marquer_candidature_relancee', {
+  title: 'Marquer une candidature relancée',
+  description: "Enregistre qu'une relance a été envoyée pour une candidature déjà « postulée » (section Emploi) : reprogramme la prochaine relance (config.json > emploi.relance_jours, jours ouvrés), sauf après 2 relances déjà faites — la limite est alors atteinte et plus aucune relance n'est programmée.",
+  inputSchema: { id: z.string().trim().min(1).describe("Id de l'offre Emploi (voir lister_candidatures_a_relancer).") },
+}, async ({ id }) => {
+  try { return texte(await marquerCandidatureRelancee(id)); }
   catch (e) { return erreur(e); }
 });
 

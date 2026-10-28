@@ -3,43 +3,51 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-<meta name="theme-color" content="#131A2E">
+<meta name="theme-color" content="#0b0d13">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Atlas">
+<script>try{document.documentElement.classList.add('amb-' + (localStorage.getItem('jarvis_ambiance') || '1'));}catch{document.documentElement.classList.add('amb-1');}</script>
 <title>Atlas</title>
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Chakra+Petch:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/glass.css">
 <style>
   :root {
-    --bg: #131A2E;
-    --surface: #1C2440;
-    --line: #2C3658;
-    --gold: #E2B04A;
-    --gold-deep: #B8872C;
-    --gold-soft: rgba(226, 176, 74, 0.13);
-    --text: #EEF0F6;
-    --muted: #EEF0F6;
-    --red: #E0503F;
-    --red-soft: rgba(224, 80, 63, 0.12);
-    --display: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
-    --body: "Barlow", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --bg: transparent;
+    --surface: var(--glass-bg);
+    --line: var(--glass-border);
+    --gold: #5B8DEF;
+    --gold-deep: #3E6FE0;
+    --gold-soft: rgba(91, 141, 239, 0.16);
+    --text: #FFFFFF;
+    --muted: rgba(255, 255, 255, 0.6);
+    --red: #D4645A;
+    --red-soft: rgba(212, 100, 90, 0.14);
+    --panel-base: #11131c;
+    --panel-strong: rgba(10, 12, 18, 0.88);
+    --display: "Inter", "Segoe UI", system-ui, sans-serif;
+    --body: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
+  html { color-scheme: dark; }
+  select option { background: #11131c; color: #fff; }
   body {
-    background: var(--bg);
+    position: relative;
     color: var(--text);
-    font: 400 17px/1.5 var(--body);
+    font: 400 16px/1.5 var(--body);
     display: flex;
     flex-direction: column;
     -webkit-font-smoothing: antialiased;
   }
+  body::before { content: ""; position: fixed; inset: 0; background: rgba(5, 7, 12, 0.28); pointer-events: none; z-index: 0; }
+  header, main, footer, #tiroir, #voile { position: relative; z-index: 1; }
   button { font: inherit; color: inherit; cursor: pointer; }
   button:focus-visible, textarea:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 
@@ -55,10 +63,12 @@
   .who p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
   .who p.off { color: var(--red); }
   .icon-btn {
-    width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line);
-    background: transparent; display: grid; place-items: center;
+    width: 44px; height: 44px; border-radius: 16px; border: 1px solid var(--line);
+    background: var(--surface); display: grid; place-items: center;
+    transition: transform .2s ease-out, background .2s ease-out, border-color .2s ease-out;
   }
-  .icon-btn[aria-pressed="true"] { border-color: var(--gold); color: var(--gold); background: var(--gold-soft); }
+  .icon-btn:hover { transform: translateY(-2px); }
+  .icon-btn[aria-pressed="true"] { border-color: transparent; color: #fff; background: var(--gold); }
   .icon-btn svg { width: 22px; height: 22px; }
 
   /* Fil */
@@ -66,18 +76,13 @@
   main { flex: 1; overflow-y: auto; padding: 20px 16px 8px; scrollbar-width: none; -ms-overflow-style: none; }
   main::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
-  /* Barre de défilement : fine, fond transparent, discrète (dorée comme le reste de l'interface) */
-  html { color-scheme: dark; }
-  ::-webkit-scrollbar { width: 6px; height: 6px; background: transparent; }
-  ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(226, 176, 74, 0.28); border-radius: 6px; }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(226, 176, 74, 0.55); }
-  ::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
-  @supports not selector(::-webkit-scrollbar) { * { scrollbar-width: thin; scrollbar-color: rgba(226, 176, 74, 0.35) transparent; } }
+  /* Aucune barre de défilement visible (le défilement marche toujours à la molette/trackpad) */
+  ::-webkit-scrollbar { display: none; width: 0; height: 0; }
+  * { scrollbar-width: none; }
   .feed { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
   .msg { max-width: 86%; white-space: pre-wrap; overflow-wrap: anywhere; }
   .msg.moi {
-    align-self: flex-end; background: var(--gold-soft); border: 1px solid rgba(226, 176, 74, 0.35);
+    align-self: flex-end; background: var(--gold-soft); border: 1px solid rgba(91, 141, 239, 0.35);
     border-radius: 16px 16px 4px 16px; padding: 10px 14px;
   }
   .msg.jarvis { align-self: flex-start; padding: 2px 0 2px 14px; border-left: 2px solid var(--line); }
@@ -110,17 +115,17 @@
   /* Le bouton principal : un réacteur */
   .reactor {
     width: 64px; height: 64px; flex: none; border-radius: 50%; border: none; position: relative;
-    background: radial-gradient(circle at 50% 50%, #F4D48A 0 18%, var(--gold) 19% 44%, var(--bg) 45% 55%, var(--gold-deep) 56% 70%, #3A3220 71%);
-    box-shadow: 0 0 0 1px rgba(226, 176, 74, 0.5), 0 0 22px rgba(226, 176, 74, 0.28);
+    background: radial-gradient(circle at 50% 50%, #BFD4FF 0 18%, var(--gold) 19% 44%, var(--panel-base) 45% 55%, var(--gold-deep) 56% 70%, #15213A 71%);
+    box-shadow: 0 0 0 1px rgba(91, 141, 239, 0.5), 0 0 22px rgba(91, 141, 239, 0.28);
     display: grid; place-items: center;
   }
-  .reactor svg { width: 22px; height: 22px; color: #1A1406; position: relative; z-index: 1; }
+  .reactor svg { width: 22px; height: 22px; color: #0B1220; position: relative; z-index: 1; }
   .reactor .ico { display: none; }
   .reactor[data-state="micro"] .i-mic,
   .reactor[data-state="envoyer"] .i-send,
   .reactor[data-state="stop"] .i-stop,
   .reactor[data-state="attente"] .i-wait { display: block; }
-  .reactor[data-state="stop"] { background: radial-gradient(circle, #FF9C8C 0 18%, var(--red) 19% 44%, var(--bg) 45% 55%, #9E3025 56% 70%, #3A1C18 71%); box-shadow: 0 0 0 1px rgba(224, 80, 63, 0.6), 0 0 26px rgba(224, 80, 63, 0.45); }
+  .reactor[data-state="stop"] { background: radial-gradient(circle, #FF9C8C 0 18%, var(--red) 19% 44%, var(--panel-base) 45% 55%, #9E3025 56% 70%, #3A1C18 71%); box-shadow: 0 0 0 1px rgba(224, 80, 63, 0.6), 0 0 26px rgba(224, 80, 63, 0.45); }
   .reactor[data-state="stop"]::after {
     content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--red);
     animation: pulse 1.2s ease-out infinite;
@@ -133,21 +138,22 @@
   #menuBtn { display: none; position: relative; }
   #menuBtn[data-alerte="1"]::after, #menuBtn[data-alerte="2"]::after { content: ""; position: absolute; top: 6px; right: 6px; width: 11px; height: 11px; border-radius: 50%; background: var(--gold); }
   #menuBtn[data-alerte="2"]::after { background: var(--red); }
-  #tiroir { display: none; position: fixed; top: 0; bottom: 0; left: 0; width: min(84vw, 320px); z-index: 60; flex-direction: column; gap: 4px; overflow-y: auto; background: var(--bg); border-right: 1px solid var(--line);
+  #tiroir { display: none; position: fixed; top: 0; bottom: 0; left: 0; width: min(84vw, 320px); z-index: 60; flex-direction: column; gap: 4px; overflow-y: auto; background: var(--panel-strong); border-right: 1px solid var(--line);
     padding: calc(env(safe-area-inset-top) + 14px) 12px calc(env(safe-area-inset-bottom) + 14px); transform: translateX(-105%); transition: transform .2s ease; }
   #voile { display: none; position: fixed; inset: 0; z-index: 55; background: rgba(5, 8, 18, 0.6); }
   .ti { position: relative; display: flex; align-items: center; gap: 16px; padding: 14px 12px; border-radius: 12px; border: 1px solid transparent; color: var(--muted); text-decoration: none; font-size: 19px; white-space: nowrap; }
-  .ti svg { width: 24px; height: 24px; flex: none; } .ti[aria-current="page"] { color: var(--gold); background: var(--gold-soft); border-color: rgba(226, 176, 74, 0.35); }
-  .ti.bas { margin-top: auto; } .ti .b { margin-left: auto; min-width: 22px; padding: 0 6px; height: 22px; line-height: 22px; text-align: center; border-radius: 11px; font-size: 13px; color: #1a1405; background: var(--gold); } .ti .b.ko { background: var(--red); color: #fff; }
+  .ti svg { width: 24px; height: 24px; flex: none; } .ti[aria-current="page"] { color: var(--gold); background: var(--gold-soft); border-color: rgba(91, 141, 239, 0.35); }
+  .ti.bas { margin-top: auto; } .ti .b { margin-left: auto; min-width: 22px; padding: 0 6px; height: 22px; line-height: 22px; text-align: center; border-radius: 11px; font-size: 13px; color: #fff; background: var(--gold); } .ti .b.ko { background: var(--red); color: #fff; }
   @media (max-width: 480px) {
     html:not(.integre) #menuBtn { display: grid; }
-    html:not(.integre) #phoneBtn, html:not(.integre) #agendaBtn, html:not(.integre) #bizBtn, html:not(.integre) #projBtn, html:not(.integre) #secBtn { display: none !important; }
+    html:not(.integre) #phoneBtn, html:not(.integre) #agendaBtn, html:not(.integre) #bizBtn, html:not(.integre) #secBtn { display: none !important; }
     html:not(.integre) #tiroir { display: flex; }
     html.menu-ouvert #tiroir { transform: none; box-shadow: 10px 0 40px rgba(0, 0, 0, 0.6); } html.menu-ouvert #voile { display: block; }
     header { gap: 10px; } .who h1, .who p { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   }
-  /* Intégré dans le tableau de bord (?integre=1) : le bouton Projets n'a plus de sens, on est déjà dedans */
-  html.integre #projBtn { display: none; }
+  /* Panneau Atlas compact (?integre=1, panneau latéral ou mini-fenêtre) : agenda/business/sécurité sont déjà dans le tableau de bord juste à côté,
+     on ne garde que l'essentiel du panneau lui-même (dashboard, focus, voix, thème) pour laisser la place au nom "Atlas" */
+  html.integre #phoneBtn, html.integre #agendaBtn, html.integre #bizBtn, html.integre #secBtn { display: none !important; }
   html.plein header, html.plein footer, html.plein #feed { display: none !important; }
   html.plein main { padding-top: 16px; }
   html.plein .agenda, html.plein .biz { max-width: 900px; margin: 0 auto; }
@@ -166,11 +172,11 @@
   dialog p { margin: 0 0 14px; color: var(--muted); font-size: 15px; }
   dialog input {
     width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--line);
-    background: var(--bg); color: var(--text); font: 400 16px var(--body); margin-bottom: 14px;
+    background: var(--panel-base); color: var(--text); font: 400 16px var(--body); margin-bottom: 14px;
   }
   .row { display: flex; gap: 10px; justify-content: flex-end; }
   .btn { border-radius: 10px; padding: 10px 16px; border: 1px solid var(--line); background: transparent; }
-  .btn.primary { background: var(--gold); border-color: var(--gold); color: #1A1406; font-weight: 600; }
+  .btn.primary { background: var(--gold); border-color: var(--gold); color: #FFFFFF; font-weight: 600; }
   #qr { background: #fff; padding: 12px; border-radius: 12px; width: fit-content; margin: 0 auto 14px; }
   #qr img, #qr canvas { display: block; }
   .steps { margin: 0 0 14px; padding-left: 20px; color: var(--muted); font-size: 15px; }
@@ -181,58 +187,82 @@
   .day { margin-bottom: 22px; }
   .day h2 { margin: 0 0 8px; font: 600 16px/1.3 var(--display); letter-spacing: 0.02em; color: var(--muted); }
   .day.today h2 { color: var(--gold); }
-  .ev { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
-  .ev:last-child { border-bottom: none; }
+  .ev {
+    display: flex; align-items: center; gap: 12px; padding: 14px 16px; margin-bottom: 10px;
+    border: 1px solid var(--line); border-radius: 14px; background: var(--surface);
+    box-shadow: 0 8px 22px -16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);
+  }
+  .ev:last-child { margin-bottom: 0; }
   .ev .when { width: 64px; flex: none; font: 500 15px/1.2 var(--display); color: var(--gold); }
   .ev .what { flex: 1; min-width: 0; }
   .ev .what small { display: block; color: var(--muted); font-size: 13px; }
-  .ev.pause { background: var(--gold-soft); border-radius: 12px; padding: 12px; border-bottom: none; margin-bottom: 6px; }
+  .ev.pause { background: var(--gold-soft); }
   .ev.rappel .when { color: var(--muted); }
-  .ev button { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: transparent; color: var(--muted); flex: none; }
+  .ev.cours { border-left: 3px solid #5B8DEF; }
+  .ev button { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line); background: transparent; color: var(--muted); flex: none; }
   .agenda .hint, .biz .hint { color: var(--muted); font-size: 15px; margin: 0 0 20px; }
 
-  /* Business */
+  /* Business (onglet "Prospects") : mêmes codes visuels que le reste du tableau de bord (cartes carrées, radius 14-16px,
+     ombre portée douce + liseré clair en haut) plutôt que l'ancienne liste à séparateurs — moins "appli de réglages". */
   .biz { max-width: 720px; margin: 0 auto; }
   .money { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 26px; }
-  .money div { border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+  .money div { border: 1px solid var(--line); border-radius: 16px; padding: 16px; background: var(--surface); box-shadow: 0 8px 22px -16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1); }
   .money span { display: block; font-size: 13px; color: var(--muted); }
   .money strong { font: 600 20px/1.3 var(--display); }
   .money .due strong { color: var(--red); }
   .money .play strong { color: var(--gold); }
   .biz h2 { margin: 0 0 6px; font: 600 16px/1.3 var(--display); color: var(--muted); letter-spacing: 0.02em; }
   .biz section { margin-bottom: 26px; }
-  .line { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
-  .line:last-child { border-bottom: none; }
+  .line {
+    display: flex; align-items: center; gap: 12px; padding: 14px 16px; margin-bottom: 10px;
+    border: 1px solid var(--line); border-radius: 14px; background: var(--surface);
+    box-shadow: 0 8px 22px -16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);
+  }
+  .line:last-child { margin-bottom: 0; }
   .line .what { flex: 1; min-width: 0; }
   .line .what small { display: block; color: var(--muted); font-size: 13px; }
   .line .amount { font: 500 15px/1.2 var(--display); white-space: nowrap; }
   .stage { font-size: 12px; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
   .line select {
-    background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 10px;
+    background: var(--panel-base); color: var(--text); border: 1px solid var(--line); border-radius: 10px;
     padding: 8px; font: 400 14px var(--body); max-width: 118px;
   }
-  .line .open { height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--gold); background: transparent; color: var(--gold); flex: none; }
+  .line .open { height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--gold); background: transparent; color: var(--gold); flex: none; }
   .late { color: var(--red); }
-  .biz details { margin-bottom: 14px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
-  .biz details .line { padding: 10px 14px; margin: 0; }
-  .biz summary { cursor: pointer; padding: 12px 14px; font: 600 14px/1.3 var(--display); list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .biz details {
+    margin-bottom: 14px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--surface);
+    box-shadow: 0 8px 22px -16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);
+  }
+  .biz details .line { padding: 12px 14px; margin: 10px 14px; background: var(--panel-base); box-shadow: none; }
+  .biz summary { cursor: pointer; padding: 14px 16px; font: 600 14px/1.3 var(--display); list-style: none; display: flex; align-items: center; gap: 10px; transition: border-color .2s ease; }
   .biz summary::-webkit-details-marker { display: none; }
-  .biz summary .n { color: var(--muted); font: 400 13px var(--body); }
-  .biz details[open] summary { border-bottom: 1px solid var(--line); }
+  .biz summary::before { content: "›"; display: inline-block; transition: transform .22s ease; font-size: 20px; color: var(--muted); }
+  .biz details:not(.ferme) summary::before { transform: rotate(90deg); }
+  .biz summary .n { margin-left: auto; background: var(--gold-soft); color: var(--gold); font-size: 13px; font-weight: 600; padding: 2px 10px; border-radius: 999px; }
+  .biz details:not(.ferme) summary { border-bottom: 1px solid var(--line); }
+  /* Accordéon animé (repli/dépli en douceur) : voir accordeonsAnimer() plus bas — <details> reste toujours "open",
+     .ferme pilote la hauteur visible via ce wrapper en grid-rows 0fr/1fr, qui marche quelle que soit la hauteur du contenu. */
+  .acc-anim { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .3s cubic-bezier(.4,0,.2,1), opacity .22s ease; opacity: 1; }
+  .acc-anim > * { overflow: hidden; min-height: 0; }
+  .ferme > .acc-anim { grid-template-rows: 0fr; opacity: 0; }
   .biz .rowbtns { display: flex; align-items: center; gap: 8px; }
-  .biz .urgent { border: 1px solid var(--red); background: var(--red-soft); border-radius: 14px; padding: 12px 14px; margin-bottom: 18px; }
-  .biz .urgent h3 { margin: 0 0 4px; font: 600 14px/1.3 var(--display); color: var(--red); }
-  .biz .urgent .line { border-bottom: 1px solid rgba(224, 80, 63, 0.25); }
-  .biz .urgent .line:last-child { border-bottom: none; }
+  .biz .urgent {
+    border: 1px solid var(--red); background: var(--red-soft); border-radius: 16px; padding: 14px 16px; margin-bottom: 18px;
+    box-shadow: 0 8px 22px -16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);
+  }
+  .biz .urgent h3 { margin: 0 0 10px; font: 600 14px/1.3 var(--display); color: var(--red); }
+  .biz .urgent .line { background: var(--panel-base); border-color: rgba(224, 80, 63, 0.3); }
   .biz .urgent .btns { display: flex; gap: 6px; flex: none; }
-  .biz .urgent .btns button { height: 34px; padding: 0 10px; border-radius: 8px; font-size: 13px; border: 1px solid var(--line); background: transparent; color: var(--text); }
+  .biz .urgent .btns button { height: 34px; padding: 0 12px; border-radius: 999px; font-size: 13px; border: 1px solid var(--line); background: transparent; color: var(--text); }
   .biz .urgent .btns button.ok { border-color: var(--red); color: var(--red); }
-  .biz .autrement { border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; margin-bottom: 18px; }
-  .biz .autrement h3 { margin: 0 0 4px; font: 600 14px/1.3 var(--display); color: var(--text); }
-  .biz .autrement .line { border-bottom: 1px solid var(--line); }
-  .biz .autrement .line:last-child { border-bottom: none; }
+  .biz .autrement {
+    border: 1px solid var(--line); background: var(--surface); border-radius: 16px; padding: 14px 16px; margin-bottom: 18px;
+    box-shadow: 0 8px 22px -16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);
+  }
+  .biz .autrement h3 { margin: 0 0 10px; font: 600 14px/1.3 var(--display); color: var(--text); }
+  .biz .autrement .line { background: var(--panel-base); }
   .biz .autrement .btns { display: flex; gap: 6px; flex: none; }
-  .biz .autrement .btns button { height: 34px; padding: 0 10px; border-radius: 8px; font-size: 13px; border: 1px solid var(--line); background: transparent; color: var(--text); }
+  .biz .autrement .btns button { height: 34px; padding: 0 12px; border-radius: 999px; font-size: 13px; border: 1px solid var(--line); background: transparent; color: var(--text); }
   .line.doc { flex-wrap: wrap; row-gap: 8px; }
   .line.doc .what { flex-basis: 100%; }
   .line.doc .amount { margin-right: auto; }
@@ -244,7 +274,7 @@
   dialog label { display: block; margin: 0 0 4px; color: var(--muted); font-size: 13px; }
   dialog select, dialog textarea {
     width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--line);
-    background: var(--bg); color: var(--text); font: 400 16px var(--body); margin-bottom: 14px;
+    background: var(--panel-base); color: var(--text); font: 400 16px var(--body); margin-bottom: 14px;
   }
   dialog textarea { min-height: 84px; resize: vertical; }
   dialog .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -262,13 +292,14 @@
   .seclog small { grid-column: 1 / -1; color: var(--muted); overflow-wrap: anywhere; }
   .icon-btn[data-attente="1"] { border-color: var(--gold); color: var(--gold); background: var(--gold-soft); }
   .icon-btn[data-suspendu="1"] { border-color: var(--red); color: var(--red); background: var(--red-soft); }
+
 </style>
 </head>
 <body>
 
 <header>
   <svg class="sigil" viewBox="0 0 32 32" aria-hidden="true">
-    <path fill="#E2B04A" fill-rule="evenodd" d="M16 5 L26.5 27 L21.9 27 L20.1 22.8 L11.9 22.8 L10.1 27 L5.5 27 Z M16 11.5 L13 19 L19 19 Z"/>
+    <path fill="#5B8DEF" fill-rule="evenodd" d="M16 5 L26.5 27 L21.9 27 L20.1 22.8 L11.9 22.8 L10.1 27 L5.5 27 Z M16 11.5 L13 19 L19 19 Z"/>
   </svg>
   <div class="who">
     <h1 id="name">Atlas</h1>
@@ -284,10 +315,13 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M8.5 7V5.5a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2V7M3 12.5h18"/></svg>
   </button>
   <a class="icon-btn" id="projBtn" href="/projets" title="Tableau de bord des projets (s'ouvre en grand)" aria-label="Projets" style="color:inherit;text-decoration:none">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><path d="M9 4v16M14.5 9H20M14.5 13H20"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="13" width="7.5" height="7.5" rx="1.8"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.8"/></svg>
   </a>
   <button class="icon-btn" id="secBtn" data-suspendu="0" data-attente="0" title="Sécurité : actions et confirmations" aria-label="Sécurité">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9.5 12l2 2 3-3.5"/></svg>
+  </button>
+  <button class="icon-btn" id="focusBtn" aria-pressed="false" title="Mode focus / jeux : coupe MetaTrader et Ollama" aria-label="Mode focus / jeux">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9h10a4 4 0 0 1 4 4v1.2a2.3 2.3 0 0 1-4.1 1.4L16 14H8l-.9 1.6A2.3 2.3 0 0 1 3 14.2V13a4 4 0 0 1 4-4Z"/><path d="M8 11v2M7 12h2"/><circle cx="17" cy="11.3" r=".55" fill="currentColor" stroke="none"/><circle cx="15.5" cy="12.8" r=".55" fill="currentColor" stroke="none"/></svg>
   </button>
   <button class="icon-btn" id="voiceBtn" aria-pressed="false" title="Réponses à voix haute" aria-label="Réponses à voix haute">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5v14l-4.5-4.5H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
@@ -298,7 +332,8 @@
 <main id="scroller">
   <div class="agenda hidden" id="agenda">
     <p class="hint">Touchez un rendez-vous pour le corriger, ou dites-le à Atlas : « Déplace le rendez-vous de jeudi à 16h », « Je prends ma journée vendredi ».</p>
-    <div class="addbar"><button class="btn primary" id="evAdd">+ Rendez-vous</button></div>
+    <div class="addbar"><button class="btn primary" id="evAdd">+ Rendez-vous</button><button class="btn" id="facSync">🔄 Emploi du temps fac</button></div>
+    <p class="hint" id="facSyncStatut" style="display:none"></p>
     <div id="agendaList"></div>
   </div>
   <div class="biz hidden" id="biz">
@@ -324,10 +359,6 @@
   <div class="status" id="status"></div>
   <div class="dock">
     <textarea id="input" rows="1" placeholder="Écrire à Atlas…" aria-label="Message"></textarea>
-    <input type="file" id="pdfFile" accept="application/pdf" hidden>
-    <button class="icon-btn" id="pdfBtn" aria-label="Envoyer un PDF (rapport SEO)" title="Envoyer un PDF (rapport SEO)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.4 11.1l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.2-8.2a3.5 3.5 0 0 1 5 5l-8.3 8.2a2 2 0 0 1-2.8-2.8l7.6-7.6"/></svg>
-    </button>
     <button class="icon-btn hidden" id="cancelRec" aria-label="Annuler l'enregistrement" title="Annuler (rien n'est envoyé)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
     </button>
@@ -403,6 +434,7 @@
 <dialog id="docDlg" class="big">
   <h2 id="docH">Devis ou facture</h2>
   <div id="docTypeBox"><label for="docType">Type</label><select id="docType"><option value="devis">Devis</option><option value="facture">Facture</option></select></div>
+  <div id="docEmetteurBox"><label for="docEmetteur">Émetteur</label><select id="docEmetteur"><option value="freelance">Youssef Kacem (freelance)</option><option value="masnasoft">Masnasoft</option></select></div>
   <label for="docClient">Client</label><input id="docClient" maxlength="500" autocomplete="off">
   <label for="docObjet">Objet</label><input id="docObjet" maxlength="500" autocomplete="off">
   <div class="two">
@@ -540,27 +572,6 @@ async function send(payload) {
   }
 }
 
-/* ---------- Envoi d'un PDF (rapport SEO) : enregistré puis évalué tout de suite, la réponse arrive dans le fil comme un message normal ---------- */
-const pdfBtn = $('#pdfBtn'), pdfFile = $('#pdfFile');
-pdfBtn.addEventListener('click', () => pdfFile.click());
-pdfFile.addEventListener('change', async () => {
-  const f = pdfFile.files[0]; pdfFile.value = '';
-  if (!f) return;
-  if (f.type !== 'application/pdf' && !/\.pdf$/i.test(f.name)) { statusEl.textContent = 'Ce fichier n\'est pas un PDF.'; return; }
-  if (f.size > 10e6) { statusEl.textContent = 'PDF trop lourd (10 Mo maximum).'; return; }
-  render({ de: 'moi', texte: '📄 PDF envoyé : ' + f.name, t: Date.now() }); toBottom();
-  busy = true; setReactor(); thinking(true);
-  try {
-    const data = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1] || ''); r.onerror = rej; r.readAsDataURL(f); });
-    const r = await api('/api/seo/pdf', { method: 'POST', body: JSON.stringify({ nom: f.name, data }) });
-    if (!r.ok) throw new Error(await r.text());
-    thinking(false); await pullFeed();
-  } catch (err) {
-    thinking(false);
-    statusEl.textContent = err.message === 'Failed to fetch' ? 'Atlas ne répond pas.' : err.message;
-  } finally { busy = false; setReactor(); }
-});
-
 /* ---------- Voix ---------- */
 function unlockAudio() {
   player.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
@@ -697,7 +708,8 @@ async function loadAgenda() {
       list.append(box);
     }
     if (!items.length) {
-      list.innerHTML = '<p class="hint">Rien de prévu. Dites par exemple : « Rendez-vous client jeudi à 14h ».</p>';
+      const txt = (data.routines || []).length ? "Rien d'autre de prévu. Dites par exemple : « Rendez-vous client jeudi à 14h »." : 'Rien de prévu. Dites par exemple : « Rendez-vous client jeudi à 14h ».';
+      list.append(el('p', 'hint', txt));
       return;
     }
     let current = null, box = null;
@@ -714,7 +726,8 @@ async function loadAgenda() {
       const when = document.createElement('span'); when.className = 'when';
       when.textContent = e.type === 'pause' ? 'Pause' : e.type === 'rappel' ? '⏰ ' + e.heure.replace(':', 'h') : (e.heure ? e.heure.replace(':', 'h') : 'Journée');
       const what = document.createElement('span'); what.className = 'what'; what.textContent = e.titre;
-      if (e.duree) { const sm = document.createElement('small'); sm.textContent = `${e.duree} min`; what.append(sm); }
+      if (e.enseignant) { const sm = document.createElement('small'); sm.textContent = e.enseignant; what.append(sm); }
+      else if (e.duree) { const sm = document.createElement('small'); sm.textContent = `${e.duree} min`; what.append(sm); }
       row.append(when, what);
       if (e.id) {
         for (const x of [when, what]) { x.classList.add('clickable'); x.addEventListener('click', () => openEvent(e)); }
@@ -730,6 +743,28 @@ async function loadAgenda() {
     }
   } catch {}
 }
+async function majFacStatut() {
+  const el = $('#facSyncStatut');
+  try {
+    const d = await (await api('/api/fac')).json();
+    if (d.en_cours) { el.style.display = ''; el.textContent = '🔄 Synchronisation de l\'emploi du temps en cours…'; return true; }
+    if (d.dernier) {
+      el.style.display = '';
+      el.textContent = d.dernier.ok
+        ? `✅ Emploi du temps synchronisé (${d.dernier.ajoutes} ajouté(s), ${d.dernier.maj} mis à jour).`
+        : `⚠️ ${d.dernier.raison || 'Échec de la synchronisation.'}`;
+    }
+  } catch {}
+  return false;
+}
+$('#facSync').addEventListener('click', async () => {
+  const r = await (await api('/api/fac/sync', { method: 'POST' })).json();
+  if (!r.ok) { $('#facSyncStatut').style.display = ''; $('#facSyncStatut').textContent = '⚠️ ' + (r.message || 'Échec.'); return; }
+  const poll = setInterval(async () => {
+    const enCours = await majFacStatut();
+    if (!enCours) { clearInterval(poll); loadAgenda(); }
+  }, 2000);
+});
 /* ---------- Vues : fil / agenda / business ---------- */
 let view = 'feed';
 const relancesIgnorees = new Set();   // "Pas encore" : masque la relance de la session en cours, sans toucher à la date (elle revient au prochain chargement/demain)
@@ -742,7 +777,7 @@ function setView(v) {
   $('#agenda').classList.toggle('hidden', view !== 'agenda');
   $('#biz').classList.toggle('hidden', view !== 'biz');
   feedEl.classList.toggle('hidden', view !== 'feed');
-  if (view === 'agenda') loadAgenda();
+  if (view === 'agenda') { loadAgenda(); majFacStatut(); }
   if (view === 'biz') loadBiz();
   if (view === 'feed') toBottom(); else scroller.scrollTop = 0;
 }
@@ -763,6 +798,28 @@ function prochaineOccurrence(jourNom) {
 }
 function el(tag, cls, text) { const x = document.createElement(tag); if (cls) x.className = cls; if (text !== undefined) x.textContent = text; return x; }
 
+/* ---------- Accordéons animés (repli/dépli en douceur) : <details> de .biz (Prospects) ----------
+   Un <details> natif ne peut pas être animé en CSS (son ouverture bascule display:none, qui ne se transitionne pas).
+   Il reste donc TOUJOURS "open", et c'est une classe .ferme qui pilote la hauteur visible via un wrapper .acc-anim
+   en grid-rows 0fr/1fr (voir CSS). Tourne en continu (MutationObserver) car loadBiz() reconstruit ces <details>. */
+function accordeonsAnimer(racine) {
+  racine.querySelectorAll('.biz details').forEach((det) => {
+    if (det.dataset.accAnime) return;
+    const sum = det.querySelector('summary'); if (!sum) return;
+    det.dataset.accAnime = '1';
+    const reste = [...det.childNodes].filter((n) => n !== sum);
+    const wrap = el('div', 'acc-anim'); reste.forEach((n) => wrap.append(n)); det.append(wrap);
+    det.classList.toggle('ferme', !det.open); det.open = true;
+    sum.addEventListener('click', (e) => {
+      e.preventDefault();
+      det.classList.toggle('ferme');
+      det.dispatchEvent(new CustomEvent('acc-toggle', { detail: { ouvert: !det.classList.contains('ferme') } }));
+    });
+  });
+}
+new MutationObserver(() => accordeonsAnimer(document.body)).observe(document.body, { childList: true, subtree: true });
+accordeonsAnimer(document.body);
+
 function ligneProspect(p, today) {
   const row = el('div', 'line');
   const what = el('span', 'what', p.nom + (p.entreprise && p.entreprise !== p.nom ? ' — ' + p.entreprise : ''));
@@ -779,8 +836,16 @@ function ligneProspect(p, today) {
   row.append(what, col);
   return row;
 }
-function openDocPourProspect(p) { openDoc(null); setv('docClient', p.entreprise || p.nom); }
+function openDocPourProspect(p) {
+  const deMasnasoft = /assist.*ia|ia.*telephon/i.test(p.source || '');
+  openDoc(null, deMasnasoft ? 'masnasoft' : 'freelance');
+  setv('docClient', p.entreprise || p.nom);
+}
 
+// Repli/dépli des groupes de prospects : ouvert par défaut, mais on retient le choix (sinon loadBiz, rappelé toutes les
+// quelques secondes, rouvrirait une carte qu'on vient de fermer).
+function groupeOuvert(lib) { try { return localStorage.getItem('biz_groupe_' + lib) !== '0'; } catch { return true; } }
+function sauverGroupeOuvert(lib, ouvert) { try { localStorage.setItem('biz_groupe_' + lib, ouvert ? '1' : '0'); } catch {} }
 async function loadBiz() {
   try {
     const data = await (await api('/business')).json();
@@ -871,18 +936,22 @@ async function loadBiz() {
       liste.forEach((p) => dejaVus.add(p.id));
       liste.sort((a, b) => (b.cree || '').localeCompare(a.cree || '') || b.id - a.id);
       if (!liste.length) continue;
-      const det = el('details'); det.open = true;
+      const det = el('details'); det.open = groupeOuvert(vue.lib);
+      det.addEventListener('acc-toggle', (e) => sauverGroupeOuvert(vue.lib, e.detail.ouvert));
       const sum = el('summary'); sum.append(el('span', '', vue.lib), el('span', 'n', String(liste.length)));
       det.append(sum);
-      for (const p of liste) det.append(ligneProspect(p, today));
+      const corps = el('div'); for (const p of liste) corps.append(ligneProspect(p, today));
+      det.append(corps);
       pl.append(det);
     }
     const reste = data.prospects.filter((p) => !dejaVus.has(p.id)).sort((a, b) => (b.cree || '').localeCompare(a.cree || '') || b.id - a.id);
     if (reste.length) {
-      const det = el('details'); det.open = true;
+      const det = el('details'); det.open = groupeOuvert('Autres');
+      det.addEventListener('acc-toggle', (e) => sauverGroupeOuvert('Autres', e.detail.ouvert));
       const sum = el('summary'); sum.append(el('span', '', 'Autres'), el('span', 'n', String(reste.length)));
       det.append(sum);
-      for (const p of reste) det.append(ligneProspect(p, today));
+      const corps = el('div'); for (const p of reste) corps.append(ligneProspect(p, today));
+      det.append(corps);
       pl.append(det);
     }
 
@@ -900,7 +969,10 @@ async function loadBiz() {
         loadBiz();
       });
       const open = el('button', 'open', 'Ouvrir');
-      open.addEventListener('click', () => window.open(`/doc?id=${d.id}&t=${encodeURIComponent(token)}`, '_blank'));
+      open.addEventListener('click', async () => {
+        if (session) { try { const r = await post('/business/doc/ouvrir', { id: d.id }); if (r.ok) return; } catch {} }
+        window.open(`/doc?id=${d.id}&t=${encodeURIComponent(token)}`, '_blank');
+      });
       const edit = el('button', 'open', 'Modifier');
       edit.addEventListener('click', () => openDoc(d));
       row.append(what, el('span', 'amount', money(d.total, d.devise)), sel, edit, open);
@@ -988,10 +1060,12 @@ function lignesDepuisTexte(t) {
     return { desc: p[0], qte: 1, prix: 0 };
   });
 }
-function openDoc(d) {
+function openDoc(d, emetteur) {
   docEditId = d && d.id ? d.id : null;
   $('#docH').textContent = d ? `Modifier ${d.numero}` : 'Nouveau devis ou facture';
   $('#docTypeBox').classList.toggle('hidden', !!d);
+  $('#docEmetteurBox').classList.toggle('hidden', !!d);
+  setv('docEmetteur', (d && d.emetteur) || emetteur || 'freelance');
   setv('docType', 'devis'); setv('docClient', d && d.client); setv('docObjet', d && d.objet);
   setv('docEch', d && d.echeance); setv('docDevise', (d && d.devise) || 'EUR'); setv('docNotes', d && d.notes);
   setv('docLignes', ((d && d.lignes) || []).map((l) => `${l.desc} ; ${l.qte} ; ${l.prix}`).join('\n'));
@@ -1004,7 +1078,7 @@ $('#docSave').addEventListener('click', async () => {
   const lignes = lignesDepuisTexte(val('docLignes'));
   if (!docEditId && !lignes.length) return showErr('docErr', 'Ajoutez au moins une ligne (description ; quantité ; prix).');
   try {
-    await post('/business/doc', { id: docEditId, type: val('docType'), client: val('docClient'), objet: val('docObjet'),
+    await post('/business/doc', { id: docEditId, type: val('docType'), emetteur: val('docEmetteur'), client: val('docClient'), objet: val('docObjet'),
       echeance: val('docEch'), devise: val('docDevise'), notes: val('docNotes'), lignes });
     $('#docDlg').close(); loadBiz();
   } catch { showErr('docErr', 'Enregistrement impossible.'); }
@@ -1061,10 +1135,30 @@ secBtn.addEventListener('click', () => { renderSecDlg(); $('#secDlg').showModal(
 $('#secClose').addEventListener('click', () => $('#secDlg').close());
 $('#secSuspend').addEventListener('click', async () => { try { await post('/securite/suspendre', { suspendu: !secEtat.suspendu }); } catch {} pullSecu(); });
 
+/* ---------- Mode focus / jeux ---------- */
+const focusBtn = $('#focusBtn');
+let focusActif = false;
+async function pullFocus() {
+  try { const d = await (await api('/api/focus')).json(); focusActif = !!d.actif; focusBtn.setAttribute('aria-pressed', String(focusActif)); } catch {}
+}
+focusBtn.addEventListener('click', async () => {
+  focusBtn.disabled = true;
+  try { await post(focusActif ? '/api/focus/desactiver' : '/api/focus/activer', {}); } catch {}
+  await pullFocus();
+  focusBtn.disabled = false;
+});
+
 /* ---------- Réglages ---------- */
 const voiceBtn = $('#voiceBtn');
 function setVoice(on) { voiceOn = on; voiceBtn.setAttribute('aria-pressed', String(on)); try { localStorage.setItem('jarvis_voice', on ? '1' : '0'); } catch {} }
 voiceBtn.addEventListener('click', () => { unlockAudio(); setVoice(!voiceOn); });
+
+/* ---------- Ambiance (fond) : réglée depuis Projets > Paramètres, synchronisée en direct ici ---------- */
+function applyAmbiance(n) {
+  document.documentElement.classList.remove('amb-1', 'amb-2', 'amb-3');
+  document.documentElement.classList.add('amb-' + (n || '1'));
+}
+window.addEventListener('storage', (e) => { if (e.key === 'jarvis_ambiance') applyAmbiance(e.newValue); });
 setVoice(voiceOn);
 
 $('#tokenSave').addEventListener('click', () => {
@@ -1145,6 +1239,7 @@ function majMenuBadge() {                        // pastille sur ☰ et sur "Sé
   setInterval(pullFeed, 4000);
   setInterval(pullEtat, 1000);
   pullSecu(); setInterval(pullSecu, 2000);
+  pullFocus(); setInterval(pullFocus, 5000);
   setInterval(() => { if (view === 'agenda') loadAgenda(); if (view === 'biz') loadBiz(); }, 20000);
 })();
 </script>

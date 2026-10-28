@@ -132,6 +132,28 @@
     "mentions_facture": "Payment due on receipt."
   },
   "_aide_entreprise": "Check VAT, stamp duty and mandatory mentions with your accountant (these defaults are France/Tunisia-specific examples).",
+  "entreprise_masnasoft": {
+    "nom": "Your Second Brand",
+    "contact": "Your Name",
+    "adresse": "",
+    "email": "contact@yourbrand.example",
+    "telephone": "",
+    "matricule_fiscal": "",
+    "iban": "",
+    "mentions_devis": "Quote valid for 30 days.",
+    "mentions_facture": "Payment due on receipt."
+  },
+  "_aide_entreprise_masnasoft": "Optional second invoice issuer — used when a client comes from a specific lead source (here: AI-prospected leads), while the default `entreprise` above stays the issuer for everything else. Each issuer gets its own invoice numbering sequence, never mixed.",
+  "emploi": {
+    "relance_jours": 10
+  },
+  "_aide_emploi": "relance_jours: delay (in BUSINESS days, weekends excluded) after marking a job application as 'sent' before it shows up in the follow-up list. Computed from the actual send date, not the date the draft was written.",
+  "fac": {
+    "email": "",
+    "mot_de_passe": "",
+    "semaines_avance": 4
+  },
+  "_aide_fac": "Optional: credentials for a third-party schedule portal synced by fac.js (headless-browser automation, see README) into the agenda. Leave email empty to disable — nothing is attempted without it. semaines_avance: how many weeks ahead to read on each sync.",
   "bilan_jour": 0,
   "bilan_heure": 19,
   "spotify": {

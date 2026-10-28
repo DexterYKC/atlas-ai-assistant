@@ -3,44 +3,51 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#131A2E">
+<meta name="theme-color" content="#0b0d13">
+<script>try{document.documentElement.classList.add('amb-' + (localStorage.getItem('jarvis_ambiance') || '1'));}catch{document.documentElement.classList.add('amb-1');}</script>
 <title>Projets</title>
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Chakra+Petch:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/glass.css">
 <style>
   :root {
-    --bg: #131A2E; --surface: #1C2440; --surface2: #232D4E; --line: #2C3658;
-    --gold: #E2B04A; --gold-soft: rgba(226,176,74,.13); --text: #EEF0F6; --muted: #EEF0F6;
-    --red: #E0503F; --green: #4CB782; --blue: #5B9BE0;
-    --display: "Chakra Petch", "Segoe UI", system-ui, sans-serif; --body: "Barlow", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --bg: transparent; --surface: var(--glass-bg); --surface2: var(--glass-bg-strong); --line: var(--glass-border);
+    --gold: #5B8DEF; --gold-soft: rgba(91,141,239,.16); --text: #FFFFFF; --muted: rgba(255,255,255,.6);
+    --red: #D4645A; --green: #3FBE7A; --blue: #5B8DEF; --panel-base: #11131c; --panel-strong: rgba(10,12,18,.88);
+    --display: "Inter", "Segoe UI", system-ui, sans-serif; --body: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
     color-scheme: dark;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; min-height: 100%; }
-  body { background: var(--bg); color: var(--text); font: 400 16px/1.45 var(--body); -webkit-font-smoothing: antialiased; }
+  body { position: relative; color: var(--text); font: 400 16px/1.45 var(--body); -webkit-font-smoothing: antialiased; }
+  body::before { content: ""; position: fixed; inset: 0; background: rgba(5, 7, 12, 0.28); pointer-events: none; z-index: 0; }
+  #cadre { position: relative; z-index: 1; }
   button, input, select, textarea { font: inherit; color: inherit; }
   button { cursor: pointer; }
   button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
-  ::-webkit-scrollbar { width: 6px; height: 6px; } ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(226,176,74,.35); border-radius: 6px; }
-  @supports not selector(::-webkit-scrollbar) { * { scrollbar-width: thin; scrollbar-color: rgba(226,176,74,.35) transparent; } }
+  /* Aucune barre de défilement visible nulle part (comme dans Prospects) : le défilement marche toujours (molette/trackpad), juste sans piste/pouce affichés. */
+  ::-webkit-scrollbar { display: none; width: 0; height: 0; }
+  * { scrollbar-width: none; }
 
-  header { position: sticky; top: 0; z-index: 5; background: rgba(19,26,46,.94); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line);
+  header { position: sticky; top: 0; z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line);
     padding: calc(env(safe-area-inset-top) + 10px) 16px 10px; }
   .bar { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   h1 { margin: 0; font: 600 21px/1.1 var(--display); letter-spacing: .02em; flex: 1 1 auto; }
   h1 a { color: var(--muted); text-decoration: none; font-size: 14px; font-family: var(--body); font-weight: 500; margin-right: 10px; }
-  .btn { border: 1px solid var(--line); background: transparent; border-radius: 10px; padding: 8px 14px; min-height: 40px; }
+  .btn { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 8px 16px; min-height: 40px; }
   .btn:hover { border-color: var(--gold); }
-  .btn.gold { background: var(--gold); color: #1a1405; border-color: var(--gold); font-weight: 600; }
+  .btn.gold { background: var(--gold); color: #fff; border-color: var(--gold); font-weight: 600; }
   .btn.danger { color: var(--red); border-color: rgba(224,80,63,.4); }
   .btn.small { min-height: 32px; padding: 4px 10px; font-size: 14px; }
   input, select, textarea { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; min-height: 40px; width: 100%; }
+  /* Le popup natif d'un <select> ignore souvent le fond translucide (verre) et peut retomber sur un fond blanc système :
+     fond et texte du popup fixés explicitement pour ne jamais se retrouver avec du texte clair sur fond clair. */
+  select option { background: var(--panel-base); color: var(--text); }
   textarea { resize: vertical; min-height: 64px; }
   .filtres { max-width: 1100px; margin: 10px auto 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-  .filtres input[type=search] { flex: 1 1 200px; width: auto; }
+  .filtres input[type=search] { flex: 1 1 200px; width: auto; border-radius: 999px; padding-left: 18px; }
   .filtres select { width: auto; }
   .chips { display: flex; gap: 6px; flex-wrap: wrap; }
   .chip { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 5px 12px; font-size: 14px; color: var(--muted); }
@@ -49,12 +56,12 @@
   main { max-width: 1100px; margin: 0 auto; padding: 16px 16px calc(env(safe-area-inset-bottom) + 40px); }
   .resume { color: var(--muted); font-size: 15px; margin: 0; }
   .grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 16px; }
-  .carte { text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 10px; min-height: 130px; }
-  .carte:hover { border-color: var(--gold); }
+  .carte { text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 10px; min-height: 130px; min-width: 0; box-shadow: 0 8px 22px -16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1); transition: border-color .15s ease, box-shadow .15s ease; }
+  .carte:hover { border-color: var(--gold); box-shadow: 0 10px 26px -14px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.14); }
   .carte h3 { margin: 0; font: 600 22px/1.2 var(--display); word-break: break-word; }
-  .ligne { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .ligne { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; min-width: 0; }
   .badge { font-size: 14px; padding: 3px 12px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
-  .badge[data-st="en cours"] { color: var(--green); border-color: rgba(76,183,130,.5); } .badge[data-st="idée"] { color: var(--gold); border-color: rgba(226,176,74,.5); }
+  .badge[data-st="en cours"] { color: var(--green); border-color: rgba(76,183,130,.5); } .badge[data-st="idée"] { color: var(--gold); border-color: rgba(91,141,239,.5); }
   .badge[data-st="en attente"] { color: var(--blue); border-color: rgba(91,155,224,.5); }
   .prio { margin-left: auto; display: inline-flex; gap: 3px; }
   .prio i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); display: block; }
@@ -63,15 +70,16 @@
   .pied { margin-top: auto; font-size: 15px; align-items: center; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; }
   .vide { text-align: center; color: var(--muted); padding: 60px 16px; }
 
-  dialog { background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 16px; padding: 0; width: min(760px, calc(100vw - 20px)); max-height: calc(100dvh - 20px); }
+  dialog { background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 18px; padding: 0; width: min(760px, calc(100vw - 20px)); max-height: calc(100dvh - 20px); box-shadow: 0 30px 70px -20px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.1); }
+  .dlg-tete .badge { flex: none; }
   dialog::backdrop { background: rgba(5,8,18,.7); }
-  .dlg-tete { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--bg); z-index: 2; }
+  .dlg-tete { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--surface); z-index: 2; }
   .dlg-tete input { font: 600 20px var(--display); flex: 1; background: transparent; border-color: transparent; }
   .dlg-tete input:hover, .dlg-tete input:focus { border-color: var(--line); background: var(--surface); }
   .dlg-corps { padding: 14px 16px 18px; display: grid; gap: 18px; overflow-y: auto; }
   .champs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
   label.f { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
-  section h4 { margin: 0 0 8px; font: 600 13px var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--gold); }
+  section h4 { margin: 0 0 12px; font: 600 13px var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--gold); }
   ul.l { list-style: none; margin: 0 0 8px; padding: 0; display: grid; gap: 6px; }
   ul.l li { font-size: 17px; display: flex; gap: 10px; align-items: flex-start; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
   ul.l li span.t { flex: 1; word-break: break-word; }
@@ -101,7 +109,7 @@
   #contenu { flex: 1; min-width: 0; overflow-y: auto; }
   /* Barre latérale : icônes seules, elle s'élargit au survol (par-dessus le contenu) */
   #lateral { position: relative; flex: 0 0 68px; z-index: 30; }
-  #nav { position: absolute; top: 0; bottom: 0; left: 0; width: 68px; background: var(--bg); border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; padding: 12px 10px; overflow: hidden; transition: width .15s ease; }
+  #nav { position: absolute; top: 0; bottom: 0; left: 0; width: 68px; background: var(--surface); border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; padding: 12px 10px; overflow: hidden; transition: width .15s ease; }
   #lateral:hover #nav, #lateral:focus-within #nav { width: 216px; box-shadow: 10px 0 30px rgba(0,0,0,.45); }
   .nav-btn { position: relative; display: flex; align-items: center; gap: 16px; width: 100%; padding: 11px 12px; border-radius: 12px; border: 1px solid transparent; background: transparent; color: var(--muted); font-size: 17px; text-align: left; white-space: nowrap; text-decoration: none; }
   .nav-btn svg { width: 24px; height: 24px; flex: none; }
@@ -109,10 +117,10 @@
   #lateral:hover .nav-btn .lib, #lateral:focus-within .nav-btn .lib { opacity: 1; }
   #securite, #musique { display: grid; gap: 24px; }
   .nav-btn:hover:not([disabled]) { color: var(--text); background: var(--surface); }
-  .nav-btn[aria-current=page] { color: var(--gold); background: var(--gold-soft); border-color: rgba(226,176,74,.35); }
+  .nav-btn[aria-current=page] { color: var(--gold); background: var(--gold-soft); border-color: rgba(91,141,239,.35); }
   .nav-btn[disabled] { opacity: .45; cursor: default; }
   .nav-btn.retour { margin-top: auto; }
-  .nav-btn .pt { position: absolute; top: 5px; left: 28px; min-width: 16px; height: 16px; border-radius: 8px; font-size: 11px; line-height: 16px; text-align: center; color: #1a1405; padding: 0 4px; display: none; }
+  .nav-btn .pt { position: absolute; top: 5px; left: 28px; min-width: 16px; height: 16px; border-radius: 8px; font-size: 11px; line-height: 16px; text-align: center; color: #fff; padding: 0 4px; display: none; }
   .nav-btn .pt.ok { display: block; background: var(--green); min-width: 10px; height: 10px; top: 9px; left: 30px; }
   .nav-btn .pt.att { display: block; background: var(--gold); } .nav-btn .pt.ko { display: block; background: var(--red); color: #fff; }
   .nav-btn.enfant { padding-left: 12px; }   /* repliée : alignée comme les icônes de titre, pas d'indentation */
@@ -121,39 +129,76 @@
   .nav-btn .chevron { margin-left: auto; flex: none; width: 16px; height: 16px; opacity: 0; transition: opacity .1s, transform .15s ease; }
   #lateral:hover .nav-btn .chevron, #lateral:focus-within .nav-btn .chevron { opacity: .55; }
   .nav-btn.groupe.ouvert .chevron { transform: rotate(90deg); }
-  .sec { min-height: 100%; animation: sec-apparition .22s ease; } .sec.plein { height: 100%; } .sec.plein iframe { width: 100%; height: 100%; border: 0; display: block; background: var(--bg); color-scheme: dark; }
+  .nav-enfants { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .3s cubic-bezier(.4,0,.2,1), opacity .22s ease; opacity: 1; }
+  .nav-enfants > div { overflow: hidden; min-height: 0; display: flex; flex-direction: column; gap: 4px; }
+  .nav-enfants.ferme { grid-template-rows: 0fr; opacity: 0; }
+  .sec { min-height: 100%; animation: sec-apparition .22s ease; } .sec.plein { height: 100%; } .sec.plein iframe { width: 100%; height: 100%; border: 0; display: block; background: transparent; color-scheme: dark; }
   @keyframes sec-apparition { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
   @media (prefers-reduced-motion: reduce) { .sec { animation: none; } }
-  .sec-corps { padding: 22px 26px 50px; max-width: 1000px; margin: 0 auto; display: grid; gap: 20px; align-content: start; }
+  .sec-corps { padding: 22px 26px 50px; max-width: 1000px; margin: 0 auto; display: grid; gap: 20px; align-content: start; min-width: 0; transition: max-width .32s cubic-bezier(.4,0,.2,1); }
+  /* Panneau Atlas ouvert : le tableau de bord occupe (presque) toute la largeur qui reste plutôt que d'en laisser une partie vide à droite. */
+  html.jarvis-ouvert .sec-corps { max-width: 1600px; }
+  #notes, #trading, #mail, #automatisation, #emploi, #journal, #securite, #parametres { display: grid; gap: 20px; align-content: start; min-width: 0; }
   .sec-titre { margin: 0; font: 600 28px/1.1 var(--display); letter-spacing: .02em; }
   .sec-statut { border: 1px solid var(--line); border-radius: 16px; padding: 16px 20px; display: grid; gap: 8px; justify-items: start; background: var(--surface); }
   .sec-statut.ok { border-color: rgba(76,183,130,.5); } .sec-statut.ko { border-color: rgba(224,80,63,.6); background: rgba(224,80,63,.1); }
   .sec-statut .v { font: 600 22px var(--display); } .sec-statut .l { color: var(--muted); font-size: 16px; }
-  .conf { display: grid; gap: 8px; padding: 14px 18px; border: 1px solid rgba(226,176,74,.5); background: var(--gold-soft); border-radius: 14px; font-size: 17px; }
+  .conf { display: grid; gap: 8px; padding: 14px 18px; border: 1px solid rgba(91,141,239,.5); background: var(--gold-soft); border-radius: 14px; font-size: 17px; }
   .journal { display: grid; gap: 4px; font-size: 15px; } .journal .lg { display: grid; grid-template-columns: 96px 130px 1fr; gap: 10px; padding: 8px 10px; border-bottom: 1px solid var(--line); align-items: baseline; }
   .journal .lg small { color: var(--muted); display: block; } .journal .ok { color: var(--green); } .journal .ko { color: var(--red); } .journal .att { color: var(--gold); }
-  .sec-corps h4 { margin: 0 0 8px; font: 600 13px var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--gold); }
+  .sec-corps h4 { margin: 0 0 12px; font: 600 13px var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--gold); }
   .pres-boutons { display: flex; gap: 8px; flex-wrap: wrap; }
   details.guide { border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; background: var(--surface); }
-  details.guide summary { cursor: pointer; font: 600 17px var(--display); color: var(--gold); }
+  details.guide summary { cursor: pointer; font: 600 17px var(--display); color: var(--gold); list-style: none; display: flex; align-items: center; gap: 8px; }
+  details.guide summary::-webkit-details-marker { display: none; }
+  details.guide summary::before { content: "›"; display: inline-block; transition: transform .15s ease; font-size: 18px; }
+  details.guide:not(.ferme) summary::before { transform: rotate(90deg); }
   details.guide ol { margin: 10px 0 0; padding-left: 22px; display: grid; gap: 10px; font-size: 16px; }
-  .copie { display: flex; gap: 8px; align-items: center; } .copie code { flex: 1; min-width: 0; overflow: auto; white-space: nowrap; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-size: 14px; }
-  .offre { display: grid; gap: 7px; padding: 14px 16px; border: 1px solid var(--line); background: var(--surface); border-radius: 14px; }
-  .offre.nouvelle { border-color: rgba(226,176,74,.55); background: var(--gold-soft); }
+  .copie { display: flex; gap: 8px; align-items: center; } .copie code { flex: 1; min-width: 0; overflow: auto; white-space: nowrap; background: var(--panel-base); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-size: 14px; }
+  .offre { display: grid; gap: 9px; padding: 18px 20px; border: 1px solid var(--line); background: var(--surface); border-radius: 16px; box-shadow: 0 8px 22px -16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1); }
+  .offre.nouvelle { border-color: rgba(91,141,239,.55); background: var(--gold-soft); }
   .offre.ecartee { opacity: .6; }
   .offre .haut { display: flex; gap: 10px; align-items: baseline; justify-content: space-between; flex-wrap: wrap; }
   .offre .titre { font: 600 19px var(--display); color: var(--text); text-decoration: none; overflow-wrap: anywhere; }
   .offre a.titre:hover { color: var(--gold); text-decoration: underline; }
   .offre .meta { color: var(--muted); font-size: 15px; overflow-wrap: anywhere; }
   .chips { display: flex; gap: 6px; flex-wrap: wrap; }
-  .chip { font-size: 13px; padding: 2px 9px; border-radius: 99px; background: var(--bg); border: 1px solid var(--line); color: var(--muted); }
-  .chip.score { color: var(--gold); border-color: rgba(226,176,74,.5); font-weight: 600; }
-  .offres { display: grid; gap: 10px; }
-  .app-ligne { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 9px 12px; border-bottom: 1px solid var(--line); font-size: 16px; }
-  .trou { display: grid; gap: 10px; padding: 16px 18px; border: 1px solid rgba(226,176,74,.5); background: var(--gold-soft); border-radius: 14px; }
+  .chip { font-size: 13px; padding: 2px 9px; border-radius: 99px; background: var(--panel-base); border: 1px solid var(--line); color: var(--muted); }
+  .chip.score { color: var(--gold); border-color: rgba(91,141,239,.5); font-weight: 600; }
+  .offres { display: grid; gap: 18px; }
+  .emp-groupe { border: 1px solid var(--line); background: var(--surface); border-radius: 16px; overflow: hidden; box-shadow: 0 8px 22px -16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1); }
+  #ai-valides { display: grid; gap: 12px; }
+  #ai-onglets { margin: 0; }
+  .emp-groupe summary { cursor: pointer; list-style: none; padding: 16px 20px; display: flex; align-items: center; gap: 10px; font: 600 16px var(--display); transition: border-color .2s ease; }
+  .emp-groupe summary::-webkit-details-marker { display: none; }
+  .emp-groupe summary::before { content: "›"; display: inline-block; transition: transform .22s ease; font-size: 20px; color: var(--muted); }
+  .emp-groupe:not(.ferme) summary::before { transform: rotate(90deg); }
+  .emp-groupe summary .n { margin-left: auto; background: var(--gold-soft); color: var(--gold); font-size: 13px; font-weight: 600; padding: 2px 10px; border-radius: 999px; }
+  .emp-groupe .offres { padding: 0 20px 20px; }
+  .emp-groupe:not(.ferme) summary { border-bottom: 1px solid var(--line); }
+  /* Accordéon animé : <details> natif ne peut pas transitionner (son ouverture bascule display:none, qui ne s'anime pas),
+     donc il reste TOUJOURS "open" et c'est .ferme qui pilote la hauteur visible via ce wrapper en grid-rows 0fr/1fr —
+     ça marche quelle que soit la hauteur du contenu, sans avoir à la mesurer en JS. Posé par accordeonsAnimer(). */
+  .acc-anim { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .3s cubic-bezier(.4,0,.2,1), opacity .22s ease; opacity: 1; }
+  .acc-anim > * { overflow: hidden; min-height: 0; }
+  .ferme > .acc-anim { grid-template-rows: 0fr; opacity: 0; }
+  .app-ligne {
+    display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 12px 14px; font-size: 16px;
+    border: 1px solid var(--line); border-radius: 12px; background: var(--surface);
+    box-shadow: 0 8px 22px -16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);
+  }
+  .app-ligne + .app-ligne { margin-top: 10px; }
+  .micro-ligne + .micro-ligne { margin-top: 10px; }
+  .trou { display: grid; gap: 10px; padding: 16px 18px; border: 1px solid rgba(91,141,239,.5); background: var(--gold-soft); border-radius: 14px; }
+  .trou + .trou { margin-top: 14px; }
   .trou .q { font-size: 17px; } .trou .quand { color: var(--gold); font: 600 15px var(--display); letter-spacing: .03em; }
   .trou textarea { min-height: 84px; }
-  .suivi { display: flex; gap: 12px; align-items: baseline; padding: 9px 12px; border-bottom: 1px solid var(--line); font-size: 16px; }
+  .suivi {
+    display: flex; gap: 12px; align-items: baseline; padding: 12px 14px; font-size: 16px;
+    border: 1px solid var(--line); border-radius: 12px; background: var(--surface);
+    box-shadow: 0 8px 22px -16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);
+  }
+  .suivi + .suivi { margin-top: 10px; }
   .suivi .ok { color: var(--green); } .suivi .ko { color: var(--red); } .suivi .att { color: var(--gold); } .suivi small { color: var(--muted); }
   pre.jtxt { margin: 0; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; white-space: pre-wrap; word-break: break-word; font: 400 15px/1.55 var(--body); max-height: 60vh; overflow: auto; }
   .mus-carte { display: flex; gap: 22px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 20px; flex-wrap: wrap; }
@@ -168,12 +213,12 @@
   @media (max-width: 699px) {
     /* Téléphone : une barre en haut (☰ + titre de la section), et la barre latérale devient un TIROIR qui glisse depuis la gauche */
     #cadre { flex-direction: column; }
-    #barreMobile { display: flex; align-items: center; gap: 12px; flex: none; padding: calc(env(safe-area-inset-top) + 8px) 14px 8px; border-bottom: 1px solid var(--line); background: var(--bg); position: relative; z-index: 5; }
+    #barreMobile { display: flex; align-items: center; gap: 12px; flex: none; padding: calc(env(safe-area-inset-top) + 8px) 14px 8px; border-bottom: 1px solid var(--line); background: var(--surface); position: relative; z-index: 5; }
     #menuBtn { position: relative; width: 46px; height: 46px; flex: none; border-radius: 12px; border: 1px solid var(--line); background: transparent; display: grid; place-items: center; }
     #menuBtn svg { width: 24px; height: 24px; } #menuBtn[data-alerte="1"]::after { content: ""; position: absolute; top: 6px; right: 6px; width: 11px; height: 11px; border-radius: 50%; background: var(--gold); }
     #menuBtn[data-alerte="2"]::after { content: ""; position: absolute; top: 6px; right: 6px; width: 11px; height: 11px; border-radius: 50%; background: var(--red); }
     #titreMobile { font: 600 22px var(--display); letter-spacing: .02em; }
-    #lateral { position: fixed; top: 0; bottom: 0; left: 0; width: min(84vw, 320px); z-index: 60; flex: none; transform: translateX(-105%); transition: transform .2s ease; background: var(--bg); }
+    #lateral { position: fixed; top: 0; bottom: 0; left: 0; width: min(84vw, 320px); z-index: 60; flex: none; transform: translateX(-105%); transition: transform .2s ease; background: var(--panel-strong); }
     #nav { position: static; width: 100%; height: 100%; flex-direction: column; overflow-y: auto; padding: calc(env(safe-area-inset-top) + 14px) 12px calc(env(safe-area-inset-bottom) + 14px); border-right: 1px solid var(--line); }
     #lateral:hover #nav, #lateral:focus-within #nav { width: 100%; box-shadow: none; }
     html.menu-ouvert #lateral { transform: none; box-shadow: 10px 0 40px rgba(0,0,0,.6); }
@@ -183,17 +228,40 @@
     header { padding-top: 12px; }
     .journal .lg { grid-template-columns: 1fr; }
     dialog { padding-top: env(safe-area-inset-top); }
+    /* Pastilles de filtre (En ligne / En cours / ...) : en bande défilante horizontale plutôt qu'un empilement sur 3 lignes qui prend toute la hauteur. */
+    .onglets, .onglets.sous { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; width: auto; max-width: 100%; min-width: 0; }
+    .onglets::-webkit-scrollbar, .onglets.sous::-webkit-scrollbar { display: none; }
+    .onglets .onglet, .onglets.sous .onglet { flex: none; }
   }
   /* 30vw (relatif à la fenêtre) inclut la barre de défilement de la fenêtre sur certains navigateurs : dès qu'elle apparaît/disparaît (une section qui change de hauteur), tout le panneau Atlas se redimensionne et glisse.
      30% (relatif à #cadre, qui n'a lui-même pas de barre) n'a pas ce problème. */
-  #jarvisPanel { flex: 0 0 clamp(380px, 30%, 470px); border-left: 1px solid var(--line); background: var(--bg); display: flex; flex-direction: column; }
-  #jarvisPanel iframe { flex: 1; width: 100%; border: 0; background: var(--bg); color-scheme: dark; }
+  /* Replié/déplié en douceur : flex-basis et opacity s'animent plutôt que de basculer "hidden" (display:none ne se transitionne pas).
+     overflow:hidden pendant la transition pour que le contenu de l'iframe ne déborde pas tant que le panneau est étroit. */
+  #jarvisPanel { flex: 0 0 clamp(380px, 26%, 420px); border-left: 1px solid var(--line); background: transparent; display: flex; flex-direction: column; overflow: hidden; opacity: 1; transition: flex-basis .32s cubic-bezier(.4,0,.2,1), opacity .22s ease, border-color .32s ease; }
+  #jarvisPanel.ferme { flex-basis: 0; opacity: 0; border-left-color: transparent; pointer-events: none; }
+  #jarvisPanel iframe { flex: 1; width: clamp(380px, 26vw, 420px); border: 0; background: transparent; color-scheme: dark; }
   #btnPanneau { display: none; } html.avec-jarvis #btnPanneau { display: inline-block; }
-  @media (max-width: 999px) { #jarvisPanel { display: none !important; } }
-  .onglets { max-width: 1100px; margin: 10px auto 0; display: flex; gap: 6px; }
-  .onglet { border: 1px solid var(--line); background: transparent; border-radius: 10px; padding: 7px 16px; color: var(--muted); font-weight: 500; }
-  .onglet[aria-selected=true] { border-color: var(--gold); color: var(--gold); background: var(--gold-soft); }
+  /* Poignée pour replier/déplier Atlas : collée à la frontière RÉELLE du panneau (même clamp() que sa largeur, donc toujours
+     au bon endroit), pas un item de la rangée flex — sinon elle flotte dans le vide laissé par le contenu centré "max-width"
+     du tableau de bord. Visible sur tous les onglets. */
+  #jarvisRail { display: none; }
+  html.avec-jarvis #jarvisRail { display: block; position: absolute; top: 50%; right: 0; transform: translateY(-50%); z-index: 10; transition: right .32s cubic-bezier(.4,0,.2,1); }
+  html.avec-jarvis #jarvisRail:not(.ferme) { right: clamp(380px, 26%, 420px); }
+  #jarvisToggle {
+    width: 20px; height: 56px; border-radius: 10px 0 0 10px; border: 1px solid var(--line); border-right: 0;
+    background: var(--surface); color: var(--muted); display: grid; place-items: center; cursor: pointer; font-size: 16px;
+    box-shadow: -6px 0 16px -10px rgba(0,0,0,.5);
+    transition: color .15s ease, border-color .15s ease;
+  }
+  #jarvisToggle:hover { color: var(--gold); border-color: var(--gold); }
+  #jarvisToggle .fleche { display: inline-block; transition: transform .32s cubic-bezier(.4,0,.2,1); }
+  #jarvisToggle.ferme .fleche { transform: rotate(180deg); }
+  @media (max-width: 999px) { #jarvisPanel, #jarvisRail { display: none !important; } }
+  .onglets { display: flex; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px; box-shadow: inset 0 1px 0 rgba(255,255,255,.1); width: fit-content; margin: 10px auto 0; margin-left: max(0px, calc((100% - 1100px) / 2)); margin-right: auto; }
+  .onglet { border: none; background: transparent; border-radius: 999px; padding: 7px 16px; color: var(--muted); font-weight: 500; transition: background-color .25s cubic-bezier(.4,0,.2,1), color .25s cubic-bezier(.4,0,.2,1); }
+  .onglet[aria-selected=true] { color: #fff; background: var(--gold); font-weight: 600; }
   .onglet .n { margin-left: 7px; font-size: 13px; opacity: .75; }
+  .badge[data-etat]::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: inline-block; margin-right: 6px; vertical-align: middle; opacity: .85; }
   .badge[data-etat="ready"] { color: var(--green); border-color: rgba(76,183,130,.5); }
   .badge[data-etat="error"] { color: var(--red); border-color: rgba(224,80,63,.6); background: rgba(224,80,63,.1); }
   .badge[data-etat="building"], .badge[data-etat="enqueued"], .badge[data-etat="processing"], .badge[data-etat="uploading"], .badge[data-etat="new"], .badge[data-etat="retrying"] { color: var(--blue); border-color: rgba(91,155,224,.5); }
@@ -206,43 +274,109 @@
   .dlg-corps .ligne a { font-size: 16px; }
   .sugg { font-size: 14px; color: var(--muted); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .ext-bloc { display: grid; gap: 6px; padding: 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
-  .ext-bloc select { background: var(--bg); }
+  .ext-bloc select { background: var(--panel-base); }
   main .filtres { margin: 0 0 16px; max-width: none; align-items: center; }
   .sous-barre { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0 0 18px; }
   .sous-barre .onglets { margin: 0; max-width: none; flex-wrap: wrap; } .sous-barre .spacer { flex: 1; }
   .onglets.sous .onglet { padding: 6px 12px; font-size: 15px; } .onglets.sous { gap: 5px; }
   .bloc { margin: 0 0 34px; } .bloc-tete { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 14px; }
   .bloc-tete h2 { margin: 0; font: 600 24px/1.1 var(--display); letter-spacing: .02em; } .bloc-tete .spacer { flex: 1; }
-  .carte.site { padding: 0; overflow: hidden; gap: 0; min-height: 0; }
-  .carte.site .capture { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: top; background: var(--surface2); display: block; border-bottom: 1px solid var(--line); }
-  .carte.site .corps { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
-  .carte.site h3 { font-size: 24px; } .carte.site .badge { font-size: 15px; }
+  .carte.site { padding: 0; overflow: hidden; gap: 0; min-height: 0; border-radius: 18px; cursor: grab; }
+  .carte.site:hover { transform: translateY(-2px); box-shadow: 0 16px 36px -16px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.14); }
+  .carte.site.dragging { opacity: .4; cursor: grabbing; }
+  .carte.site .capture-wrap { position: relative; width: 100%; aspect-ratio: 16 / 9; border-bottom: 1px solid var(--line); }
+  .carte.site .capture { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+  .carte.site .capture-wrap .badge { position: absolute; top: 12px; left: 12px; font-size: 12px; padding: 4px 11px; background: var(--panel-strong); border-color: rgba(255,255,255,.12); }
+  .carte.site .corps { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 9px; flex: 1; }
+  .carte.site h3 { font-size: 20px; }
+  .carte.site .sous { font-size: 14px; }
+  .carte.site .sous a { color: var(--gold); text-decoration: none; }
+  .carte.site .note { font-size: 13.5px; color: var(--text); background: var(--surface2); border: 1px solid var(--line); border-radius: 9px; padding: 8px 11px; margin: 0; -webkit-line-clamp: 2; }
   .sante { display: flex; gap: 8px; flex-wrap: wrap; font-size: 16px; color: var(--text); align-items: center; }
+  .carte.site .sante { font-size: 13px; color: var(--muted); gap: 10px; }
+  .carte.site .pied { font-size: 13px; gap: 8px; }
   .point { width: 11px; height: 11px; border-radius: 50%; background: var(--muted); display: inline-block; flex: none; }
   .point.ok { background: var(--green); } .point.ko { background: var(--red); } .point.att { background: var(--gold); }
   dialog.large { width: min(1040px, calc(100vw - 20px)); }
   .tuiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
   .tuile { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
   .tuile .v { font: 600 24px/1.1 var(--display); } .tuile .l { color: var(--muted); font-size: 14px; margin-top: 4px; }
+  button.tuile { display: block; width: 100%; text-align: left; cursor: pointer; }
+  .ai-kpi { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 18px; }
   .tuile.ok .v { color: var(--green); } .tuile.ko .v { color: var(--red); } .tuile.att .v { color: var(--gold); }
   .carte-tete { font: 600 16px var(--display); color: var(--text); }
-  #overview { align-items: start; }   /* chaque carte garde sa propre hauteur : le survol d'une carte n'étire jamais sa voisine */
-  #overview .tuile { background: none; border: 0; padding: 0; }
-  #overview .tuile .v { font-size: 34px; } #overview .tuile .l { font-size: 15px; }
-  #overview .carte { position: relative; z-index: 1; padding: 22px; min-height: 160px; background: rgba(28, 36, 64, .62); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); transition: border-color .2s ease; }
-  #overview .carte:hover, #overview .carte:focus-within { z-index: 20; }   /* toute la carte (donc son survol flottant) passe au-dessus de TOUTES les autres, peu importe leur ordre */
-  #overview .carte-tete { font-size: 18px; }
-  #overview .apercu-ligne { font-size: 15px; }
-  /* Le détail flotte AU-DESSUS du contenu suivant (jamais dans le flux) : une carte qui s'ouvre ne déplace jamais ses voisines, ni celles en dessous */
-  #overview .apercu-liste {
-    position: absolute; left: 22px; right: 22px; top: 100%; margin-top: 8px; z-index: 5;
-    background: rgba(20, 27, 50, .96); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px;
-    box-shadow: 0 14px 34px rgba(0,0,0,.5); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-    max-height: 0; opacity: 0; overflow: hidden; pointer-events: none;
-    transition: max-height .32s ease, opacity .22s ease;
+  #overview { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+  #overview .stats-top, #overview .ov-row { min-width: 0; }
+  #overview .stats-top { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; align-items: stretch; }
+  #overview .stats-top .carte { justify-content: flex-start; }
+  @media (max-width: 900px) { #overview .stats-top { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  #overview .stats-top .carte {
+    position: relative; z-index: 1; padding: 20px; min-height: 150px; min-width: 0; gap: 14px;
+    box-shadow: 0 8px 22px -16px rgba(0,0,0,.5), 0 0 0 1px rgba(91,141,239,.08), 0 0 26px -6px rgba(91,141,239,.22), inset 0 1px 0 rgba(255,255,255,.1);
+    transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
   }
-  #overview .carte:hover .apercu-liste, #overview .carte:focus-visible .apercu-liste { max-height: 220px; opacity: 1; pointer-events: auto; transition: max-height .38s ease, opacity .3s ease .05s; }
-  @media (prefers-reduced-motion: reduce) { #overview .apercu-liste, #overview .carte:hover .apercu-liste, #overview .carte:focus-visible .apercu-liste { transition: none; } }
+  #overview .stats-top .carte:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px -14px rgba(0,0,0,.55), 0 0 0 1px rgba(91,141,239,.18), 0 0 34px -4px rgba(91,141,239,.36), inset 0 1px 0 rgba(255,255,255,.14);
+  }
+  #overview .carte:hover, #overview .carte:focus-within { z-index: 20; }   /* toute la carte (donc son survol flottant) passe au-dessus de TOUTES les autres, peu importe leur ordre */
+  #overview .carte-tete-row { display: flex; align-items: center; gap: 10px; }
+  #overview .carte-ico { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; flex: none; background: var(--gold-soft); color: var(--gold); }
+  #overview .carte-ico svg { width: 17px; height: 17px; }
+  #overview .carte-tete { font: 500 12px var(--body); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+  #overview .carte-valeur { font: 600 24px var(--display); letter-spacing: .01em; }
+  #overview .carte-valeur.ok { color: var(--green); } #overview .carte-valeur.att { color: var(--gold); } #overview .carte-valeur.ko { color: var(--red); }
+  #overview .carte-caption { font-size: 13px; color: var(--muted); }
+  #overview .ov-row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; align-items: stretch; }
+  @media (max-width: 900px) { #overview .ov-row { grid-template-columns: minmax(0, 1fr); } }
+  #overview .ov-panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; box-shadow: 0 8px 22px -16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1); min-width: 0; }
+  #overview .ov-panel.span2 { grid-column: span 2; }
+  @media (max-width: 900px) { #overview .ov-panel.span2 { grid-column: span 1; } }
+  #overview .ov-panel-tete { display: flex; align-items: center; margin: 0 0 16px; }
+  #overview .ov-panel-tete h2 { margin: 0; font: 600 14px var(--display); }
+  #overview .ov-panel-tete .n { margin-left: auto; font-size: 12px; color: var(--muted); }
+  #overview .ov-panel-graphique { display: flex; flex-direction: column; }
+  #overview .ov-bars-zone { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  #overview .ov-bars { position: relative; display: flex; align-items: flex-end; gap: 8px; height: 90px; }
+  #overview .ov-bars i { flex: 1; min-width: 6px; border-radius: 5px 5px 0 0; background: rgba(255,255,255,.14); display: block; cursor: default; transition: background .2s ease; }
+  #overview .ov-bars i.active { background: var(--gold); }
+  #overview .ov-bars i:hover { background: var(--gold); }
+  #overview .ov-bar-tip {
+    position: absolute; bottom: 100%; transform: translate(-50%, -8px) scale(.96); margin-bottom: 4px;
+    padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface);
+    color: var(--text); font-size: 12px; font-weight: 600; white-space: nowrap; pointer-events: none;
+    opacity: 0; transition: opacity .15s ease, transform .15s ease; box-shadow: 0 8px 22px -12px rgba(0,0,0,.6);
+    z-index: 2;
+  }
+  #overview .ov-bar-tip.visible { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  #overview .ov-bars-jours { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; color: var(--muted); margin-top: 8px; }
+  #overview .ov-bars-jours span.active { color: var(--text); font-weight: 600; }
+  #overview .ov-timeline { display: flex; flex-direction: column; gap: 14px; }
+  #overview .ov-timeline-item { display: flex; gap: 10px; }
+  #overview .ov-timeline-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex: none; background: var(--gold); }
+  #overview .ov-timeline-item .t { font-size: 13px; }
+  #overview .ov-timeline-item .h { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  #overview .ov-activite { display: flex; flex-direction: column; }
+  #overview .ov-activite-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+  #overview .ov-activite-item:first-child { border-top: 0; padding-top: 0; }
+  #overview .ov-activite-badge { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-size: 13px; font-weight: 600; flex: none; background: var(--gold-soft); color: var(--gold); }
+  #overview .ov-activite-badge.alerte { background: var(--red-soft); color: var(--red); }
+  #overview .ov-activite-item .txt { flex: 1; min-width: 0; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #overview .ov-activite-item .h { font-size: 12px; color: var(--muted); flex: none; }
+  .ov-urgent { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; box-shadow: 0 8px 22px -16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1); display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+  .ov-urgent-tete { display: flex; align-items: center; gap: 10px; margin: 0 0 4px; flex: none; }
+  .ov-urgent-tete h2 { margin: 0; font: 600 16px var(--display); }
+  .ov-urgent .pill { font-size: 13px; padding: 3px 11px; border-radius: 999px; background: var(--gold-soft); color: var(--gold); }
+  .ov-urgent-liste { overflow-y: auto; max-height: min(44vh, 420px); margin: 0 -8px; padding: 8px 8px 0; }
+  .ov-urgent-ligne { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid var(--line); }
+  .ov-urgent-ligne:first-of-type { border-top: 0; }
+  .ov-urgent-ligne .quoi { flex: 1; min-width: 0; }
+  .ov-urgent-ligne .quoi b { font-weight: 600; }
+  .ov-urgent-ligne .quoi small { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .ov-urgent-ligne .btns { display: flex; gap: 6px; flex: none; }
+  .ov-urgent-ligne .btns button { height: 34px; padding: 0 12px; border-radius: 9px; font-size: 13px; border: 1px solid var(--line); background: transparent; color: var(--text); }
+  .ov-urgent-ligne .btns button.ok { border-color: var(--green); color: var(--green); }
+  .ov-vide { color: var(--muted); font-size: 15px; margin: 0; }
   .apercu-musique { display: flex; gap: 12px; align-items: center; min-width: 0; }
   .apercu-musique img { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; flex: none; }
   .apercu-musique > div { min-width: 0; }
@@ -250,17 +384,21 @@
   .apercu-liste { display: flex; flex-direction: column; gap: 4px; }
   .apercu-ligne { font-size: 14px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   #notes .apercu-ligne { white-space: normal; overflow: visible; padding: 5px 0; font-size: 19px; line-height: 1.4; }
-  #notes h4 { margin: 20px 0 8px; font-size: 16px; }
-  #notes h4:first-child { margin-top: 0; }
-  .hero { display: grid; grid-template-columns: minmax(0, 340px) 1fr; gap: 16px; align-items: start; }
-  .hero img { width: 100%; border-radius: 12px; border: 1px solid var(--line); display: block; }
-  .verdict { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 12px; }
-  .vcol { border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; background: var(--surface); }
-  .vcol h5 { margin: 0 0 10px; font: 600 17px var(--display); }
-  .vcol.marche { border-color: rgba(76,183,130,.5); } .vcol.marche h5 { color: var(--green); }
-  .vcol.afaire { border-color: rgba(226,176,74,.5); } .vcol.afaire h5 { color: var(--gold); }
-  .vcol.eviter { border-color: rgba(224,80,63,.5); } .vcol.eviter h5 { color: var(--red); }
-  .vcol ul { margin: 0; padding-left: 20px; display: grid; gap: 8px; font-size: 16px; }
+  .hero { display: grid; grid-template-columns: minmax(0, 280px) 1fr; gap: 20px; align-items: start; }
+  .hero img { width: 100%; border-radius: 14px; border: 1px solid var(--line); display: block; aspect-ratio: 4 / 3; object-fit: cover; }
+  .hero .tuiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .hero .tuile { padding: 13px 15px; }
+  .hero .tuile .l { font: 500 11px var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
+  .hero .tuile .v { font: 600 20px var(--display); }
+  .verdict { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 14px; }
+  .vcol { border: 1px solid var(--line); border-radius: 14px; padding: 15px 17px; background: var(--surface); }
+  .vcol h5 { margin: 0 0 10px; font: 600 14px var(--display); display: flex; align-items: center; gap: 7px; }
+  .vcol.marche { border-color: rgba(76,183,130,.4); background: rgba(76,183,130,.06); } .vcol.marche h5 { color: var(--green); }
+  .vcol.afaire { border-color: rgba(91,141,239,.4); background: var(--gold-soft); } .vcol.afaire h5 { color: var(--gold); }
+  .vcol.eviter { border-color: rgba(224,80,63,.4); background: rgba(224,80,63,.06); } .vcol.eviter h5 { color: var(--red); }
+  .vcol ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 9px; font-size: 14px; }
+  .vcol li { position: relative; padding-left: 15px; line-height: 1.5; color: var(--text); }
+  .vcol li::before { content: ""; position: absolute; left: 0; top: 7px; width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: .7; }
   table.checks { width: 100%; border-collapse: collapse; font-size: 16px; }
   table.checks td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; } table.checks td:first-child { width: 30px; text-align: center; }
   table.checks .ok { color: var(--green); } table.checks .attention { color: var(--gold); } table.checks .ko { color: var(--red); }
@@ -328,17 +466,18 @@
 </main>
 </div>
 <div id="sec-agenda" class="sec plein" hidden><iframe id="fr-agenda" title="Agenda"></iframe></div>
-<div id="sec-business" class="sec plein" hidden><iframe id="fr-business" title="Business"></iframe></div>
+<div id="sec-business" class="sec plein" hidden><iframe id="fr-business" title="Prospects"></iframe></div>
 <div id="sec-overview" class="sec" hidden><div class="sec-corps">
   <h1 class="sec-titre">Vue d'ensemble</h1>
   <div id="overview" class="grille"><p class="aide">Chargement…</p></div>
 </div></div>
 <div id="sec-notes" class="sec" hidden><div class="sec-corps">
   <h1 class="sec-titre">Notes</h1>
+  <input type="search" id="notes-recherche" placeholder="Rechercher une note…" style="max-width:320px;margin-bottom:16px" aria-label="Rechercher une note">
   <div id="notes"><p class="aide">Chargement…</p></div>
 </div></div>
 <div id="sec-trading" class="sec" hidden><div class="sec-corps">
-  <h1 class="sec-titre">Trading (compte démo)</h1>
+  <h1 class="sec-titre">Trading</h1>
   <div id="trading"><p class="aide">Chargement…</p></div>
 </div></div>
 <div id="sec-mail" class="sec" hidden><div class="sec-corps">
@@ -371,40 +510,42 @@
   <h1 class="sec-titre">Paramètres</h1>
   <div id="parametres"><p class="aide">Chargement…</p></div>
 </div></div>
-<div id="sec-seo" class="sec" hidden><div class="sec-corps">
-  <h1 class="sec-titre">SEO</h1>
-  <p class="aide">Dis « Atlas, audite tel-site.com » ou « cherche des plombiers à Lyon » : ça ouvre et pilote directement ton outil (audit complet multi-pages, prospection, PDF) — Atlas ne fabrique jamais son propre audit ni son propre PDF. Dépose le PDF « rapport client » téléchargé dans <code>F:\Jarvis\seo_pdfs</code>, puis dis « j'ai déposé le PDF, c'est un bon prospect ? » : Atlas le lit et, si c'est un bon prospect, prépare un mail simple (sans jargon technique).</p>
-  <section class="bloc-tete"><h2>Nouvel audit complet</h2>
-    <div class="ajout"><input id="seo-site" placeholder="site-a-auditer.com"><input id="seo-client" placeholder="Nom du client (pour le rapport)"><button class="btn" id="seo-lancer">Lancer dans l'outil ↗</button></div>
-  </section>
-  <section id="seo-recherche-s" hidden><h2>Prospects trouvés</h2>
-    <p class="aide">Tous les prospects trouvés depuis le début, gardés ici (les plus récents en premier) — rien n'est jamais supprimé.</p>
-    <ul class="l" id="seo-recherche"></ul>
-  </section>
-  <section><h2>Historique <button class="btn small" id="seo-actualiser" style="margin-left:8px">Actualiser</button></h2>
-    <ul class="l" id="seo-hist"><li class="aide">Chargement…</li></ul>
-  </section>
-</div></div>
 <div id="sec-agentsia" class="sec" hidden><div class="sec-corps">
   <h1 class="sec-titre">Agents IA</h1>
   <p class="aide">Dis « Atlas, cherche des artisans » (avec ou sans métier/ville précis) : Atlas trouve sur Google Maps des artisans susceptibles d'avoir besoin d'un agent IA téléphonique (ils ratent des appels), toujours avec un email. Ceux dont le site montre déjà une équipe/un standard/un assistant vocal sont écartés automatiquement (basé sur tes propres motifs de rejet) ; les autres arrivent ici à trier, parfois avec un ⚠ si un signal faible a été repéré. « Bon » les garde ici (groupés par métier) ET les ajoute en prospect dans la section Business (avec site et email) ; « Pas bon » les écarte pour toujours (avec ton motif, si tu en donnes un). Aucun mail n'est jamais rédigé ni envoyé pour eux — c'est toi qui écris.</p>
+  <div class="ai-kpi">
+    <button type="button" class="tuile att" id="ai-kpi-btn-trier"><div class="v" id="ai-kpi-trier">0</div><div class="l">À trier</div></button>
+    <button type="button" class="tuile ok" id="ai-kpi-btn-valides"><div class="v" id="ai-kpi-valides">0</div><div class="l">Validés</div></button>
+    <div class="tuile ko"><div class="v" id="ai-kpi-rejetes">0</div><div class="l">Rejetés</div></div>
+  </div>
   <section class="bloc-tete"><h2>Nouvelle recherche</h2>
-    <div class="ajout"><input id="ai-metiers" placeholder="Métiers (facultatif, virgule)"><input id="ai-villes" placeholder="Villes (facultatif, virgule)"><button class="btn" id="ai-lancer">Chercher</button></div>
+    <div class="ajout"><input id="ai-metiers" placeholder="Métiers (facultatif, virgule)"><input id="ai-villes" placeholder="Villes (facultatif, virgule)"><button class="btn gold" id="ai-lancer">🔎 Chercher</button></div>
     <p class="aide">Laisse vide pour utiliser sa liste de métiers configurée et avancer tout seul dans la rotation des villes.</p>
+    <p class="aide" id="ai-statut"></p>
+    <details class="emp-groupe" id="ai-hist-det" style="margin-top:10px"><summary><span>Historique des recherches</span></summary>
+      <div class="offres" id="ai-hist"><p class="aide">Aucune recherche pour l'instant.</p></div>
+    </details>
   </section>
-  <section><h2>À trier <span class="aide" id="ai-compte"></span></h2>
-    <ul class="l" id="ai-trier"><li class="aide">Chargement…</li></ul>
+  <div class="onglets" id="ai-onglets" role="tablist">
+    <button class="onglet" type="button" role="tab" data-v="trier">À trier</button>
+    <button class="onglet" type="button" role="tab" data-v="valides">Validés</button>
+  </div>
+  <section id="ai-sec-trier">
+    <h2>À trier <span class="aide" id="ai-compte"></span></h2>
+    <div class="ligne" id="ai-filtres" style="margin-bottom:12px"></div>
+    <div class="grille ai-grille" id="ai-trier"><p class="aide">Chargement…</p></div>
   </section>
-  <section><h2>Validés, groupés par métier</h2>
+  <section id="ai-sec-valides" hidden><h2>Validés, groupés par métier</h2>
     <div id="ai-valides"><p class="aide">Chargement…</p></div>
   </section>
 </div></div>
 </div>
-<aside id="jarvisPanel" hidden aria-label="Atlas"><iframe id="jarvisFrame" title="Atlas" allow="microphone; autoplay; clipboard-write"></iframe></aside>
+<div id="jarvisRail"><button id="jarvisToggle" type="button" aria-label="Afficher ou masquer Atlas" title="Afficher ou masquer Atlas"><span class="fleche">‹</span></button></div>
+<aside id="jarvisPanel" class="ferme" aria-label="Atlas"><iframe id="jarvisFrame" title="Atlas" allow="microphone; autoplay; clipboard-write"></iframe></aside>
 </div>
 
 <dialog id="dlgExt" aria-label="Détails">
-  <div class="dlg-tete"><strong id="x-titre" style="flex:1;font:600 20px var(--display);word-break:break-word"></strong><button class="btn small" data-fermer="dlgExt" autofocus>Fermer</button></div>
+  <div class="dlg-tete"><strong id="x-titre" style="flex:1;font:600 20px var(--display);word-break:break-word"></strong><span class="badge" id="x-etat" hidden></span><button class="btn small" data-fermer="dlgExt" autofocus>Fermer</button></div>
   <div class="dlg-corps" id="x-corps"></div>
 </dialog>
 
@@ -423,8 +564,7 @@
       <datalist id="d-dossier-liste"></datalist><p class="aide" id="d-dossier-aide"></p></section>
     <section><h4>Liens</h4><ul class="l" id="d-liens"></ul><div class="ajout"><input id="d-lien-titre" placeholder="Titre" style="max-width:35%"><input id="d-lien-url" placeholder="https://…" inputmode="url"><button class="btn" id="d-lien-ok">Ajouter</button></div></section>
     <section id="d-ext-s"><h4>GitHub &amp; Netlify</h4><div id="d-ext" style="display:grid;gap:10px"></div></section>
-    <section><h4>Application liée</h4><label class="f">Adresse du site déployé<input id="d-outil" placeholder="https://mon-outil.netlify.app" inputmode="url"></label>
-      <p class="aide">L'historique complet des audits (avec les PDF) est dans la section SEO de la barre latérale.</p></section>
+    <section><h4>Application liée</h4><label class="f">Adresse du site déployé<input id="d-outil" placeholder="https://mon-outil.netlify.app" inputmode="url"></label></section>
     <section id="d-mentions-s" hidden><h4>Dans ton agenda et ton carnet</h4><ul class="l" id="d-mentions"></ul></section>
     <div><button class="btn danger small" id="d-suppr">Supprimer ce projet</button></div>
   </div>
@@ -529,6 +669,41 @@
 <script>
 const $ = (s) => document.querySelector(s);
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+
+/* ---------- Accordéons animés (repli/dépli en douceur) : <details class="emp-groupe"|"guide"> partout dans l'app ----------
+   Un <details> natif ne peut pas être animé en CSS (son ouverture bascule display:none, qui ne se transitionne pas).
+   Il reste donc TOUJOURS "open" (son contenu reste dans le DOM), et c'est une classe .ferme qui pilote la hauteur
+   visible via un wrapper .acc-anim en grid-rows 0fr/1fr (voir CSS) — marche quelle que soit la hauteur du contenu.
+   Tourne en continu (MutationObserver) car ces <details> sont régulièrement reconstruits par les dessiner*(). */
+function accordeonsAnimer(racine) {
+  racine.querySelectorAll('details.emp-groupe, details.guide').forEach((det) => {
+    if (det.dataset.accAnime) return;
+    const sum = det.querySelector('summary'); if (!sum) return;
+    det.dataset.accAnime = '1';
+    const reste = [...det.childNodes].filter((n) => n !== sum);
+    const wrap = el('div', 'acc-anim'); reste.forEach((n) => wrap.append(n)); det.append(wrap);
+    det.classList.toggle('ferme', !det.open); det.open = true;
+    sum.addEventListener('click', (e) => {
+      e.preventDefault();
+      det.classList.toggle('ferme');
+      det.dispatchEvent(new CustomEvent('acc-toggle', { detail: { ouvert: !det.classList.contains('ferme') } }));
+    });
+  });
+}
+new MutationObserver(() => accordeonsAnimer(document.body)).observe(document.body, { childList: true, subtree: true });
+accordeonsAnimer(document.body);
+
+/* ---------- Ambiance (fond) : réglée depuis Paramètres > Apparence, synchronisée en direct dans les autres fenêtres/iframes ---------- */
+function applyAmbiance(n) {
+  document.documentElement.classList.remove('amb-1', 'amb-2', 'amb-3');
+  document.documentElement.classList.add('amb-' + (n || '1'));
+}
+function choisirAmbiance(n) {
+  applyAmbiance(n);
+  try { localStorage.setItem('jarvis_ambiance', n); } catch {}
+  if (sectionCourante === 'parametres') chargerParametres();
+}
+window.addEventListener('storage', (e) => { if (e.key === 'jarvis_ambiance') applyAmbiance(e.newValue); });
 let token = '';
 try { token = localStorage.getItem('jarvis_token') || ''; } catch {}
 const h = new URLSearchParams(location.hash.slice(1)).get('t');
@@ -538,7 +713,6 @@ let data = { projets: [], types: [], statuts: [], dossiers_autorises: [] };
 let filtreStatut = 'enligne', ouvert = null, activite = {};      // sous-onglet de "Projets" : "enligne" (sites Netlify), un statut, ou "tous"
 try { const o = localStorage.getItem('projets_sous'); if (o) filtreStatut = o; } catch {}
 let onglet = 'projets', ext = { gh: null, nf: null, at: 0 }, sante = {};
-try { const o = localStorage.getItem('projets_onglet'); if (['projets', 'github'].includes(o)) onglet = o; } catch {}
 const dlg = $('#dlg');
 
 async function api(chemin, corps) {
@@ -565,6 +739,27 @@ const ouvertes = (p) => p.taches.filter((t) => !t.fait).length;
 const derniere = (p) => { const a = activite[p.id]; const d = a ? (a.git && a.git.dernier_commit) || a.modifie : ''; return d || ''; };
 
 function remplirSelect(sel, liste, valeur) { sel.replaceChildren(...liste.map((x) => { const o = el('option', '', x); o.value = x; return o; })); if (valeur !== undefined) sel.value = valeur; }
+
+// Met à jour un groupe de boutons .onglet EN PLACE (sans les détruire/recréer) quand leur liste de valeurs n'a pas changé,
+// pour que la transition CSS (fondu du fond/texte) ait un même nœud DOM à animer au lieu de passer d'un coup à l'état final.
+function majOnglets(conteneur, defs, valeurCourante, onClic) {
+  const ok = conteneur.children.length === defs.length && [...conteneur.children].every((b, i) => b.dataset.v === String(defs[i][0]));
+  if (!ok) {
+    conteneur.replaceChildren(...defs.map(([v, t]) => {
+      const b = el('button', 'onglet'); b.dataset.v = v;
+      b.append(document.createTextNode(t), el('span', 'n'));
+      b.setAttribute('role', 'tab');
+      b.onclick = () => onClic(v);
+      return b;
+    }));
+  }
+  [...conteneur.children].forEach((b, i) => {
+    const [v, , n] = defs[i];
+    const spanN = b.querySelector('span.n');
+    spanN.hidden = n === '' || n == null; spanN.textContent = n === '' || n == null ? '' : String(n);
+    b.setAttribute('aria-selected', String(valeurCourante === v));
+  });
+}
 
 function filtrer() {
   const q = $('#q').value.trim().toLowerCase(), type = $('#type').value;
@@ -595,13 +790,8 @@ function dessiner() {
 const SOUS = [['enligne', 'En ligne'], ['en cours', 'En cours'], ['en attente', 'En attente'], ['idée', 'Idées'], ['terminé', 'Terminés'], ['archivé', 'Archivés'], ['tous', 'Tous']];
 function dessinerProjets() {
   if (!SOUS.some(([v]) => v === filtreStatut)) filtreStatut = 'enligne';
-  $('#sousOnglets').replaceChildren(...SOUS.map(([v, t]) => {
-    const n = v === 'enligne' ? sitesListe().length : v === 'tous' ? data.projets.length : data.projets.filter((p) => p.statut === v).length;
-    const b = el('button', 'onglet', t); b.append(el('span', 'n', String(n)));
-    b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', String(filtreStatut === v));
-    b.onclick = () => { filtreStatut = v; try { localStorage.setItem('projets_sous', v); } catch {} dessiner(); };
-    return b;
-  }));
+  const defsSous = SOUS.map(([v, t]) => [v, t, v === 'enligne' ? sitesListe().length : v === 'tous' ? data.projets.length : data.projets.filter((p) => p.statut === v).length]);
+  majOnglets($('#sousOnglets'), defsSous, filtreStatut, (v) => { filtreStatut = v; try { localStorage.setItem('projets_sous', v); } catch {} dessiner(); });
   const enLigne = filtreStatut === 'enligne';
   $('#vueSites').hidden = !enLigne; $('#vueListe').hidden = enLigne;
   if (enLigne) return;                                              // les cartes des sites sont dessinées par dessinerSites()
@@ -691,12 +881,7 @@ async function chargerSante() {
 }
 function dessinerOnglets() {
   const defs = [['projets', 'Projets', data.projets.length + (ext.nf && ext.nf.ok ? sitesListe().filter((x) => !projetLie('netlify', x.id)).length : 0)], ['github', 'Code (GitHub)', ext.gh && ext.gh.ok ? depotsListe().length : '']];
-  $('#onglets').replaceChildren(...defs.map(([v, t, n]) => {
-    const b = el('button', 'onglet', t); if (n !== '') b.append(el('span', 'n', String(n)));
-    b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', String(onglet === v));
-    b.onclick = () => { onglet = v; try { localStorage.setItem('projets_onglet', v); } catch {} dessiner(); };
-    return b;
-  }));
+  majOnglets($('#onglets'), defs, onglet, (v) => { onglet = v; dessiner(); });
 }
 function boutonProjet(source, ref) {
   const p = projetLie(source === 'github' ? 'github' : 'netlify', ref);
@@ -743,20 +928,51 @@ function santeLigne(x) {
   if (h.ssl_jours != null) l.append(`· certificat ${h.ssl_jours} j`);
   return l;
 }
+const CATEGORIES = ['cat-blue', 'cat-ocre', 'cat-violet', 'cat-green', 'cat-red'];
+const categorieDe = (id) => { let h = 0; for (const c of String(id)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return CATEGORIES[h % CATEGORIES.length]; };
 function carteSite(x) {
-  const c = carteExt(() => ouvrirSite(x)); c.classList.add('site');
-  if (x.capture) { const im = el('img', 'capture'); im.src = x.capture; im.alt = ''; im.loading = 'lazy'; im.referrerPolicy = 'no-referrer'; im.onerror = () => im.remove(); c.append(im); }
+  const c = carteExt(() => ouvrirSite(x)); c.classList.add('site'); c.dataset.id = x.id;
+  const cw = el('div', 'capture-wrap ' + categorieDe(x.id));
+  if (x.capture) { const im = el('img', 'capture'); im.src = x.capture; im.alt = ''; im.loading = 'lazy'; im.referrerPolicy = 'no-referrer'; im.onerror = () => im.remove(); cw.append(im); }
+  if (x.deploy) cw.append(badgeEtat(x.deploy.etat));
+  c.append(cw);
   const b = el('div', 'corps');
   b.append(el('h3', '', x.nom));
-  const l1 = el('div', 'ligne'); if (x.deploy) l1.append(badgeEtat(x.deploy.etat)); b.append(l1);
   if (x.url) { const u = el('div', 'sous'); u.append(lien((x.domaine || x.url).replace(/^https:\/\//, ''), x.url)); b.append(u); }
   b.append(santeLigne(x));
-  if (x.deploy) b.append(el('p', '', `${x.deploy.message || 'dernier déploiement'}${x.deploy.erreur ? ' — ' + x.deploy.erreur : ''}`));
+  if (x.deploy) b.append(el('p', 'note', `${x.deploy.message || 'dernier déploiement'}${x.deploy.erreur ? ' — ' + x.deploy.erreur : ''}`));
   const pied = el('div', 'pied');
   if (x.deploy) pied.append(el('span', '', `déployé ${ilya(x.deploy.cree)}${x.deploy.branche ? ' · ' + x.deploy.branche : ''}`));
   if (x.depot_nom) pied.append(el('span', 'pill neutre', '⎇ ' + x.depot_nom));
   pied.append(boutonProjet('netlify', x.id)); b.append(pied);
   c.append(b); return c;
+}
+// Ordre manuel (drag and drop) des cartes "En ligne" : persisté en local, appliqué par-dessus le tri par défaut
+// (échec d'abord, puis date) ; les sites pas encore déplacés gardent leur position relative d'origine.
+function ordreManuelAppliquer(liste, cle) {
+  let ordre = []; try { ordre = JSON.parse(localStorage.getItem(cle) || '[]'); } catch {}
+  if (!ordre.length) return liste;
+  const rang = new Map(ordre.map((id, i) => [id, i]));
+  return [...liste].sort((a, b) => (rang.has(a.id) ? rang.get(a.id) : Infinity) - (rang.has(b.id) ? rang.get(b.id) : Infinity));
+}
+function activerDragReorder(container, cle) {
+  let dragEl = null;
+  [...container.children].forEach((card) => {
+    card.draggable = true;
+    card.addEventListener('dragstart', (e) => { dragEl = card; card.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
+    card.addEventListener('dragend', () => { card.classList.remove('dragging'); dragEl = null; });
+    card.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      if (!dragEl || dragEl === card) return;
+      const r = card.getBoundingClientRect();
+      const avant = (e.clientX - r.left) < r.width / 2;
+      container.insertBefore(dragEl, avant ? card : card.nextSibling);
+    });
+  });
+  container.ondrop = (e) => {
+    e.preventDefault();
+    try { localStorage.setItem(cle, JSON.stringify([...container.children].map((c) => c.dataset.id))); } catch {}
+  };
 }
 function dessinerSites() {
   const grille = $('#grilleSites'), info = $('#sitesResume');
@@ -766,9 +982,11 @@ function dessinerSites() {
   const q = $('#q').value.trim().toLowerCase(), tous = sitesListe(), c = ext.nf.compte;
   const ko = tous.filter((x) => x.deploy && x.deploy.etat === 'error').length;
   info.textContent = `${tous.length} site(s) · ${ko ? ko + ' en échec' : 'déploiements tous réussis'}` + (c && c.bande_passante ? ` · bande passante ${gigas(c.bande_passante.utilise)} / ${gigas(c.bande_passante.inclus)}` : '') + (c && c.minutes_build ? ` · minutes de build ${c.minutes_build.utilise} / ${c.minutes_build.inclus}` : '');
-  const l = tous.filter((x) => !q || [x.nom, x.url, x.domaine, x.depot_nom].join(' ').toLowerCase().includes(q));
+  let l = tous.filter((x) => !q || [x.nom, x.url, x.domaine, x.depot_nom].join(' ').toLowerCase().includes(q));
   l.sort((a, b) => (b.deploy && b.deploy.etat === 'error') - (a.deploy && a.deploy.etat === 'error') || ((b.deploy && b.deploy.cree) || b.maj || '').localeCompare((a.deploy && a.deploy.cree) || a.maj || ''));
+  l = ordreManuelAppliquer(l, 'projets_ordre_sites');
   grille.replaceChildren(...l.map(carteSite));
+  activerDragReorder(grille, 'projets_ordre_sites');
 }
 function section(titre, items, fabrique, vide) {
   const s = el('section'); s.append(el('h4', '', titre));
@@ -777,7 +995,8 @@ function section(titre, items, fabrique, vide) {
 }
 async function detailDepot(d) {
   $('#dlgExt').classList.remove('large');
-  $('#x-titre').textContent = d.nom; const corps = $('#x-corps'); corps.replaceChildren(el('p', 'aide', 'Chargement…')); if (!$('#dlgExt').open) $('#dlgExt').showModal();
+  $('#x-titre').textContent = d.nom; $('#x-etat').hidden = true;
+  const corps = $('#x-corps'); corps.replaceChildren(el('p', 'aide', 'Chargement…')); if (!$('#dlgExt').open) $('#dlgExt').showModal();
   try {
     const r = await api('/api/externe/github/detail?nom=' + encodeURIComponent(d.nom));
     if (!r.ok) { corps.replaceChildren(el('p', 'aide', r.message)); return; }
@@ -803,7 +1022,7 @@ function scoreRond(l, v) { const niv = v == null ? '' : v >= 90 ? 'ok' : v >= 50
 
 async function ouvrirSite(s, force) {
   const d = $('#dlgExt'); d.classList.add('large');
-  $('#x-titre').textContent = s.nom;
+  $('#x-titre').textContent = s.nom; $('#x-etat').hidden = true;
   const corps = $('#x-corps'); corps.replaceChildren(el('p', 'aide', 'Analyse du site en cours (une dizaine de secondes)…'));
   if (!d.open) d.showModal();
   try {
@@ -815,13 +1034,13 @@ async function ouvrirSite(s, force) {
 function renderBilan(s, b) {
   const corps = $('#x-corps'), dp = b.deploys, cn = b.code, f = b.formulaires, q = b.compte;
   const parts = [];
+  const xe = $('#x-etat'); xe.textContent = (ETATS[b.etat] || '?'); xe.dataset.etat = b.etat; xe.hidden = false;
   // 1) en-tête : capture + chiffres clés
   const hero = el('div', 'hero');
   const pleine = () => { hero.style.gridTemplateColumns = '1fr'; };               // sans capture : les chiffres prennent toute la largeur
   if (b.capture) { const im = el('img'); im.src = b.capture; im.alt = 'Capture du site'; im.referrerPolicy = 'no-referrer'; im.onerror = () => { im.remove(); pleine(); }; hero.append(im); } else pleine();
   const droite = el('div'); droite.style.display = 'grid'; droite.style.gap = '12px';
   const t = el('div', 'tuiles');
-  t.append(tuile('Dernier déploiement', b.etat === 'error' ? 'échec' : b.etat === 'ready' ? 'en ligne' : (ETATS[b.etat] || '?'), b.etat === 'ready' ? 'ok' : b.etat === 'error' ? 'ko' : 'att'));
   if (dp && dp.dernier) t.append(tuile('Mis en ligne', ilya(dp.dernier.cree)));
   if (dp && dp.taux !== null) t.append(tuile(`Déploiements réussis (${dp.total})`, dp.taux + ' %', dp.taux >= 90 ? 'ok' : dp.taux >= 70 ? 'att' : 'ko'));
   if (dp && dp.duree_moy) t.append(tuile('Durée moyenne du build', dp.duree_moy + ' s'));
@@ -1002,68 +1221,65 @@ function afficherDetail() {
   m.carnet.forEach((e) => { const li = el('li'); li.append(el('span', 't', `📝 ${e}`)); l.append(li); });
   $('#d-mentions-s').hidden = !l.children.length;
 }
-// ---------- SEO : historique complet (base Supabase de l'outil, lu en direct) + lancement d'un nouvel audit complet ----------
-const seoOutilUrl = () => (data.projets.find((p) => p.outil) || {}).outil || '';
-async function chargerSeo(force) {
-  const ul = $('#seo-hist');
-  try {
-    const r = await api('/api/seo/historique' + (force ? '?force=1' : ''));
-    if (sectionCourante !== 'seo') return;
-    if (!r.ok) { ul.replaceChildren(el('li', 'aide', r.message)); return; }
-    if (!r.audits.length) { ul.replaceChildren(el('li', 'aide', 'Aucun audit enregistré pour le moment.')); return; }
-    ul.replaceChildren(...r.audits.slice(0, 30).map((a) => {
-      const li = el('li'), s = el('span', 't');
-      const couleur = a.score >= 75 ? 'vert' : a.score >= 50 ? 'neutre' : 'rouge';
-      s.append(el('span', 'pill ' + couleur, `${a.score}/100`), ` ${a.site}${a.client ? ' · ' + a.client : ''} — ${a.critiques} critique(s), ${a.majeurs} majeur(s) · ${ilya(a.date)}`);
-      const b = el('button', 'btn small', 'Générer les PDF ↗');
-      b.title = "Rouvre l'audit dans l'outil (seul endroit qui sait fabriquer les 2 PDF)";
-      b.onclick = async () => { b.disabled = true; const r2 = await api('/api/seo/reauditer', { id: a.id }); b.disabled = false; if (!r2.ok) toast(r2.message, true); };
-      li.append(s, b); return li;
-    }));
-  } catch (e) { if (sectionCourante === 'seo') ul.replaceChildren(el('li', 'aide', e.message)); }
-}
-async function chargerSeoRecherche() {
-  try {
-    const r = await api('/api/seo/prospects');
-    if (sectionCourante !== 'seo') return;
-    const s = $('#seo-recherche-s'); if (!r.ok || !r.prospects.length) { s.hidden = true; return; }
-    s.hidden = false;
-    $('#seo-recherche').replaceChildren(...r.prospects.map((e) => {
-      const li = el('li'), s2 = el('span', 't');
-      const couleur = e.scan.scoreProspect >= 60 ? 'rouge' : e.scan.scoreProspect >= 35 ? 'neutre' : 'vert';   // score prospect élevé = mauvais SEO = bonne opportunité
-      s2.append(el('span', 'pill ' + couleur, `${e.scan.scoreProspect}/100`), ` ${e.nom} — ${(e.scan.problemes || []).slice(0, 3).join(', ') || 'peu de problèmes'}${e.scan.emails && e.scan.emails.length ? ' · ' + e.scan.emails[0] : ' · pas d\'email trouvé'}`);
-      s2.append(el('br'), el('small', '', `${(e.metiers || []).join(', ')} à ${e.ville || '?'} · ${ilya(e.trouve_le)}`));
-      if (e.site) s2.append(el('br'), lien(e.site, e.site));
-      const colonne = el('div'); colonne.style.cssText = 'display:flex;flex-direction:column;gap:6px';
-      const bAudit = el('button', 'btn small', 'Auditer dans mon outil ↗');
-      bAudit.onclick = async () => {
-        const base = seoOutilUrl(); if (!base || !e.site) { toast('Site ou outil manquant.', true); return; }
-        const r2 = await api('/api/ouvrir', { url: base + '/?u=' + encodeURIComponent(e.site) + '&c=' + encodeURIComponent(e.nom) + '&go=1' });
-        if (!r2.ok) toast(r2.message, true);
-      };
-      const bMail = el('button', 'btn small', 'Rédiger un mail');
-      bMail.onclick = async () => { bMail.disabled = true; bMail.textContent = 'Rédaction…'; const r2 = await api('/api/seo/mail', { ref: e.nom }); bMail.disabled = false; bMail.textContent = 'Rédiger un mail';
-        if (!r2.ok) { toast(r2.message, true); return; } $('#rapTitre').textContent = 'Mail de prospection — ' + e.nom; $('#rapTexte').textContent = r2.message; $('#dlgRapport').showModal(); };
-      colonne.append(bAudit, bMail);
-      li.append(s2, colonne); return li;
-    }));
-  } catch (e) { if (sectionCourante === 'seo') $('#seo-recherche-s').hidden = true; }
-}
-$('#seo-actualiser').onclick = () => chargerSeo(true);
-$('#seo-lancer').onclick = async () => {
-  const site = $('#seo-site').value.trim(), client = $('#seo-client').value.trim();
-  if (!site) { toast('Indique un site.', true); return; }
-  const base = seoOutilUrl();
-  if (!base) { toast("Aucun outil SEO lié (projet « Audit SEO »).", true); return; }
-  try { const r = await api('/api/ouvrir', { url: base + '/?u=' + encodeURIComponent(site) + '&c=' + encodeURIComponent(client) + '&go=1' }); if (!r.ok) toast(r.message, true); }
-  catch (e) { toast(e.message, true); }
-};
-
 // ---------- Agents IA : prospection d'artisans (Google Maps, email obligatoire, tri bon/pas bon, jamais de mail) ----------
-let agentsIASig = '';
+let agentsIASig = '', agentsIAData = null, aiFiltreMetier = '', aiFiltreVille = '', aiFiltreFaible = false;
 async function decideArtisan(id, decision, motif) {
   try { await api('/api/agentsia/decider', { id, decision, motif }); agentsIASig = ''; chargerAgentsIA(); }
   catch (e) { toast(e.message, true); }
+}
+function carteArtisan(e) {
+  const c = el('div', 'offre');
+  const haut = el('div', 'haut');
+  haut.append(el('span', 'titre', e.nom));
+  if (e.note != null) haut.append(el('span', 'chip score', `★ ${e.note} (${e.avis || 0})`));
+  c.append(haut);
+  c.append(el('div', 'meta', `${e.metier || '?'} · ${e.ville || '?'}${e.tel ? ' · ' + e.tel : ''}${e.email ? ' · ' + e.email : ''}`));
+  if (e.site) { const l = el('div', 'meta'); l.append(lien(e.site, e.site)); c.append(l); }
+  if (e.trouves && e.trouves.length) { const ch = el('div', 'chips'); e.trouves.forEach((t) => ch.append(el('span', 'chip', '⚠ ' + t))); c.append(ch); }
+  const act = el('div', 'ligne');
+  const bBon = el('button', 'btn small gold', '✅ Bon'); bBon.onclick = () => decideArtisan(e.id, 'bon');
+  const bPas = el('button', 'btn small', '❌ Pas bon');
+  bPas.onclick = () => { const motif = prompt('Pourquoi pas bon ? (facultatif — sert à cibler les prochaines recherches)', ''); if (motif === null) return; decideArtisan(e.id, 'pas_bon', motif); };
+  act.append(bBon, bPas); c.append(act);
+  return c;
+}
+let aiVue = 'trier'; try { aiVue = localStorage.getItem('ai_vue') || 'trier'; } catch {}
+function appliquerVueAI() {
+  $('#ai-onglets').querySelectorAll('.onglet').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.v === aiVue)));
+  $('#ai-sec-trier').hidden = aiVue !== 'trier';
+  $('#ai-sec-valides').hidden = aiVue !== 'valides';
+}
+function choisirVueAI(v) { aiVue = v; try { localStorage.setItem('ai_vue', aiVue); } catch {} appliquerVueAI(); }
+$('#ai-onglets').querySelectorAll('.onglet').forEach((b) => b.onclick = () => choisirVueAI(b.dataset.v));
+$('#ai-kpi-btn-trier').onclick = () => choisirVueAI('trier');
+$('#ai-kpi-btn-valides').onclick = () => choisirVueAI('valides');
+appliquerVueAI();
+function dessinerFiltresAgents() {
+  const box = $('#ai-filtres'); box.replaceChildren();
+  const liste = (agentsIAData && agentsIAData.aTrier) || [];
+  const metiers = [...new Set(liste.map((e) => e.metier).filter(Boolean))].sort();
+  const villes = [...new Set(liste.map((e) => e.ville).filter(Boolean))].sort();
+  const selM = el('select'); selM.setAttribute('aria-label', 'Filtrer par métier'); selM.style.maxWidth = '220px';
+  selM.append(new Option('Tous les métiers', ''));
+  metiers.forEach((m) => selM.append(new Option(m, m)));
+  selM.value = aiFiltreMetier; selM.onchange = () => { aiFiltreMetier = selM.value; dessinerTrierAgents(); };
+  const selV = el('select'); selV.setAttribute('aria-label', 'Filtrer par ville'); selV.style.maxWidth = '220px';
+  selV.append(new Option('Toutes les villes', ''));
+  villes.forEach((v) => selV.append(new Option(v, v)));
+  selV.value = aiFiltreVille; selV.onchange = () => { aiFiltreVille = selV.value; dessinerTrierAgents(); };
+  const chF = el('button', 'chip', '⚠ Avec signal faible seulement');
+  chF.setAttribute('aria-pressed', aiFiltreFaible ? 'true' : 'false');
+  chF.onclick = () => { aiFiltreFaible = !aiFiltreFaible; chF.setAttribute('aria-pressed', aiFiltreFaible ? 'true' : 'false'); dessinerTrierAgents(); };
+  box.append(selM, selV, chF);
+}
+function dessinerTrierAgents() {
+  if (!agentsIAData) return;
+  let liste = agentsIAData.aTrier;
+  if (aiFiltreMetier) liste = liste.filter((e) => e.metier === aiFiltreMetier);
+  if (aiFiltreVille) liste = liste.filter((e) => e.ville === aiFiltreVille);
+  if (aiFiltreFaible) liste = liste.filter((e) => e.trouves && e.trouves.length);
+  $('#ai-compte').textContent = agentsIAData.aTrier.length ? `(${liste.length}/${agentsIAData.aTrier.length})` : '';
+  $('#ai-trier').replaceChildren(...(liste.length ? liste.map(carteArtisan) : [el('p', 'aide', agentsIAData.aTrier.length ? 'Aucun artisan ne correspond à ces filtres.' : 'Aucun artisan en attente pour l\'instant.')]));
 }
 async function chargerAgentsIA() {
   try {
@@ -1072,34 +1288,39 @@ async function chargerAgentsIA() {
     const sig = JSON.stringify(r);
     if (sig === agentsIASig) return; agentsIASig = sig;
     if (!r.ok) return;
-    $('#ai-compte').textContent = r.aTrier.length ? `(${r.aTrier.length})` : '';
-    $('#ai-trier').replaceChildren(...(r.aTrier.length ? r.aTrier.map((e) => {
-      const li = el('li'), s = el('span', 't');
-      s.append(`${e.nom} — ${e.metier || '?'} à ${e.ville || '?'}${e.tel ? ' · ' + e.tel : ''}${e.email ? ' · ' + e.email : ''}`);
-      if (e.note != null) s.append(el('br'), el('small', '', `★ ${e.note} (${e.avis || 0} avis)`));
-      if (e.site) s.append(el('br'), lien(e.site, e.site));
-      if (e.trouves && e.trouves.length) { const av = el('small', '', `⚠ ${e.trouves.join(', ')}`); av.style.color = 'var(--red)'; s.append(el('br'), av); }
-      const colonne = el('div'); colonne.style.cssText = 'display:flex;gap:6px';
-      const bBon = el('button', 'btn small gold', '✅ Bon'); bBon.onclick = () => decideArtisan(e.id, 'bon');
-      const bPas = el('button', 'btn small', '❌ Pas bon');
-      bPas.onclick = () => { const motif = prompt('Pourquoi pas bon ? (facultatif — sert à cibler les prochaines recherches)', ''); if (motif === null) return; decideArtisan(e.id, 'pas_bon', motif); };
-      colonne.append(bBon, bPas);
-      li.append(s, colonne); return li;
-    }) : [el('li', 'aide', 'Aucun artisan en attente pour l\'instant.')]));
+    agentsIAData = r;
+    const nbValides = Object.values(r.valides).reduce((n, l) => n + l.length, 0);
+    $('#ai-kpi-trier').textContent = r.aTrier.length; $('#ai-kpi-valides').textContent = nbValides; $('#ai-kpi-rejetes').textContent = r.rejetes;
+    dessinerFiltresAgents(); dessinerTrierAgents();
+    const b = $('#ai-lancer'); b.disabled = r.en_cours;
+    const derniere = (r.historique || [])[0];
+    $('#ai-statut').textContent = r.en_cours ? '⏳ Recherche en cours…' : derniere ? `Dernière recherche ${ilYa(derniere.le) || "aujourd'hui"} : ${derniere.erreur ? 'échec (' + derniere.erreur + ')' : `${derniere.retenus} retenu(s) sur ${derniere.trouves} trouvé(s)`}.` : 'Aucune recherche pour l\'instant.';
+    $('#ai-hist').replaceChildren(...((r.historique || []).length ? r.historique.map((h) => {
+      const c = el('div', 'offre');
+      const haut = el('div', 'haut');
+      haut.append(el('span', 'titre', new Date(h.le).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })));
+      haut.append(el('span', 'chip', h.source === 'automatique (nuit)' ? '🌙 nocturne' : '🖐 manuelle'));
+      c.append(haut);
+      if (h.erreur) c.append(el('div', 'meta', '✖ Échec : ' + h.erreur));
+      else c.append(el('div', 'meta', `${(h.metiers || []).join(', ') || '?'} à ${(h.villes || []).join(', ') || '?'} · ${h.retenus} retenu(s) sur ${h.trouves} trouvé(s)${h.autoRejetes ? `, ${h.autoRejetes} auto-écarté(s)` : ''}`));
+      return c;
+    }) : [el('p', 'aide', 'Aucune recherche pour l\'instant.')]));
     const metiers = Object.keys(r.valides).sort();
     $('#ai-valides').replaceChildren(...(metiers.length ? metiers.map((m) => {
-      const box = el('div'); box.style.marginBottom = '14px';
-      box.append(el('h3', '', `${m} (${r.valides[m].length})`));
-      const ul = el('ul', 'l');
-      ul.append(...r.valides[m].map((e) => {
-        const li = el('li'), s2 = el('span', 't');
-        s2.append(`${e.nom} à ${e.ville || '?'}${e.tel ? ' · ' + e.tel : ''}${e.email ? ' · ' + e.email : ''}`);
-        if (e.site) s2.append(el('br'), lien(e.site, e.site));
-        li.append(s2); return li;
+      const det = el('details', 'emp-groupe');
+      const sum = el('summary', ''); sum.append(el('span', '', m), el('span', 'n', String(r.valides[m].length)));
+      det.append(sum);
+      const box = el('div', 'offres grille');
+      box.append(...r.valides[m].map((e) => {
+        const c = el('div', 'offre');
+        const h = el('div', 'haut'); h.append(el('span', 'titre', e.nom)); c.append(h);
+        c.append(el('div', 'meta', `${e.ville || '?'}${e.tel ? ' · ' + e.tel : ''}${e.email ? ' · ' + e.email : ''}`));
+        if (e.site) { const l = el('div', 'meta'); l.append(lien(e.site, e.site)); c.append(l); }
+        return c;
       }));
-      box.append(ul); return box;
+      det.append(box); return det;
     }) : [el('p', 'aide', 'Aucun artisan validé pour l\'instant.')]));
-  } catch (e) { if (sectionCourante === 'agentsia') $('#ai-trier').replaceChildren(el('li', 'aide', e.message)); }
+  } catch (e) { if (sectionCourante === 'agentsia') $('#ai-trier').replaceChildren(el('p', 'aide', e.message)); }
 }
 $('#ai-lancer').onclick = async () => {
   const b = $('#ai-lancer'); b.disabled = true; b.textContent = 'Recherche…';
@@ -1179,14 +1400,14 @@ const ICO_NAV = {
   overview: '<rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="13" width="7.5" height="7.5" rx="1.8"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.8"/>',
   projets: '<rect x="3.5" y="4" width="17" height="16" rx="2.5"/><path d="M9 4v16M14.5 9H20M14.5 13H20"/>',
   agenda: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
-  business: '<rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M8.5 7V5.5a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2V7M3 12.5h18"/>',
+  business: '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3.5 2.5-6 5.5-6s5.5 2.5 5.5 6"/><circle cx="17.5" cy="9" r="2.6"/><path d="M16 13.2c2.3.4 4 2.3 4 4.8"/>',
+  groupe_business: '<rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M8.5 7V5.5a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2V7M3 12.5h18"/>',
   trading: '<path d="M3.5 18l5-6 4 3 7-9"/><path d="M15 6h4.5v4.5"/>',
   emploi: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5M11 8v6M8 11h6"/>',
   journal: '<path d="M6 3.5h9.5L19 7v13.5H6z"/><path d="M15 3.5V7h4M9 11h7M9 14.5h7M9 18h4"/>',
   musique: '<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>',
   securite: '<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9.5 12l2 2 3-3.5"/>',
   parametres: '<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>',
-  seo: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-5.5-5.5"/>',
   agentsia: '<path d="M6.5 3.5h3l1.3 3.6-2 1.6a12.5 12.5 0 0 0 6 6l1.6-2 3.6 1.3v3c0 1-.8 1.8-1.8 1.7C10.3 18.5 5.5 13.7 4.8 6.3c-.1-1 .7-1.8 1.7-1.8z"/>',
   mail: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5"/>',
   notes: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="14 3 14 9 20 9"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>',
@@ -1194,15 +1415,15 @@ const ICO_NAV = {
   retour: '<path d="M15 5l-7 7 7 7"/>',
   presence: '<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/>',
 };
-const SECTIONS = [['overview', 'Overview'], ['projets', 'Projets'], ['notes', 'Notes'], ['agenda', 'Agenda'], ['business', 'Business'], ['emploi', 'Emploi'], ['trading', 'Trading'], ['mail', 'Mail'], ['seo', 'SEO'], ['agentsia', 'Agents IA'], ['automatisation', 'Automatisation'], ['journal', 'Journal'], ['musique', 'Musique'], ['securite', 'Sécurité'], ['parametres', 'Paramètres']];
+const SECTIONS = [['overview', 'Overview'], ['projets', 'Projets'], ['notes', 'Notes'], ['agenda', 'Agenda'], ['business', 'Prospects'], ['emploi', 'Emploi'], ['trading', 'Trading'], ['mail', 'Mail'], ['agentsia', 'Agents IA'], ['automatisation', 'Automatisation'], ['journal', 'Journal'], ['musique', 'Musique'], ['securite', 'Sécurité'], ['parametres', 'Paramètres']];
 // Regroupement de la barre latérale (pour ne pas avoir 13 icônes à plat) : un groupe se déplie/replie, un seul ouvert à la fois.
 const GROUPES_NAV = [
   { v: 'overview' },
   { g: 'projets', lib: 'Projets', enfants: ['projets', 'automatisation'] },
-  { g: 'business', lib: 'Business', enfants: ['business', 'emploi', 'trading', 'seo', 'agentsia', 'mail'] },
+  { g: 'business', lib: 'Business', ico: 'groupe_business', enfants: ['business', 'emploi', 'trading', 'agentsia', 'mail'] },
   { g: 'organisation', lib: 'Organisation', enfants: ['agenda', 'notes', 'journal'] },
-  { v: 'musique' },
   { g: 'systeme', lib: 'Système', enfants: ['parametres', 'securite'] },
+  { v: 'musique' },
 ];
 const groupeDe = (v) => (GROUPES_NAV.find((x) => x.enfants && x.enfants.includes(v)) || {}).g || null;
 let sectionCourante = 'overview';
@@ -1218,26 +1439,50 @@ function boutonSection(v, lib) {
   b.onclick = () => afficherSection(v);
   return b;
 }
+// Les groupes (Business, Projets, Organisation…) restent TOUJOURS dans le DOM, repliés via une classe .ferme
+// (même mécanisme grid-rows 0fr/1fr que les accordéons ailleurs dans l'app) : un group replié/déplié anime
+// sa hauteur au lieu d'apparaître/disparaître d'un coup (le DOM n'est reconstruit qu'une seule fois, au départ).
+let navConstruit = false;
 function construireNav() {
-  const nav = $('#nav'), items = [];
-  for (const it of GROUPES_NAV) {
-    if (it.v) { items.push(boutonSection(it.v, (SECTIONS.find(([v]) => v === it.v) || [0, it.v])[1])); continue; }
-    const ouvert = groupeOuvert === it.g;
-    const gb = el('button', 'nav-btn groupe' + (ouvert ? ' ouvert' : '')); gb.type = 'button'; gb.dataset.groupe = it.g; gb.title = it.lib;
-    gb.innerHTML = svg(ICO_NAV[it.enfants[0]]) + CHEVRON;
-    gb.insertBefore(el('span', 'lib', it.lib), gb.querySelector('.chevron'));
-    gb.append(el('span', 'pt'));
-    gb.onclick = () => { groupeOuvert = ouvert ? null : it.g; try { localStorage.setItem('projets_groupe', groupeOuvert || ''); } catch {} construireNav(); };
-    items.push(gb);
-    if (ouvert) for (const v of it.enfants) { const b = boutonSection(v, (SECTIONS.find(([vv]) => vv === v) || [0, v])[1]); b.classList.add('enfant'); items.push(b); }
+  const nav = $('#nav');
+  if (!navConstruit) {
+    const items = [];
+    for (const it of GROUPES_NAV) {
+      if (it.v) { const b = boutonSection(it.v, (SECTIONS.find(([v]) => v === it.v) || [0, it.v])[1]); if (it.v === 'musique') b.style.marginTop = 'auto'; items.push(b); continue; }
+      const ouvertInit = groupeOuvert === it.g;
+      const gb = el('button', 'nav-btn groupe' + (ouvertInit ? ' ouvert' : '')); gb.type = 'button'; gb.dataset.groupe = it.g; gb.title = it.lib;
+      gb.innerHTML = svg(ICO_NAV[it.ico || it.enfants[0]]) + CHEVRON;
+      gb.insertBefore(el('span', 'lib', it.lib), gb.querySelector('.chevron'));
+      gb.append(el('span', 'pt'));
+      gb.onclick = () => { groupeOuvert = groupeOuvert === it.g ? null : it.g; try { localStorage.setItem('projets_groupe', groupeOuvert || ''); } catch {} appliquerEtatNav(); };
+      items.push(gb);
+      const wrap = el('div', 'nav-enfants' + (ouvertInit ? '' : ' ferme')); wrap.dataset.groupe = it.g;
+      const inner = el('div');
+      for (const v of it.enfants) { const b = boutonSection(v, (SECTIONS.find(([vv]) => vv === v) || [0, v])[1]); b.classList.add('enfant'); inner.append(b); }
+      wrap.append(inner);
+      items.push(wrap);
+    }
+    nav.replaceChildren(...items);
+    const pr = el('button', 'nav-btn'); pr.type = 'button'; pr.id = 'presBtn'; pr.title = 'Où es-tu ? (présence)';
+    pr.innerHTML = svg(ICO_NAV.presence); pr.append(el('span', 'lib', 'Présence'), el('span', 'pt')); pr.onclick = ouvrirPresence;
+    nav.append(pr);
+    const r = el('a', 'nav-btn retour'); r.style.marginTop = '0'; r.href = '/'; r.id = 'retourAtlas'; r.title = 'Retour à Atlas (remet la petite fenêtre)';
+    r.innerHTML = svg(ICO_NAV.retour); r.append(el('span', 'lib', 'Atlas'));
+    nav.append(r);
+    navConstruit = true;
   }
-  nav.replaceChildren(...items);
-  const pr = el('button', 'nav-btn'); pr.type = 'button'; pr.id = 'presBtn'; pr.title = 'Où es-tu ? (présence)'; pr.style.marginTop = 'auto';
-  pr.innerHTML = svg(ICO_NAV.presence); pr.append(el('span', 'lib', 'Présence'), el('span', 'pt')); pr.onclick = ouvrirPresence;
-  nav.append(pr);
-  const r = el('a', 'nav-btn retour'); r.style.marginTop = '0'; r.href = '/'; r.id = 'retourAtlas'; r.title = 'Retour à Atlas (remet la petite fenêtre)';
-  r.innerHTML = svg(ICO_NAV.retour); r.append(el('span', 'lib', 'Atlas'));
-  nav.append(r);
+  appliquerEtatNav();
+}
+function appliquerEtatNav() {
+  const nav = $('#nav');
+  for (const it of GROUPES_NAV) {
+    if (!it.g) continue;
+    const ouvert = groupeOuvert === it.g;
+    const gb = nav.querySelector('.nav-btn[data-groupe="' + it.g + '"]');
+    const wrap = nav.querySelector('.nav-enfants[data-groupe="' + it.g + '"]');
+    if (gb) gb.classList.toggle('ouvert', ouvert);
+    if (wrap) wrap.classList.toggle('ferme', !ouvert);
+  }
   for (const b of nav.querySelectorAll('.nav-btn[data-section]')) { if (b.dataset.section === sectionCourante) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }
   appliquerBadges();
 }
@@ -1257,7 +1502,7 @@ function appliquerBadges() {
     set('.nav-btn[data-groupe="' + it.g + '"] .pt', pire, pire === 'ko' ? '!' : '');
   }
 }
-let musTimer = null, musTick = null, jourTimer = null, empTimer = null, tradTimer = null, mailTimer = null, autoTimer = null, overTimer = null, paramTimer = null, notesTimer = null, seoTimer = null, agentsIATimer = null;
+let musTimer = null, musTick = null, jourTimer = null, empTimer = null, tradTimer = null, mailTimer = null, autoTimer = null, overTimer = null, paramTimer = null, notesTimer = null, agentsIATimer = null;
 function afficherSection(s) {
   if (!SECTIONS.some(([v]) => v === s)) s = 'projets';
   sectionCourante = s; try { localStorage.setItem('projets_section', s); } catch {}
@@ -1280,7 +1525,6 @@ function afficherSection(s) {
   clearInterval(overTimer); if (s === 'overview') { chargerOverview(); overTimer = setInterval(chargerOverview, 30000); }
   clearInterval(paramTimer); if (s === 'parametres') { chargerParametres(); paramTimer = setInterval(chargerParametres, 5000); }
   clearInterval(notesTimer); if (s === 'notes') { chargerNotes(); notesTimer = setInterval(chargerNotes, 15000); }
-  clearInterval(seoTimer); if (s === 'seo') { chargerSeo(); chargerSeoRecherche(); seoTimer = setInterval(() => { chargerSeo(); chargerSeoRecherche(); }, 30000); }
   clearInterval(agentsIATimer); if (s === 'agentsia') { chargerAgentsIA(); agentsIATimer = setInterval(chargerAgentsIA, 20000); }
   if (s === 'journal') { chargerJournal(); jourTimer = setInterval(chargerJournal, 6000); }
   if (s === 'musique') { chargerMusique(); musTimer = setInterval(chargerMusique, 4000); musTick = setInterval(tickMusique, 1000); }
@@ -1306,9 +1550,10 @@ async function execAction(chemin, corps, msg) {
   tradSig = ''; chargerTrading(true);
 }
 function dessinerExecuteur(v, b) {
-  const box = el('div'), d = v.dernier;
+  const box = el('div'); box.style.display = 'grid'; box.style.gap = '16px';
+  const d = v.dernier;
   const st = el('div', 'sec-statut ' + (v.actif && !v.arret && !v.suspendu ? 'ok' : 'ko'));
-  st.append(el('div', 'v', !v.actif ? '⚪ Désactivé : Atlas ne passe aucun ordre' : v.arret ? "🛑 ARRÊTÉ (arrêt d'urgence) : aucune entrée" : v.suspendu ? '⏸ Atlas est suspendu : aucune nouvelle entrée' : '🟢 Activé : Atlas applique ses règles sur le compte démo'));
+  st.append(el('div', 'v', !v.actif ? '⚪ Désactivé : Atlas ne passe aucun ordre' : v.arret ? "🛑 ARRÊTÉ (arrêt d'urgence) : aucune entrée" : v.suspendu ? '⏸ Atlas est suspendu : aucune nouvelle entrée' : '🟢 Activé : Atlas applique ses règles sur ton compte'));
   if (v.actif && d) st.append(el('div', 'l', d.ok ? `Dernier passage ${new Date(d.t).toLocaleTimeString('fr-FR')} · ${(d.positions || []).length} position(s) de Atlas · résultat du jour ${num2(d.pnl_jour)} (limite de perte ${num2(d.perte_max_jour)}) · ${d.ordres_jour} ordre(s) aujourd'hui${d.entrees_autorisees ? '' : ' · entrées suspendues : ' + d.motif}` : 'Bloqué : ' + d.raison));
   box.append(st);
   const barre = el('div', 'ligne');
@@ -1317,12 +1562,18 @@ function dessinerExecuteur(v, b) {
   if (v.arret) { const re = el('button', 'btn gold', "▶ Lever l'arrêt"); re.onclick = () => execAction('/api/trading/executeur/reprendre'); barre.append(re); }
   box.append(barre);
   const bil = {}; for (const s of ((b && b.bilan && b.bilan.strategies) || [])) bil[s.id] = s;
+  const grille = el('div', 'grille');
   for (const s of v.strategies) {
-    const l = el('div', 'suivi'); l.style.display = 'block'; const r = bil[s.id];
-    l.append(el('div', '', `${s.statut === 'candidat' ? '✅' : '🧪'} ${s.nom} — ${s.lot} lot`), el('div', 'aide', `${s.statut === 'candidat' ? 'Candidat du laboratoire' : 'Exploration (non confirmée)'} · attendu : ${s.attendu}`));
-    if (r) l.append(el('div', 'aide', r.transactions ? `Résultats réels (90 j) : ${r.transactions} transaction(s), net ${num2(r.net)}, ${num2(r.gagnantes_pct, 1)} % gagnantes, facteur de profit ${r.facteur_de_profit == null ? '—' : num2(r.facteur_de_profit)}${r.transactions < 100 ? ' — trop peu pour conclure (il en faut 100 ou plus)' : ''}` : 'Pas encore de transaction.'));
-    box.append(l);
+    const r = bil[s.id];
+    const c = el('div', 'offre' + (s.statut === 'candidat' ? ' nouvelle' : ''));
+    const haut = el('div', 'haut'); haut.append(el('span', 'titre', `${s.nom} — ${s.lot} lot`));
+    haut.append(el('span', 'chip score', s.statut === 'candidat' ? '✅ Candidat' : '🧪 Exploration'));
+    c.append(haut);
+    c.append(el('div', 'meta', `${s.statut === 'candidat' ? 'Candidat du laboratoire' : 'Non confirmée'} · attendu : ${s.attendu}`));
+    c.append(el('div', 'meta', r ? (r.transactions ? `90 j : ${r.transactions} transaction(s), net ${num2(r.net)}, ${num2(r.gagnantes_pct, 1)} % gagnantes, facteur de profit ${r.facteur_de_profit == null ? '—' : num2(r.facteur_de_profit)}${r.transactions < 100 ? ' — trop peu pour conclure (il en faut 100 ou plus)' : ''}` : 'Pas encore de transaction.') : ''));
+    grille.append(c);
   }
+  box.append(grille);
   box.append(el('p', 'aide', `Garde-fous dans le code : compte démo uniquement · ton bouton « Trading Algo » · stop obligatoire · ${v.limites.positions_max} positions max · ${v.limites.ordres_max_jour} ordres/jour max · arrêt si la perte du jour dépasse ${v.limites.perte_max_jour_pct} % · tes propres positions ne sont jamais touchées.`));
   return box;
 }
@@ -1331,22 +1582,42 @@ function dessinerTrading() {
   const sig = JSON.stringify([trad.etat, trad.en_cours, trad.details, trad.executeur, tradExec]);
   if (sig === tradSig && $('#trading').children.length > 1) return; tradSig = sig;
   const parts = [], e = trad.etat || {};
-  const carte = el('div', 'sec-statut ' + (e.ok ? 'ok' : 'ko'));
   if (e.ok) {
     const c = e.compte;
-    carte.append(el('div', 'v', `✔ Compte DÉMO ${c.login} — ${c.serveur}`),
-      el('div', 'l', `Solde ${num2(c.solde)} ${c.devise} · équité ${num2(c.equite)} · profit flottant ${num2(c.profit_flottant)} · marge libre ${num2(c.marge_libre)} · levier 1:${c.levier}`),
-      el('div', 'l', e.positions.length ? `${e.positions.length} position(s) ouverte(s)` : 'Aucune position ouverte.'),
+    const tuiles = el('div', 'tuiles');
+    const tuile = (val, lib, cls = '') => { const t = el('div', 'tuile ' + cls); t.append(el('div', 'v', val), el('div', 'l', lib)); return t; };
+    tuiles.append(
+      tuile(`${num2(c.solde)} ${c.devise}`, 'Solde'),
+      tuile(`${num2(c.equite)} ${c.devise}`, 'Équité'),
+      tuile(`${num2(c.profit_flottant)} ${c.devise}`, 'Profit flottant', c.profit_flottant > 0 ? 'ok' : c.profit_flottant < 0 ? 'ko' : ''),
+      tuile(String(e.positions.length), e.positions.length ? 'Position(s) ouverte(s)' : 'Position ouverte', e.positions.length ? 'att' : ''),
+    );
+    parts.push(tuiles);
+    const carte = el('div', 'sec-statut ok');
+    carte.append(el('div', 'v', `✔ Compte ${c.login} — ${c.serveur}`),
+      el('div', 'l', `Marge libre ${num2(c.marge_libre)} ${c.devise} · levier 1:${c.levier}`),
       el('div', 'l', `Trading algorithmique du terminal : ${e.terminal.algo_trading_autorise ? 'ACTIVÉ' : 'désactivé'} — c'est TON verrou (bouton « Trading Algo » de MetaTrader). Atlas ne passe d'ordres que si l'exécuteur ci-dessous est activé ; si tu coupes « Trading Algo », il n'en passe plus aucun.`));
-  } else carte.append(el('div', 'v', e.refus_compte_reel ? '⛔ Compte non démo : refus' : '⚠ MetaTrader indisponible'), el('div', 'l', e.raison || ''));
-  parts.push(carte);
-  if (e.ok && e.positions.length) {
-    const b = el('div');
-    for (const p of e.positions) { const l = el('div', 'suivi'); l.append(el('span', p.profit >= 0 ? 'ok' : 'ko', `${p.sens} ${p.volume} ${p.symbole}`), el('span', '', `ouverte à ${num2(p.prix_ouverture)} · actuel ${num2(p.prix_actuel)} · SL ${p.sl ? num2(p.sl) : '—'} · TP ${p.tp ? num2(p.tp) : "aucun (sortie sur signal ou délai)"}`), el('small', '', `profit ${num2(p.profit)}`)); b.append(l); }
-    parts.push(bloc('Positions ouvertes', b));
+    parts.push(carte);
+  } else {
+    const carte = el('div', 'sec-statut ko');
+    carte.append(el('div', 'v', e.refus_compte_reel ? '⛔ Compte non démo : refus' : '⚠ MetaTrader indisponible'), el('div', 'l', e.raison || ''));
+    parts.push(carte);
   }
-  if (trad.executeur) parts.push(bloc('Exécuteur démo (Atlas trade tout seul, règles fixes)', dessinerExecuteur(trad.executeur, tradExec)));
-  const sec = el('div');
+  if (e.ok && e.positions.length) {
+    const grille = el('div', 'grille');
+    for (const p of e.positions) {
+      const c = el('div', 'offre');
+      const haut = el('div', 'haut'); haut.append(el('span', 'titre', `${p.sens} ${p.volume} ${p.symbole}`));
+      haut.append(el('span', 'chip score', (p.profit >= 0 ? '+' : '') + num2(p.profit)));
+      c.append(haut);
+      c.append(el('div', 'meta', `ouverte à ${num2(p.prix_ouverture)} · actuel ${num2(p.prix_actuel)}`));
+      c.append(el('div', 'meta', `SL ${p.sl ? num2(p.sl) : '—'} · TP ${p.tp ? num2(p.tp) : "aucun (sortie sur signal ou délai)"}`));
+      grille.append(c);
+    }
+    parts.push(bloc('Positions ouvertes', grille));
+  }
+  if (trad.executeur) parts.push(bloc('Exécuteur automatique (Atlas trade tout seul, règles fixes)', dessinerExecuteur(trad.executeur, tradExec)));
+  const sec = el('div'); sec.style.display = 'grid'; sec.style.gap = '16px';
   const barre = el('div', 'ligne');
   const bl = el('button', 'btn gold', trad.en_cours ? '⏳ Étude en cours…' : '🔬 Lancer une nouvelle étude'); bl.disabled = !!trad.en_cours || !e.ok; bl.onclick = lancerEtude;
   const ba = el('button', 'btn', '↻ Actualiser le compte'); ba.onclick = () => chargerTrading(true);
@@ -1354,29 +1625,42 @@ function dessinerTrading() {
   const d = trad.details || [];
   if (!d.length) sec.append(el('p', 'aide', trad.en_cours ? "L'étude tourne : elle lit l'historique de l'or et du Bitcoin, teste 64 règles simples par marché avec les vrais coûts, et te donne un verdict." : "Aucune étude pour l'instant. Elle lit l'historique de l'or et du Bitcoin, teste 64 règles simples par marché avec les vrais coûts, et te dit s'il existe un avantage fiable."));
   for (const x of d) {
-    const c = el('div', 'offre ' + (x.ok && x.candidats ? 'nouvelle' : ''));
-    if (!x.ok) { c.append(el('div', 'titre', `${(x.symbole || '').replace(/\.vx$/, '')} ${x.unite} — étude impossible`), el('div', 'meta', x.raison || '')); sec.append(c); continue; }
-    c.append(el('div', 'titre', `${(x.symbole || '').replace(/\.vx$/, '')} · bougies ${x.unite} — ${x.donnees.barres} du ${x.donnees.debut.slice(0, 10)} au ${x.donnees.fin.slice(0, 10)}`));
-    c.append(el('div', 'meta', `${x.n_tests} combinaisons essayées · coût d'un aller-retour ${num2(x.couts.cout_aller_retour)} $ par unité · buy & hold (test) ${num2(x.buy_hold.test)} $/once`));
-    const v = el('div', 'sec-statut ' + (x.candidats ? 'ok' : ''), ''); v.append(el('div', 'v', x.candidats ? `✅ ${x.candidats} candidat(s) — à confirmer en démo, ce n'est PAS une preuve` : '❌ Aucun avantage fiable trouvé après coûts'), el('div', 'l', x.verdict)); c.append(v);
-    for (const r of x.examines) {
-      const l = el('div', 'suivi'); l.style.display = 'block';
-      l.append(el('div', '', `${r.candidat ? '✅' : '❌'} ${r.strategie}`),
-        el('div', 'aide', `Entraînement : PF ${num2(r.entrainement.pf, 2)} · validation : PF ${num2(r.validation.pf, 2)} · TEST : PF ${num2(r.test.pf, 2)}, ${num2(r.test.net)} $/once, ${r.test.n} transactions, ${Math.round(r.test.gagnants * 100)} % gagnantes, baisse max ${num2(r.test.dd_max)} $ · sans tendance : PF ${num2(r.sans_tendance.pf, 2)} · coûts +50 % : PF ${num2(r.couts_x1_5.pf, 2)} · hasard : p = ${num2(r.p_hasard, 3)} (seuil ${num2(x.seuil_hasard, 3)})`));
-      if (!r.candidat && r.raisons_echec && r.raisons_echec.length) l.append(el('div', 'aide', 'Écartée : ' + r.raisons_echec.join(' ; ')));
-      c.append(l);
+    const nomSymbole = `${(x.symbole || '').replace(/\.vx$/, '')} · ${x.unite}`;
+    if (!x.ok) {
+      const c = el('div', 'offre'); c.append(el('div', 'titre', `${nomSymbole} — étude impossible`), el('div', 'meta', x.raison || '')); sec.append(c); continue;
     }
-    if (!x.examines.length) c.append(el('p', 'aide', "Aucune règle ne s'est confirmée sur la validation : rien n'a même été présenté au test."));
-    const br = el('button', 'btn small', '📄 Rapport complet'); br.onclick = () => voirRapport(x.unite, x.symbole); c.append(br);
-    sec.append(c);
+    const det = el('details', 'emp-groupe'); det.open = !!x.candidats;
+    const sum = el('summary', '');
+    sum.append(el('span', '', `${nomSymbole}${x.candidats ? ` — ✅ ${x.candidats} candidat(s)` : ' — ❌ aucun avantage'}`));
+    sum.append(el('span', 'n', `${x.examines.length} règle(s)`));
+    det.append(sum);
+    const corps = el('div', 'offres');
+    corps.append(el('p', 'aide', `bougies ${x.donnees.barres} du ${x.donnees.debut.slice(0, 10)} au ${x.donnees.fin.slice(0, 10)} · ${x.n_tests} combinaisons essayées · coût d'un aller-retour ${num2(x.couts.cout_aller_retour)} $ par unité · buy & hold (test) ${num2(x.buy_hold.test)} $/once`));
+    const v = el('div', 'sec-statut ' + (x.candidats ? 'ok' : ''), ''); v.append(el('div', 'v', x.candidats ? `✅ ${x.candidats} candidat(s) — à confirmer en démo, ce n'est PAS une preuve` : '❌ Aucun avantage fiable trouvé après coûts'), el('div', 'l', x.verdict)); corps.append(v);
+    const grilleR = el('div', 'grille'); grilleR.style.marginTop = '10px';
+    for (const r of x.examines) {
+      const c = el('div', 'offre' + (r.candidat ? ' nouvelle' : ''));
+      const haut = el('div', 'haut'); haut.append(el('span', 'titre', r.strategie));
+      haut.append(el('span', 'chip score', r.candidat ? '✅ candidate' : '❌ écartée'));
+      c.append(haut);
+      c.append(el('div', 'meta', `Entraînement : PF ${num2(r.entrainement.pf, 2)} · validation : PF ${num2(r.validation.pf, 2)} · TEST : PF ${num2(r.test.pf, 2)}, ${num2(r.test.net)} $/once, ${r.test.n} transactions, ${Math.round(r.test.gagnants * 100)} % gagnantes, baisse max ${num2(r.test.dd_max)} $`));
+      c.append(el('div', 'meta', `sans tendance : PF ${num2(r.sans_tendance.pf, 2)} · coûts +50 % : PF ${num2(r.couts_x1_5.pf, 2)} · hasard : p = ${num2(r.p_hasard, 3)} (seuil ${num2(x.seuil_hasard, 3)})`));
+      if (!r.candidat && r.raisons_echec && r.raisons_echec.length) c.append(el('div', 'meta', 'Écartée : ' + r.raisons_echec.join(' ; ')));
+      grilleR.append(c);
+    }
+    corps.append(grilleR);
+    if (!x.examines.length) corps.append(el('p', 'aide', "Aucune règle ne s'est confirmée sur la validation : rien n'a même été présenté au test."));
+    const br = el('button', 'btn small', '📄 Rapport complet'); br.onclick = () => voirRapport(x.unite, x.symbole); br.style.marginTop = '10px'; corps.append(br);
+    det.append(corps);
+    sec.append(det);
   }
   parts.push(bloc('Étude des stratégies (or et Bitcoin)', sec));
   parts.push(el('p', 'aide', "Comment lire ça : « PF » = facteur de profit (gains ÷ pertes, coûts inclus ; au-dessus de 1 = rentable). Une règle n'est retenue que si elle résiste à TOUS les contrôles : période de test jamais vue, prix sans tendance (l'or a beaucoup monté), coûts majorés de 50 % et test de hasard corrigé du nombre d'essais. « Aucun avantage » est le résultat normal pour des règles simples. L'exécuteur applique ces règles en démo pour mesurer la réalité : un candidat du laboratoire n'est pas une preuve, et les règles « exploration » (Bitcoin) n'ont PAS été confirmées : elles servent à récolter des résultats."));
   $('#trading').replaceChildren(...parts);
 }
 
-// ---------- Mail : lecture de Proton (Brave, sur demande) + tri par le modèle local. Rien n'est envoyé nulle part, aucun mail n'est ouvert. ----------
-let mailEtat = null, mailSig = '';
+// ---------- Mail : lecture de Zoho (API officielle, sur demande) + tri par le modèle local. Rien n'est envoyé nulle part, aucun mail n'est ouvert. ----------
+let mailEtat = null, mailSig = '', mailFiltreCat = '', mailFiltreNonLu = false;
 async function chargerMail() {
   try { mailEtat = await api('/api/mail'); if (sectionCourante === 'mail') dessinerMail(); if (!mailEtat.en_cours) clearInterval(mailTimer); } catch (e) { $('#mail').textContent = e.message; }
 }
@@ -1385,34 +1669,60 @@ async function lancerVerifMail() {
   catch (e) { toast(e.message, true); }
   mailSig = ''; chargerMail();
 }
-function dessinerMail() {
+const MAIL_CAT_LABEL = { emploi_direct: '💼 emploi', securite_compte: '🔒 sécurité', personnel: '👤 personnel', newsletter_emploi: '📰 newsletter emploi', promotion: '🏷 promo', autre: '· autre' };
+function carteMail(m) {
+  const c = el('div', 'offre' + (m.important ? ' nouvelle' : ''));
+  const haut = el('div', 'haut');
+  haut.append(el('span', 'titre', m.sujet || '(sans sujet)'));
+  if (m.non_lu) haut.append(el('span', 'chip score', '● non lu'));
+  if (m.important) haut.append(el('span', 'chip score', '★ important'));
+  c.append(haut);
+  c.append(el('div', 'meta', `${m.expediteur_nom || m.expediteur_email || '?'}${m.expediteur_nom && m.expediteur_email ? ' · ' + m.expediteur_email : ''}`));
+  c.append(el('div', 'meta', `${new Date(m.date_ms).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}${m.categorie ? ' · ' + (MAIL_CAT_LABEL[m.categorie] || m.categorie) : ''}`));
+  return c;
+}
+function dessinerFiltresMail(mails) {
+  const box = $('#mail-filtres'); if (!box) return;
+  box.replaceChildren();
+  const cats = [...new Set(mails.map((m) => m.categorie).filter(Boolean))].sort();
+  const selC = el('select'); selC.setAttribute('aria-label', 'Filtrer par catégorie'); selC.style.maxWidth = '220px';
+  selC.append(new Option('Toutes les catégories', ''));
+  cats.forEach((c) => selC.append(new Option(MAIL_CAT_LABEL[c] || c, c)));
+  selC.value = mailFiltreCat; selC.onchange = () => { mailFiltreCat = selC.value; dessinerMail(true); };
+  const chNL = el('button', 'chip', '● Non lus seulement'); chNL.setAttribute('aria-pressed', mailFiltreNonLu ? 'true' : 'false');
+  chNL.onclick = () => { mailFiltreNonLu = !mailFiltreNonLu; chNL.setAttribute('aria-pressed', mailFiltreNonLu ? 'true' : 'false'); dessinerMail(true); };
+  box.append(selC, chNL);
+}
+function dessinerMail(forcer) {
   if (!mailEtat) return;
   const sig = JSON.stringify(mailEtat);
-  if (sig === mailSig && $('#mail').children.length > 1) return; mailSig = sig;
+  if (!forcer && sig === mailSig && $('#mail').children.length > 1) return; mailSig = sig;
   const parts = [], d = mailEtat.dernier;
   const carte = el('div', 'sec-statut ' + (d && d.ok ? 'ok' : d ? 'ko' : ''));
   if (!d) carte.append(el('div', 'v', '📬 Aucune vérification pour l\'instant'), el('div', 'l', "Lit ta boîte Zoho (API officielle) et trie l'importance avec le modèle local : rien ne part vers Gemini ni Groq."));
   else if (!d.ok) carte.append(el('div', 'v', '⚠ Vérification impossible'), el('div', 'l', d.raison || ''));
   else {
     carte.append(el('div', 'v', `✔ ${d.non_lus_total ?? '?'} mail(s) non lu(s) au total`),
-      el('div', 'l', `${d.aujourdhui} reçu(s) aujourd'hui · ${d.lus_cette_fois} lu(s) lors de cette vérification · ${new Date(d.t).toLocaleString('fr-FR')}`),
-      d.erreur_tri ? el('div', 'l', '⚠ Tri indisponible : ' + d.erreur_tri) : null);
+      el('div', 'l', `${d.aujourdhui} reçu(s) aujourd'hui · ${d.lus_cette_fois} lu(s) lors de cette vérification · ${new Date(d.t).toLocaleString('fr-FR')}`));
+    if (d.erreur_tri) carte.append(el('div', 'l', '⚠ Tri indisponible (classement automatique) : ' + d.erreur_tri));
   }
   parts.push(carte);
   const lig = el('div', 'ligne'); lig.style.marginTop = '8px';
   const b = el('button', 'btn gold', mailEtat.en_cours ? '⏳ Vérification en cours…' : '📬 Vérifier mes mails'); b.disabled = !!mailEtat.en_cours; b.onclick = lancerVerifMail;
   lig.append(b); parts.push(lig);
-  if (d && d.ok && d.importants && d.importants.length) {
-    const box = el('div');
-    for (const m of d.importants) {
-      const c = el('div', 'offre nouvelle');
-      c.append(el('div', 'titre', m.sujet || '(sans sujet)'), el('div', 'meta', `${m.expediteur || ''} · ${m.date || ''} · ${m.categorie || ''}`));
-      box.append(c);
-    }
-    parts.push(bloc(`Mails importants (${d.importants.length})`, box));
-  } else if (d && d.ok) parts.push(el('p', 'aide', "Aucun mail jugé important cette fois."));
-  parts.push(el('p', 'aide', "Lecture seule : aucun mail n'est ouvert, marqué comme lu, envoyé ni supprimé. Une vérification se fait uniquement quand tu le demandes (jamais en tâche de fond), et seulement si Brave est fermé."));
+  if (d && d.ok && d.mails && d.mails.length) {
+    const filtres = el('div', 'ligne'); filtres.id = 'mail-filtres'; filtres.style.margin = '8px 0';
+    parts.push(filtres);
+    let liste = d.mails;
+    if (mailFiltreCat) liste = liste.filter((m) => m.categorie === mailFiltreCat);
+    if (mailFiltreNonLu) liste = liste.filter((m) => m.non_lu);
+    const grille = el('div', 'grille');
+    grille.append(...(liste.length ? liste.map(carteMail) : [el('p', 'aide', 'Aucun mail ne correspond à ces filtres.')]));
+    parts.push(bloc(`Mails lus lors de cette vérification (${liste.length}/${d.mails.length})`, grille));
+  } else if (d && d.ok) parts.push(el('p', 'aide', "Aucun mail à afficher."));
+  parts.push(el('p', 'aide', "Lecture seule : aucun mail n'est ouvert, marqué comme lu, envoyé ni supprimé. Une vérification se fait uniquement quand tu le demandes (jamais en tâche de fond)."));
   $('#mail').replaceChildren(...parts.filter(Boolean));
+  if (d && d.ok && d.mails && d.mails.length) dessinerFiltresMail(d.mails);
 }
 
 // ---------- Automatisation : N8N en local, démarré à la demande (jamais en tâche de fond, la RAM du PC est limitée) ----------
@@ -1458,105 +1768,218 @@ function dessinerAutomatisation() {
 }
 
 // ---------- Overview : petit résumé de chaque section, cliquable pour aller au détail ----------
+const JOURS_NOMS_OV = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+const frDateOv = (d) => d ? new Date(d + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '';
+const relancesIgnoreesOv = new Set();
 async function chargerOverview() {
-  try { const o = await api('/api/overview'); if (sectionCourante === 'overview') dessinerOverview(o); }
-  catch (e) { $('#overview').textContent = e.message; }
+  try {
+    const [o, biz, feed] = await Promise.all([api('/api/overview'), api('/business').catch(() => null), api('/feed?since=0').catch(() => null)]);
+    if (sectionCourante === 'overview') dessinerOverview(o, biz, feed);
+  } catch (e) { $('#overview').textContent = e.message; }
 }
-function carteOverview(titre, versSection) {
+function carteOverview(titre, versSection, ico) {
   const c = el('button', 'carte'); c.type = 'button'; c.onclick = () => afficherSection(versSection);
-  c.append(el('div', 'carte-tete', titre));
+  const row = el('div', 'carte-tete-row');
+  if (ico && ICO_NAV[ico]) { const badge = el('span', 'carte-ico'); badge.innerHTML = svg(ICO_NAV[ico]); row.append(badge); }
+  row.append(el('div', 'carte-tete', titre));
+  c.append(row);
   return c;
 }
-function dessinerOverview(o) {
-  const grille = $('#overview'); const parts = [];
+function dessinerRelancesSemaine(biz) {
+  const panel = el('div', 'ov-panel span2 ov-panel-graphique');
+  const tete = el('div', 'ov-panel-tete'); tete.append(el('h2', '', 'Relances cette semaine'), el('span', 'n', '7 jours'));
+  panel.append(tete);
+  const lundi = new Date(); lundi.setDate(lundi.getDate() - ((lundi.getDay() + 6) % 7)); lundi.setHours(12, 0, 0, 0);
+  const comptes = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(lundi); d.setDate(d.getDate() + i);
+    const iso = d.toISOString().slice(0, 10);
+    comptes.push((biz && biz.prospects ? biz.prospects.filter((p) => p.relance === iso).length : 0));
+  }
+  const max = Math.max(1, ...comptes);
+  const auj = new Date().toISOString().slice(0, 10);
+  const JOURS_LONGS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+  const bars = el('div', 'ov-bars');
+  const tip = el('div', 'ov-bar-tip');
+  comptes.forEach((n, i) => {
+    const d = new Date(lundi); d.setDate(d.getDate() + i);
+    const iso = d.toISOString().slice(0, 10);
+    const b = el('i', iso === auj ? 'active' : '');
+    b.style.height = Math.max(6, Math.round(84 * n / max)) + 'px';
+    b.addEventListener('mouseenter', () => {
+      tip.textContent = `${JOURS_LONGS[i]}${iso === auj ? " (aujourd'hui)" : ''} : ${n} relance${n > 1 ? 's' : ''}`;
+      tip.style.left = (b.offsetLeft + b.offsetWidth / 2) + 'px';
+      tip.classList.add('visible');
+    });
+    b.addEventListener('mouseleave', () => tip.classList.remove('visible'));
+    bars.append(b);
+  });
+  bars.append(tip);
+  const noms = el('div', 'ov-bars-jours');
+  ['L', 'M', 'M', 'J', 'V', 'S', 'D'].forEach((j, i) => {
+    const d = new Date(lundi); d.setDate(d.getDate() + i);
+    noms.append(el('span', d.toISOString().slice(0, 10) === auj ? 'active' : '', j));
+  });
+  const zone = el('div', 'ov-bars-zone'); zone.append(bars, noms);
+  panel.append(zone);
+  return panel;
+}
+function dessinerAujourdhuiPanel(o) {
+  const panel = el('div', 'ov-panel');
+  const tete = el('div', 'ov-panel-tete'); tete.append(el('h2', '', "Aujourd'hui")); panel.append(tete);
+  const evs = o.agenda || [];
+  if (evs.length) {
+    const tl = el('div', 'ov-timeline');
+    for (const e of evs.slice(0, 5)) {
+      const item = el('div', 'ov-timeline-item');
+      item.append(el('div', 'ov-timeline-dot'));
+      const txt = el('div');
+      txt.append(el('div', 't', e.titre), el('div', 'h', e.heure || 'journée'));
+      item.append(txt); tl.append(item);
+    }
+    panel.append(tl);
+    return panel;
+  }
+  const routines = o.routines_jour || [];
+  if (routines.length) {
+    const tl = el('div', 'ov-timeline');
+    for (const r of routines) {
+      const item = el('div', 'ov-timeline-item');
+      item.append(el('div', 'ov-timeline-dot'));
+      const txt = el('div');
+      txt.append(el('div', 't', r.texte), el('div', 'h', `🔁 ${r.heure.replace(':', 'h')}`));
+      item.append(txt); tl.append(item);
+    }
+    panel.append(tl);
+    panel.append(el('p', 'ov-vide', 'Rien d\'autre de prévu.'));
+    return panel;
+  }
+  panel.append(el('p', 'ov-vide', 'Rien de prévu.'));
+  return panel;
+}
+const FEED_IGNORES_OV = new Set(['[Point de contrôle]', '[Demande du plan du jour]', '[Point sur les projets dev]', '[Point de la journée]', '[Rapport de la journée]']);
+function dessinerActivite(feed) {
+  const panel = el('div', 'ov-panel span2');
+  const tete = el('div', 'ov-panel-tete'); tete.append(el('h2', '', 'Activité récente'));
+  panel.append(tete);
+  const items = feed && feed.items ? feed.items.filter((e) => e.de === 'jarvis' && !FEED_IGNORES_OV.has(e.texte)).slice(-5).reverse() : [];
+  if (!items.length) { panel.append(el('p', 'ov-vide', 'Rien de récent.')); return panel; }
+  const liste = el('div', 'ov-activite');
+  for (const e of items) {
+    const row = el('div', 'ov-activite-item');
+    const badge = el('div', 'ov-activite-badge' + (e.type === 'alerte' ? ' alerte' : ''), e.type === 'alerte' ? '!' : '✓');
+    const txt = el('div', 'txt', e.texte.replace(/^[\p{Emoji_Presentation}\u{1F000}-\u{1FFFF}☀-➿]\s*/u, ''));
+    const h = el('div', 'h', new Date(e.t).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }));
+    row.append(badge, txt, h); liste.append(row);
+  }
+  panel.append(liste);
+  return panel;
+}
+function dessinerOverview(o, biz, feed) {
+  const grille = $('#overview');
+  const top = el('div', 'stats-top');
 
-  const cTrading = carteOverview('📈 Trading démo', 'trading');
-  const tt = el('div', 'tuiles');
+  const stat = (titre, versSection, ico, valeur, niv, caption) => {
+    const c = carteOverview(titre, versSection, ico);
+    c.append(el('div', 'carte-valeur ' + (niv || ''), valeur));
+    if (caption) c.append(el('div', 'carte-caption', caption));
+    return c;
+  };
+
   if (o.trading) {
     const or = o.trading['XAUUSD.vx'], btc = o.trading['BTCUSD.vx'];
-    tt.append(tuile('Or (once)', or ? num2(or.bid) + ' $' : '—', or ? '' : 'ko'), tuile('Bitcoin', btc ? num2(btc.bid) + ' $' : '—', btc ? '' : 'ko'));
-  } else tt.append(tuile('État', 'MetaTrader indisponible', 'ko'));
-  cTrading.append(tt);
-  parts.push(cTrading);
+    top.append(stat('Trading', 'trading', 'trading', or ? num2(or.bid) + ' $' : '—', or ? '' : 'ko', btc ? 'Bitcoin ' + num2(btc.bid) + ' $' : null));
+  } else {
+    top.append(stat('Trading', 'trading', 'trading', 'MetaTrader indisponible', 'ko'));
+  }
 
-  const cProjets = carteOverview('📁 Projets', 'projets');
-  const tp = el('div', 'tuiles');
   const nTerminer = o.projets ? o.projets.a_terminer.length : 0;
-  tp.append(tuile('À commencer', String(o.projets ? o.projets.a_commencer : 0)), tuile('À terminer', String(nTerminer), nTerminer ? 'att' : 'ok'));
-  cProjets.append(tp);
-  if (nTerminer) {
-    const l = el('div', 'apercu-liste');
-    for (const p of o.projets.a_terminer.slice(0, 4)) l.append(el('div', 'apercu-ligne', `${p.nom} · ${p.taches_ouvertes} tâche(s) ouverte(s)`));
-    cProjets.append(l);
-  }
-  parts.push(cProjets);
+  top.append(stat('Projets', 'projets', 'projets', String(o.projets ? o.projets.a_commencer : 0) + ' à commencer', null, nTerminer ? nTerminer + ' à terminer' : 'Rien à terminer'));
 
-  const cEmploi = carteOverview('💼 Emploi', 'emploi');
-  if (o.emploi) {
-    const te = el('div', 'tuiles'); te.append(tuile('Meilleur score', '★' + o.emploi.score, o.emploi.score >= 6 ? 'ok' : 'att'));
-    cEmploi.append(te, el('div', 'apercu-ligne', `${o.emploi.titre} · ${o.emploi.societe}`));
-  } else cEmploi.append(el('div', 'aide', "Aucune offre à candidater pour l'instant."));
-  parts.push(cEmploi);
-
-  const cAgenda = carteOverview('📅 Aujourd\'hui', 'agenda');
   const nAgenda = (o.agenda || []).length;
-  const ta = el('div', 'tuiles'); ta.append(tuile('Évènement(s)', String(nAgenda), nAgenda ? 'att' : 'ok'));
-  cAgenda.append(ta);
-  if (nAgenda) {
-    const l = el('div', 'apercu-liste');
-    for (const e of o.agenda.slice(0, 5)) l.append(el('div', 'apercu-ligne', `${e.heure || 'journée'} · ${e.titre}`));
-    cAgenda.append(l);
-  }
-  parts.push(cAgenda);
+  const premier = nAgenda ? o.agenda[0] : null;
+  const premiereRoutine = !nAgenda && (o.routines_jour || []).length ? o.routines_jour[0] : null;
+  const valeurAuj = nAgenda ? nAgenda + ' événement' + (nAgenda > 1 ? 's' : '') : premiereRoutine ? '🔁 Routine du jour' : 'Rien de prévu';
+  const captionAuj = premier ? `${premier.heure || 'journée'} · ${premier.titre}` : premiereRoutine ? `${premiereRoutine.heure.replace(':', 'h')} · ${premiereRoutine.texte}` : null;
+  top.append(stat("Aujourd'hui", 'agenda', 'agenda', valeurAuj, nAgenda ? 'att' : 'ok', captionAuj));
 
-  const cMail = carteOverview('📬 Mail', 'mail');
   if (o.mail && o.mail.verifie) {
-    const tm = el('div', 'tuiles'); tm.append(tuile('Important(s)', String(o.mail.nb_importants), o.mail.nb_importants ? 'att' : 'ok'));
-    cMail.append(tm);
-    if (o.mail.top) cMail.append(el('div', 'apercu-ligne', `${o.mail.top.sujet || '(sans sujet)'} · ${o.mail.top.expediteur || ''}`));
-  } else cMail.append(el('div', 'aide', "Pas encore vérifié : dis « vérifie mes mails »."));
-  parts.push(cMail);
+    top.append(stat('Mail', 'mail', 'mail', String(o.mail.nb_importants) + ' important' + (o.mail.nb_importants > 1 ? 's' : ''), o.mail.nb_importants ? 'att' : 'ok', o.mail.top ? o.mail.top.sujet || '(sans sujet)' : null));
+  } else {
+    top.append(stat('Mail', 'mail', 'mail', 'Non vérifié', null, 'Dis « vérifie mes mails »'));
+  }
 
-  const cSeo = carteOverview('🔍 SEO', 'seo');
-  if (o.seo && o.seo.total) {
-    const ts = el('div', 'tuiles'); ts.append(tuile('Prospects trouvés', String(o.seo.total)));
-    cSeo.append(ts);
-    const l = el('div', 'apercu-liste');
-    for (const p of o.seo.derniers) l.append(el('div', 'apercu-ligne', `${p.score != null ? p.score + '/100 · ' : ''}${p.nom}${p.metiers ? ' · ' + p.metiers.join(', ') + (p.ville ? ' à ' + p.ville : '') : ''}`));
-    cSeo.append(l);
-  } else cSeo.append(el('div', 'aide', "Aucune recherche encore : dis « cherche des [métier] à [ville] »."));
-  parts.push(cSeo);
+  const row = el('div', 'ov-row');
+  row.append(dessinerRelancesSemaine(biz), dessinerAujourdhuiPanel(o), dessinerActivite(feed));
 
-  const cMusique = carteOverview('🎵 Musique', 'musique');
-  if (o.musique) {
-    const row = el('div', 'apercu-musique');
-    if (o.musique.image) { const img = el('img'); img.src = o.musique.image; img.alt = ''; row.append(img); }
-    const txt = el('div');
-    txt.append(el('div', 'apercu-ligne', `${o.musique.en_lecture ? '▶' : '⏸'} ${o.musique.titre}`), el('div', 'apercu-ligne', o.musique.artistes));
-    row.append(txt);
-    cMusique.append(row);
-  } else cMusique.append(el('div', 'aide', 'Rien en ce moment.'));
-  parts.push(cMusique);
-
-  grille.replaceChildren(...parts);
+  grille.replaceChildren(top, row, dessinerUrgent(biz));
+}
+// Ce qui presse aujourd'hui : pour l'instant, les relances dues (même logique que la page Atlas : regroupées sur le jour fixé, config.json > business.jour_relance).
+function dessinerUrgent(biz) {
+  const box = el('div', 'ov-urgent');
+  if (!biz) { box.append(el('p', 'ov-vide', 'Business indisponible.')); return box; }
+  const today = new Date().toISOString().slice(0, 10);
+  const jourDuJour = JOURS_NOMS_OV[new Date().getDay()];
+  const estJourRelance = jourDuJour === biz.jour_relance;
+  const estVeille = JOURS_NOMS_OV[(new Date().getDay() + 1) % 7] === biz.jour_relance;
+  const urgents = (biz.prospects || []).filter((p) => p.email && p.relance && p.relance <= today && !relancesIgnoreesOv.has(p.id))
+    .sort((a, b) => a.relance.localeCompare(b.relance));
+  const tete = el('div', 'ov-urgent-tete');
+  tete.append(el('h2', '', 'À faire'));
+  if (urgents.length) tete.append(el('span', 'pill', String(urgents.length)));
+  box.append(tete);
+  const liste = el('div', 'ov-urgent-liste');
+  if ((estJourRelance || (estVeille && biz.veille_bandeau)) && urgents.length) {
+    for (const p of urgents) {
+      const row = el('div', 'ov-urgent-ligne');
+      const quoi = el('div', 'quoi');
+      quoi.append(el('b', '', p.nom + (p.entreprise && p.entreprise !== p.nom ? ' — ' + p.entreprise : '')));
+      quoi.append(el('small', '', 'relance ' + frDateOv(p.relance) + (p.source ? ' · ' + p.source : '')));
+      const btns = el('div', 'btns');
+      const bOk = el('button', 'ok', 'Relancé'); bOk.type = 'button';
+      bOk.onclick = async () => { bOk.disabled = true; try { await api('/business/prospect/relance', { id: p.id }); } catch {} chargerOverview(); };
+      const bNon = el('button', '', 'Pas encore'); bNon.type = 'button';
+      bNon.onclick = () => { relancesIgnoreesOv.add(p.id); chargerOverview(); };
+      btns.append(bOk, bNon);
+      row.append(quoi, btns); liste.append(row);
+    }
+  } else {
+    liste.append(el('p', 'ov-vide', 'Rien d\'urgent pour l\'instant.'));
+  }
+  box.append(liste);
+  return box;
 }
 
 // ---------- Notes : tout ce qu'Atlas retient tout seul en conversation (idées, décisions...), pour ne rien perdre de ce qui se dit à la voix ----------
+let notesCache = [], notesFiltre = '';
 async function chargerNotes() {
-  try { const d = await api('/api/notes'); if (sectionCourante === 'notes') dessinerNotes(d.notes); }
+  try { const d = await api('/api/notes'); notesCache = d.notes; if (sectionCourante === 'notes') dessinerNotes(); }
   catch (e) { $('#notes').textContent = e.message; }
 }
-function dessinerNotes(notes) {
+$('#notes-recherche').oninput = () => { notesFiltre = $('#notes-recherche').value; dessinerNotes(); };
+function dessinerNotes() {
   const c = $('#notes');
-  if (!notes || !notes.length) { c.replaceChildren(el('p', 'aide', "Rien de noté pour l'instant : ce qu'Atlas retient en conversation (idées, décisions, tâches faites…) apparaîtra ici tout seul.")); return; }
+  if (!notesCache.length) { c.replaceChildren(el('p', 'aide', "Rien de noté pour l'instant : ce qu'Atlas retient en conversation (idées, décisions, tâches faites…) apparaîtra ici tout seul.")); return; }
+  const q = notesFiltre.trim().toLowerCase();
+  const today = new Date().toISOString().slice(0, 10);
+  const hier = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const groupes = new Map();
+  for (const n of notesCache) {
+    if (q && !n.texte.toLowerCase().includes(q)) continue;
+    if (!groupes.has(n.date)) groupes.set(n.date, []);
+    groupes.get(n.date).push(n);
+  }
+  if (!groupes.size) { c.replaceChildren(el('p', 'aide', 'Aucune note ne correspond à cette recherche.')); return; }
   const parts = [];
-  let jourCourant = '';
-  for (const n of notes) {
-    if (n.date !== jourCourant) {
-      jourCourant = n.date;
-      parts.push(el('h4', '', new Date(n.date + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })));
-    }
-    parts.push(el('div', 'apercu-ligne', '• ' + n.texte));
+  for (const [date, liste] of groupes) {
+    const det = el('details', 'emp-groupe'); det.open = date === today || date === hier || !!q;
+    const sum = el('summary', '');
+    sum.append(el('span', '', new Date(date + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })), el('span', 'n', String(liste.length)));
+    det.append(sum);
+    const box = el('div', 'offres');
+    for (const n of liste) box.append(el('div', 'apercu-ligne', '• ' + n.texte));
+    det.append(box);
+    parts.push(det);
   }
   c.replaceChildren(...parts);
 }
@@ -1586,6 +2009,17 @@ async function basculerMicro(coupe) {
 }
 function dessinerParametres(etat, micros) {
   const c = $('#parametres'); const parts = [];
+  const ambCourante = (document.documentElement.className.match(/amb-(\d)/) || [, '1'])[1];
+  const ambBox = el('div');
+  const ambPicker = el('div', 'amb-picker'); ambPicker.dataset.ambiancePicker = '1';
+  for (const n of ['1', '2', '3']) {
+    const sw = el('button', 'amb-swatch-pick amb-' + n); sw.type = 'button'; sw.title = 'Ambiance ' + n;
+    sw.setAttribute('aria-pressed', String(n === ambCourante));
+    sw.onclick = () => choisirAmbiance(n);
+    ambPicker.append(sw);
+  }
+  ambBox.append(ambPicker);
+  parts.push(bloc('Apparence', el('p', 'aide', 'Fond de l\'interface.'), ambBox));
   const okEcoute = etat.vue >= 0 && etat.vue <= 40;
   const carte = el('div', 'sec-statut ' + (etat.micro_coupe ? 'ko' : okEcoute && !etat.micro_muet ? 'ok' : 'ko'));
   carte.append(el('div', 'v', etat.micro_coupe ? '⚪ Micro coupé manuellement (aucun mot d\'éveil)' : !okEcoute ? '🔴 Écoute arrêtée ou ne répond plus' : etat.micro_muet ? '🟠 Écoute active, mais micro muet (aucun son capté)' : '🟢 Écoute active'));
@@ -1603,7 +2037,7 @@ function dessinerParametres(etat, micros) {
   if (micros && micros.ok) {
     const box = el('div');
     for (const m of micros.micros) {
-      const ligneM = el('div', 'carte'); ligneM.style.cssText = 'flex-direction:row;align-items:center;justify-content:space-between;min-height:0;padding:12px 16px';
+      const ligneM = el('div', 'carte micro-ligne'); ligneM.style.cssText = 'flex-direction:row;align-items:center;justify-content:space-between;min-height:0;padding:12px 16px';
       ligneM.append(el('div', '', m.nom + (m.defaut ? ' (par défaut Windows)' : '')));
       const choisir = el('button', 'btn', m.nom === etat.micro ? '✓ En cours' : 'Utiliser celui-ci');
       choisir.disabled = m.nom === etat.micro; choisir.onclick = () => choisirMicro(m.nom);
@@ -1620,10 +2054,11 @@ function dessinerParametres(etat, micros) {
 
 // ---------- Emploi : offres à distance trouvées chaque jour par Atlas ----------
 let emp = null, empFiltre = 'nouvelles', empSig = '';
+const RELANCE_CANDIDATURE_MAX_UI = 2;
 async function chargerEmploi(leger) {
   try {
     emp = await api('/api/emploi');
-    badgeEmploi = { n: emp.nouvelles }; appliquerBadges();
+    badgeEmploi = { n: emp.nouvelles + (emp.a_relancer || 0) }; appliquerBadges();
     if (leger !== true && sectionCourante === 'emploi') dessinerEmploi();
   } catch { /* facultatif */ }
 }
@@ -1668,7 +2103,7 @@ $('#candSauver').onclick = async () => {
   try { const r = await api('/api/emploi/candidature/maj', { id: candCourante.id, sujet: $('#candSujet').value, texte: $('#candTexte').value }); toast(r.ok ? 'Corrections enregistrées.' : r.message, !r.ok); } catch (e) { toast(e.message, true); }
 };
 $('#candRegen').onclick = () => { if (!candCourante) return; if (!confirm('Atlas va réécrire le brouillon : tes corrections seront remplacées. Continuer ?')) return; const o = (emp && emp.offres.find((x) => x.id === candCourante.id)) || { id: candCourante.id, url: candCourante.url, titre: candCourante.titre, societe: '' }; ouvrirCandidature(o, true); };
-$('#candOuvrir').onclick = () => { if (candCourante && /^https?:\/\//.test(candCourante.url)) window.open(candCourante.url, '_blank', 'noopener,noreferrer'); };
+$('#candOuvrir').onclick = () => { if (candCourante && /^https?:\/\//.test(candCourante.url)) api('/api/ouvrir', { url: candCourante.url }).catch((err) => toast(err.message, true)); };
 $('#candPostulee').onclick = async () => {
   if (!candCourante) return;
   try { await api('/api/emploi/candidature/maj', { id: candCourante.id, sujet: $('#candSujet').value, texte: $('#candTexte').value }); const r = await api('/api/emploi/statut', { id: candCourante.id, statut: 'postulee' }); toast(r.ok ? 'Noté : candidature envoyée.' : r.message, !r.ok); } catch (e) { toast(e.message, true); }
@@ -1679,25 +2114,71 @@ async function analyserCv() {
   try { const r = await api('/api/emploi/analyse', {}); toast(r.ok ? 'Analyse terminée.' : r.message, !r.ok); } catch (e) { toast(e.message, true); }
   empSig = ''; chargerEmploi();
 }
-function blocRegard() {
-  const a = emp.analyse, box = el('div', 'sec-statut ' + (a ? 'ok' : ''));
-  box.append(el('div', 'v', a ? `🧭 Le regard de Atlas sur mon CV — niveau estimé : ${a.niveau}` : '🧭 Le regard de Atlas sur mon CV'));
-  const lig = el('div', 'ligne'); lig.style.marginTop = '6px';
-  const b = el('button', 'btn gold', emp.analyse_en_cours ? '⏳ Analyse en cours…' : a ? "↻ Refaire l'analyse" : '🔍 Analyser mon CV'); b.disabled = !!emp.analyse_en_cours || !emp.cv_present; b.onclick = analyserCv; lig.append(b); box.append(lig);
-  if (!emp.cv_present) box.append(el('div', 'l', `Dépose ton CV (PDF) ici, sous le nom cv.pdf : ${emp.cv_chemin || ''}`));
-  else if (!a) box.append(el('div', 'l', "Atlas lit ton CV sur ce PC, retire ton e-mail et ton téléphone AVANT d'envoyer le texte à l'IA, puis te dit ce qui est bon, ce qui l'est moins, quels postes viser et lesquels éviter."));
-  if (a) {
-    box.append(el('div', 'l', a.resume));
-    const liste = (titre, l) => { if (!l || !l.length) return; const d = document.createElement('details'); const sm = document.createElement('summary'); sm.textContent = `${titre} (${l.length})`; d.append(sm); for (const x of l) d.append(el('div', 'aide', '• ' + x)); box.append(d); };
-    liste('✅ Points forts', a.points_forts); liste('⚠ Points faibles', a.points_faibles); liste('↔ Écarts entre mon CV et mon profil', a.ecarts_profil); liste('🎯 Postes à viser', a.postes_cibles);
-    liste('🚫 Mots à éviter dans un intitulé', a.postes_a_eviter); liste('🔎 Mots-clés de recherche', a.mots_cles); liste('📝 Conseils pour mon CV', a.conseils_cv); liste('✉ Conseils pour mes candidatures', a.conseils_candidature);
-    box.append(el('div', 'aide', `Analysé le ${new Date(a.le).toLocaleString('fr-FR')} · ${a.cv}${a.fichier ? ' · résumé dans ' + a.fichier : ''}. Les offres dont l'intitulé contient un de ces mots sont signalées « niveau trop haut » et Atlas ne prépare pas de candidature pour elles sauf si tu insistes.`));
+function blocRegard(a) {
+  const det = el('details', 'emp-groupe');
+  const sum = el('summary', '');
+  sum.append(el('span', '', `🧭 Le regard de Atlas sur mon CV — niveau estimé : ${a.niveau}`));
+  det.append(sum);
+  const box = el('div', 'offres');
+  box.append(el('div', 'l', a.resume));
+  const liste = (titre, l) => { if (!l || !l.length) return; const d = el('details', 'guide'); d.style.marginTop = '8px'; const sm = document.createElement('summary'); sm.textContent = `${titre} (${l.length})`; d.append(sm); for (const x of l) d.append(el('div', 'aide', '• ' + x)); box.append(d); };
+  liste('✅ Points forts', a.points_forts); liste('⚠ Points faibles', a.points_faibles); liste('↔ Écarts entre mon CV et mon profil', a.ecarts_profil); liste('🎯 Postes à viser', a.postes_cibles);
+  liste('🚫 Mots à éviter dans un intitulé', a.postes_a_eviter); liste('🔎 Mots-clés de recherche', a.mots_cles); liste('📝 Conseils pour mon CV', a.conseils_cv); liste('✉ Conseils pour mes candidatures', a.conseils_candidature);
+  box.append(el('div', 'aide', `Analysé le ${new Date(a.le).toLocaleString('fr-FR')} · ${a.cv}${a.fichier ? ' · résumé dans ' + a.fichier : ''}. Les offres dont l'intitulé contient un de ces mots sont signalées « niveau trop haut » et Atlas ne prépare pas de candidature pour elles sauf si tu insistes.`));
+  det.append(box);
+  return det;
+}
+const EMP_CATEGORIES = [
+  { id: 'ia', label: '🤖 IA & automatisation', mots: ['artificial intelligence', ' ai ', 'machine learning', ' llm', 'gpt', 'chatbot', 'automation', 'n8n', 'zapier', 'ml engineer', 'data scientist', 'prompt engineer'] },
+  { id: 'crm', label: '📇 CRM & backoffice', mots: ['crm', 'salesforce', 'hubspot', 'zoho', 'erp', 'back-office', 'backoffice'] },
+  { id: 'site', label: '🌐 Sites simples (vitrine / e-commerce)', mots: ['wordpress', 'shopify', 'webflow', ' wix', 'landing page', 'ecommerce', 'e-commerce', 'website'] },
+  { id: 'front', label: '🎨 Frontend / UI', mots: ['react', 'next.js', 'nextjs', ' vue', 'frontend', 'front-end', 'front end', 'ui dev', 'ui/ux', 'angular'] },
+  { id: 'full', label: '🧩 Full-stack / Backend / API', mots: ['full-stack', 'fullstack', 'full stack', 'backend', 'back-end', ' node', 'api', 'laravel', ' php', 'software engineer', 'developer'] },
+];
+const EMP_AUTRE = { id: 'autre', label: '📦 Autres' };
+function categorieOffre(o) {
+  const zone = ' ' + [o.titre, (o.tags || []).join(' '), o.extrait].filter(Boolean).join(' ').toLowerCase() + ' ';
+  for (const c of EMP_CATEGORIES) if (c.mots.some((m) => zone.includes(m))) return c;
+  return EMP_AUTRE;
+}
+function carteOffre(o) {
+  const c = el('div', 'offre ' + o.statut);
+  const haut = el('div', 'haut'), ok = /^https?:\/\//.test(o.url);
+  const t = ok ? el('a', 'titre', o.titre) : el('span', 'titre', o.titre);
+  if (ok) {
+    t.href = o.url; t.title = 'Ouvrir dans Firefox';
+    t.onclick = (e) => { e.preventDefault(); if (o.statut === 'nouvelle') api('/api/emploi/statut', { id: o.id, statut: 'vue' }).catch(() => {}); api('/api/ouvrir', { url: o.url }).catch((err) => toast(err.message, true)); };
   }
-  return box;
+  haut.append(t, el('span', 'chip score', '★ ' + o.score)); if (o.niveau_ko) haut.append(el('span', 'chip', '⚠ niveau trop haut : ' + o.niveau_ko)); if (o.statut === 'postulee') haut.append(el('span', 'chip score', '✔ postulée')); else if (o.brouillon) haut.append(el('span', 'chip', '✉ brouillon prêt')); c.append(haut);
+  c.append(el('div', 'meta', [o.societe, o.lieu || 'lieu non précisé', o.source, ilYa(o.date), o.salaire].filter(Boolean).join(' · ')));
+  if (o.raisons && o.raisons.length) { const ch = el('div', 'chips'); o.raisons.forEach((r) => ch.append(el('span', 'chip', r))); c.append(ch); }
+  if (o.extrait) c.append(el('div', 'aide', o.extrait));
+  if (o.statut === 'postulee') {
+    const auj = new Date().toISOString().slice(0, 10);
+    if (o.reponse_le) c.append(el('div', 'meta', '✅ Réponse reçue le ' + new Date(o.reponse_le).toLocaleDateString('fr-FR')));
+    else if (o.relance_le) c.append(el('div', 'meta', (o.relance_le <= auj ? '⏰ ' : '') + `Postulée le ${new Date(o.postule_le).toLocaleDateString('fr-FR')} · relance prévue le ${new Date(o.relance_le + 'T12:00:00').toLocaleDateString('fr-FR')}`));
+    else c.append(el('div', 'meta', `Postulée le ${new Date(o.postule_le).toLocaleDateString('fr-FR')} · plus de relance automatique (${RELANCE_CANDIDATURE_MAX_UI} déjà faites)`));
+  }
+  const act = el('div', 'ligne');
+  const fav = el('button', 'btn small' + (o.statut === 'interessante' ? ' gold' : ''), o.statut === 'interessante' ? '★ Intéressante' : '☆ Intéressante'); fav.onclick = () => empAction('/api/emploi/statut', { id: o.id, statut: o.statut === 'interessante' ? 'vue' : 'interessante' });
+  const ec = el('button', 'btn small', o.statut === 'ecartee' ? '↩ Restaurer' : '✖ Écarter'); ec.onclick = () => empAction('/api/emploi/statut', { id: o.id, statut: o.statut === 'ecartee' ? 'vue' : 'ecartee' });
+  const cd = el('button', 'btn small gold', o.brouillon ? '✉ Voir ma candidature' : '✉ Ma candidature'); cd.onclick = () => ouvrirCandidature(o);
+  act.append(cd, fav, ec);
+  if (o.statut === 'postulee' && !o.reponse_le) {
+    const rep = el('button', 'btn small gold', '✅ Réponse reçue'); rep.onclick = () => empAction('/api/emploi/candidature/reponse', { id: o.id });
+    act.append(rep);
+    if (o.relance_le && o.relance_le <= new Date().toISOString().slice(0, 10)) { const rl = el('button', 'btn small', '🔁 Relancer'); rl.onclick = () => empAction('/api/emploi/candidature/relance', { id: o.id }); act.append(rl); }
+  } else if (o.statut !== 'postulee') {
+    const p = el('button', 'btn small', '✔ Marquer postulée'); p.onclick = () => empAction('/api/emploi/statut', { id: o.id, statut: 'postulee' });
+    act.append(p);
+  }
+  if (ok) { const v = el('a', 'btn small', '↗ Voir l\'offre'); v.href = o.url; v.title = 'Ouvrir dans Firefox'; v.onclick = (e) => { e.preventDefault(); api('/api/ouvrir', { url: o.url }).catch((err) => toast(err.message, true)); }; act.append(v); }
+  c.append(act);
+  return c;
 }
 function dessinerEmploi() {
   if (!emp) return;
-  const sig = JSON.stringify([emp.offres.map((o) => [o.id, o.statut, o.brouillon, o.niveau_ko]), emp.derniere, emp.en_cours, empFiltre, emp.erreurs, emp.stats, emp.analyse, emp.analyse_en_cours, emp.cv_present]);
+  const sig = JSON.stringify([emp.offres.map((o) => [o.id, o.statut, o.brouillon, o.niveau_ko, o.reponse_le, o.relance_le, o.nb_relances]), emp.derniere, emp.en_cours, empFiltre, emp.erreurs, emp.stats, emp.analyse, emp.analyse_en_cours, emp.cv_present]);
   if (sig === empSig && $('#emploi').children.length > 1) return; empSig = sig;
   const parts = [];
   const tete = el('div', 'sec-statut ' + (Object.keys(emp.erreurs || {}).length ? '' : 'ok'));
@@ -1711,32 +2192,34 @@ function dessinerEmploi() {
   bc.onclick = () => empAction('/api/emploi/chercher', {}, 'Recherche en cours (quelques secondes)…');
   lig.append(bc);
   if (emp.nouvelles) { const bv = el('button', 'btn', `Tout marquer comme vu (${emp.nouvelles})`); bv.onclick = () => empAction('/api/emploi/vues', {}); lig.append(bv); }
+  const a = emp.analyse;
+  const bCv = el('button', 'btn gold', emp.analyse_en_cours ? '⏳ Analyse en cours…' : a ? "↻ Refaire l'analyse du CV" : '🔍 Analyser mon CV');
+  bCv.disabled = !!emp.analyse_en_cours || !emp.cv_present; bCv.onclick = analyserCv; lig.append(bCv);
   const sel = el('select'); sel.setAttribute('aria-label', 'Filtrer les offres'); sel.style.maxWidth = '230px';
-  for (const [v, l] of [['nouvelles', 'Nouvelles'], ['interessantes', 'Intéressantes'], ['postulees', 'Postulées'], ['toutes', 'Toutes (sauf écartées)'], ['ecartees', 'Écartées']]) sel.append(new Option(l, v));
+  for (const [v, l] of [['nouvelles', 'Nouvelles'], ['interessantes', 'Intéressantes'], ['postulees', 'Postulées'], ['a_relancer', `À relancer${emp.a_relancer ? ' (' + emp.a_relancer + ')' : ''}`], ['toutes', 'Toutes (sauf écartées)'], ['ecartees', 'Écartées']]) sel.append(new Option(l, v));
   sel.value = empFiltre; sel.onchange = () => { empFiltre = sel.value; empSig = ''; dessinerEmploi(); }; lig.append(sel);
-  tete.append(lig); parts.push(tete);
-  parts.push(blocRegard());
-  const liste = emp.offres.filter((o) => empFiltre === 'nouvelles' ? o.statut === 'nouvelle' : empFiltre === 'interessantes' ? o.statut === 'interessante' : empFiltre === 'postulees' ? o.statut === 'postulee' : empFiltre === 'ecartees' ? o.statut === 'ecartee' : o.statut !== 'ecartee');
-  const box = el('div', 'offres');
-  if (!liste.length) box.append(el('p', 'aide', empFiltre === 'nouvelles' ? (emp.derniere ? "Rien de nouveau pour l'instant : les offres déjà vues sont dans « Toutes »." : 'Aucune recherche faite : touche « Chercher maintenant ».') : 'Aucune offre dans cette liste.'));
-  for (const o of liste.slice(0, 80)) {
-    const c = el('div', 'offre ' + o.statut);
-    const haut = el('div', 'haut'), ok = /^https?:\/\//.test(o.url);
-    const t = ok ? el('a', 'titre', o.titre) : el('span', 'titre', o.titre);
-    if (ok) { t.href = o.url; t.target = '_blank'; t.rel = 'noopener noreferrer'; t.onclick = () => { if (o.statut === 'nouvelle') api('/api/emploi/statut', { id: o.id, statut: 'vue' }).catch(() => {}); }; }
-    haut.append(t, el('span', 'chip score', '★ ' + o.score)); if (o.niveau_ko) haut.append(el('span', 'chip', '⚠ niveau trop haut : ' + o.niveau_ko)); if (o.statut === 'postulee') haut.append(el('span', 'chip score', '✔ postulée')); else if (o.brouillon) haut.append(el('span', 'chip', '✉ brouillon prêt')); c.append(haut);
-    c.append(el('div', 'meta', [o.societe, o.lieu || 'lieu non précisé', o.source, ilYa(o.date), o.salaire].filter(Boolean).join(' · ')));
-    if (o.raisons && o.raisons.length) { const ch = el('div', 'chips'); o.raisons.forEach((r) => ch.append(el('span', 'chip', r))); c.append(ch); }
-    if (o.extrait) c.append(el('div', 'aide', o.extrait));
-    const act = el('div', 'ligne');
-    const fav = el('button', 'btn small' + (o.statut === 'interessante' ? ' gold' : ''), o.statut === 'interessante' ? '★ Intéressante' : '☆ Intéressante'); fav.onclick = () => empAction('/api/emploi/statut', { id: o.id, statut: o.statut === 'interessante' ? 'vue' : 'interessante' });
-    const ec = el('button', 'btn small', o.statut === 'ecartee' ? '↩ Restaurer' : '✖ Écarter'); ec.onclick = () => empAction('/api/emploi/statut', { id: o.id, statut: o.statut === 'ecartee' ? 'vue' : 'ecartee' });
-    const cd = el('button', 'btn small gold', o.brouillon ? '✉ Voir ma candidature' : '✉ Ma candidature'); cd.onclick = () => ouvrirCandidature(o);
-    act.append(cd, fav, ec);
-    if (ok) { const v = el('a', 'btn small', '↗ Voir l\'offre'); v.href = o.url; v.target = '_blank'; v.rel = 'noopener noreferrer'; act.append(v); }
-    c.append(act); box.append(c);
+  tete.append(lig);
+  if (!emp.cv_present) tete.append(el('div', 'l', `Dépose ton CV (PDF) ici, sous le nom cv.pdf : ${emp.cv_chemin || ''}`));
+  parts.push(tete);
+  if (a) parts.push(blocRegard(a));
+  const auj0 = new Date().toISOString().slice(0, 10);
+  const liste = emp.offres.filter((o) => empFiltre === 'nouvelles' ? o.statut === 'nouvelle' : empFiltre === 'interessantes' ? o.statut === 'interessante' : empFiltre === 'postulees' ? o.statut === 'postulee' : empFiltre === 'a_relancer' ? (o.statut === 'postulee' && !o.reponse_le && o.relance_le && o.relance_le <= auj0) : empFiltre === 'ecartees' ? o.statut === 'ecartee' : o.statut !== 'ecartee');
+  if (!liste.length) {
+    parts.push(el('p', 'aide', empFiltre === 'nouvelles' ? (emp.derniere ? "Rien de nouveau pour l'instant : les offres déjà vues sont dans « Toutes »." : 'Aucune recherche faite : touche « Chercher maintenant ».') : empFiltre === 'a_relancer' ? 'Rien à relancer pour l\'instant.' : 'Aucune offre dans cette liste.'));
+  } else {
+    const groupes = new Map();
+    for (const o of liste.slice(0, 80)) { const cat = categorieOffre(o); if (!groupes.has(cat.id)) groupes.set(cat.id, { label: cat.label, items: [] }); groupes.get(cat.id).items.push(o); }
+    for (const g of [...groupes.values()].sort((a, b) => b.items.length - a.items.length)) {
+      const det = el('details', 'emp-groupe');
+      const sum = el('summary', '');
+      sum.append(el('span', '', g.label), el('span', 'n', String(g.items.length)));
+      det.append(sum);
+      const box = el('div', 'offres');
+      for (const o of g.items) box.append(carteOffre(o));
+      det.append(box);
+      parts.push(det);
+    }
   }
-  parts.push(box);
   parts.push(el('p', 'aide', "Atlas lit seulement des flux PUBLICS (RemoteOK, We Work Remotely, Remotive, Himalayas, Jobicy) : aucun compte, aucune connexion. Fiverr et Upwork n'ont pas de flux public (leurs offres sont réservées aux comptes connectés) : pour eux, active leurs alertes par e-mail. Les mots-clés, les exclusions, le niveau (junior), le score minimum et l'heure se règlent dans config.json > emploi. « Ma candidature » prépare un brouillon à relire : rien n'est envoyé sans toi."));
   $('#emploi').replaceChildren(...parts);
 }
@@ -1857,8 +2340,15 @@ function dessinerJournal() {
   if ((sig === jrnSig || saisie || brouillon) && $('#journal').children.length > 1) return; jrnSig = sig;      // pas de redessin pendant que tu écris
   const parts = [];
   const aCompleter = jrn.trous.filter((t) => t.statut === 'vide' || t.statut === 'attente');
-  const bt = el('div'); bt.append(H4(`À compléter${aCompleter.length ? ' (' + aCompleter.length + ')' : ''}`));
-  bt.append(el('p', 'aide', "Quand Atlas prend de tes nouvelles et que tu ne peux pas répondre (ni à lui, ni à ses appels), il garde un vide ici. Remplis-le quand tu peux : ce que tu écris va dans ton journal du jour et ton rapport."));
+  const teteAC = el('div', 'ligne'); teteAC.append(H4(`À compléter${aCompleter.length ? ' (' + aCompleter.length + ')' : ''}`));
+  if (aCompleter.length > 1) {
+    const tout = el('button', 'btn small', 'Tout ignorer');
+    tout.onclick = () => { if (confirm(`Ignorer les ${aCompleter.length} moments à compléter ?`)) jrnAction('/api/trous/ignorer-tout', {}); };
+    teteAC.append(tout);
+  }
+  teteAC.style.justifyContent = 'space-between'; teteAC.style.marginBottom = '12px';
+  const bt = el('div'); bt.append(teteAC);
+  bt.append(el('p', 'aide', "Quand Atlas prend de tes nouvelles et que tu ne peux pas répondre (ni à lui, ni à ses appels), il garde un vide ici. Remplis-le quand tu peux : ce que tu écris va dans ton journal du jour et ton rapport. Un vide resté trop longtemps sans réponse s'ignore tout seul au bout de quelques jours."));
   if (!aCompleter.length) bt.append(el('p', '', '✔ Rien à compléter.'));
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   for (const t of aCompleter) {
@@ -1903,7 +2393,7 @@ function dessinerJournal() {
   jrn.jours.forEach((j) => sel.append(new Option(j === new Date().toISOString().slice(0, 10) || j === jrn.jour && !jrnJour ? j + ' (aujourd\'hui)' : j, j)));
   if (!jrn.jours.includes(jrn.jour)) sel.append(new Option(jrn.jour, jrn.jour));
   sel.value = jrn.jour; sel.onchange = () => { jrnJour = sel.value; jrnSig = ''; chargerJournal(); };
-  const tete = el('div', 'ligne'); tete.append(H4('Journal du jour'), sel); tete.style.justifyContent = 'space-between';
+  const tete = el('div', 'ligne'); tete.append(H4('Journal du jour'), sel); tete.style.justifyContent = 'space-between'; tete.style.marginBottom = '12px';
   bj.append(tete, jrn.texte.trim() ? Object.assign(el('pre', 'jtxt'), { textContent: jrn.texte.trim() }) : el('p', 'aide', 'Rien de noté ce jour-là.'));
   parts.push(bj);
   $('#journal').replaceChildren(...parts);
@@ -2111,11 +2601,17 @@ async function initPanneau() {
   if (window.innerWidth < 1000) return;                       // téléphone / petite fenêtre : pas de panneau, le lien "← Atlas" est un lien normal
   try { const r = await fetch('/session'); if (!r.ok) return; token = token || (await r.json()).token; } catch { return; }   // /session n'existe que depuis le PC lui-même
   document.documentElement.classList.add('avec-jarvis');
-  const panneau = $('#jarvisPanel'), cadre = $('#jarvisFrame');
+  const panneau = $('#jarvisPanel'), cadre = $('#jarvisFrame'), toggle = $('#jarvisToggle'), rail = $('#jarvisRail');
   let cache = false; try { cache = localStorage.getItem('projets_panneau') === '0'; } catch {}
-  const afficher = (v) => { panneau.hidden = !v; if (v && !cadre.src) cadre.src = '/?integre=1'; try { localStorage.setItem('projets_panneau', v ? '1' : '0'); } catch {} };
+  const afficher = (v) => {
+    panneau.classList.toggle('ferme', !v); toggle.classList.toggle('ferme', !v); rail.classList.toggle('ferme', !v);
+    document.documentElement.classList.toggle('jarvis-ouvert', v);
+    if (v && !cadre.src) cadre.src = '/?integre=1'; try { localStorage.setItem('projets_panneau', v ? '1' : '0'); } catch {}
+    toggle.title = v ? 'Masquer Atlas' : 'Afficher Atlas';
+  };
   afficher(!cache);
-  $('#btnPanneau').onclick = () => afficher(panneau.hidden);
+  $('#btnPanneau').onclick = () => afficher(panneau.classList.contains('ferme'));
+  toggle.onclick = () => afficher(panneau.classList.contains('ferme'));
   // signe de vie : tant que cette page est ouverte, le serveur amène CETTE fenêtre devant (et non la petite fenêtre Atlas)
   let version = null;
   const battement = () => fetch('/projets/actif', { headers: { Authorization: 'Bearer ' + token } }).then((r) => r.text()).then((v) => {

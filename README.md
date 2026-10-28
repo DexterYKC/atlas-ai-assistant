@@ -2,6 +2,9 @@
 
 Atlas is an always-on personal assistant I built and run daily: a Telegram bot, a voice assistant (wake-word + speech-to-text + TTS), and a web dashboard, all backed by one Node.js process, plus a standalone **MCP server** that lets **Claude Desktop** manage real business data (CRM-style prospect tracking, Zoho Mail drafting) through Atlas's own API.
 
+![Dashboard overview — personal data and the chat panel content are blurred for this screenshot](docs/screenshots/overview.png)
+![Agents IA — AI-sourced lead triage; third-party contact details are blurred for this screenshot](docs/screenshots/agents-ia.png)
+
 This repo is a **curated, read-only code export for review purposes** — not a toy demo and not a packaged installer. Real secrets, personal data (prospects, journal, calendar), and runtime-only files (voice biometrics, Telegram session, trading login state) are excluded; see [What's excluded](#whats-excluded--why) below. It isn't meant to be cloned and run as-is: it's wired into my own live Telegram bot, a running MetaTrader terminal, and my own Zoho/Google/GitHub accounts. What's here is the real logic that runs every day, for reading.
 
 ## Why voice-first
@@ -20,7 +23,8 @@ Voice (wake    ├──► jarvis.js (Node.js HTTP server + action orchestrator
  word + STT) ──┤         │
 Web dashboard ─┘         ├── securite.js        → permission tiers, rate limiting, audit log, path allowlist
                           ├── externe.js         → GitHub / Netlify (read-only)
-                          ├── emploi.js          → job-search monitoring
+                          ├── emploi.js          → job-search monitoring + application follow-up scheduling
+                          ├── fac.js             → third-party portal sync via headless-browser automation (no public API)
                           ├── habitudes.js       → learns quiet hours / response patterns
                           ├── projets.js         → dev-projects dashboard backend
                           └── trading/*.py       → MetaTrader5 bridge (demo-account only, enforced in code)
@@ -28,14 +32,15 @@ Web dashboard ─┘         ├── securite.js        → permission tiers, 
 Claude Desktop ──► mcp/server.js (separate process, stdio MCP)
                           ├── atlas.js    → thin HTTP client to jarvis.js's own API (never touches the data files directly)
                           ├── zoho.js     → Zoho Mail OAuth + REST client (drafts, search, folders)
-                          └── relances.js → prospect listing / follow-up / reply-triage logic
+                          ├── relances.js → prospect listing / follow-up / reply-triage logic
+                          └── emploi.js   → job-application follow-up tooling (mark sent, mark replied, list overdue)
 ```
 
 The MCP server is **intentionally a separate process** talking to Atlas only through its HTTP API. Atlas's own long-running process is the single writer of its data files; letting a second process (Claude Desktop, via MCP) write to those files directly would risk corrupting writes. Every MCP write goes through a jarvis.js route instead.
 
 ## The MCP server (`mcp/`)
 
-11 tools exposed to Claude Desktop, tightly scoped on purpose — no shell access, no general mail reading, no access outside the prospect/business workflow:
+15 tools exposed to Claude Desktop, tightly scoped on purpose — no shell access, no general mail reading, no access outside the prospect/business and job-search-follow-up workflows:
 
 | Tool | Purpose |
 |---|---|
@@ -45,6 +50,7 @@ The MCP server is **intentionally a separate process** talking to Atlas only thr
 | `lister_relances` / `marquer_relance` / `creer_relance` | Weekly follow-up cycle: due list, mark as followed-up (auto-cutoff after 2 unanswered), draft a reply in the same thread |
 | `lister_a_contacter_autrement` | Leads without an email (can't be followed up by mail) |
 | `lister_business` / `marquer_contacte` | General CRM lookup, and bulk-register contacts made outside the normal flow |
+| `lister_candidatures_a_relancer` / `marquer_candidature_envoyee` / `marquer_candidature_reponse` / `marquer_candidature_relancee` | Same follow-up pattern as prospects, applied to job applications: mark the *actual* send date (often days after the draft was written), auto-schedule a reminder N business days later, cut off after 2 unanswered follow-ups |
 
 Every write returns the result of the real HTTP call — no tool ever claims success without it.
 
@@ -55,6 +61,7 @@ These came up during actual development, not a spec sheet, and are a better sign
 - **No `/drafts` endpoint.** Zoho Mail's REST API returns `404 URL_RULE_NOT_CONFIGURED` for `/api/accounts/{id}/drafts`. The correct call is `POST /messages` with `mode: "draft"` — found by testing against a real account, not in the docs.
 - **The `from:` search operator is broken.** `searchKey=from:<email>` returns unrelated recent messages even for a made-up address that never sent anything — confirmed by testing a nonsense address and getting non-empty, wrong results. `to:` and `sender:` are reliable (empty on a true negative, correct on a true positive). The code never uses `from:` for a decision, and re-verifies the sender address client-side as a second safety net.
 - **No way to set reply headers.** The API has no documented field for `In-Reply-To` / `References`; roughly ten field-name/endpoint variants were tried and rejected (`EXTRA_KEY_FOUND_IN_JSON` or 404). `creer_relance` reuses the same subject (`Re: ...`) and recipient instead, and **says so explicitly** in its own tool output rather than silently pretending it's a real threaded reply.
+- **No public API for a third-party portal.** A recurring, schedule-bearing portal (SPA, nothing in the raw HTML) had no export/feed option. Rather than scrape pixels off a rendered page, `fac.js` drives a headless Edge instance (`playwright-core`, no bundled browser download — launches the system-installed Edge via its `channel` option), logs in, and reads the calendar's own DOM structure directly (`data-date` attributes, one `.cal-event` node per entry) across N weeks by stepping the view's own date-range URL parameter. Synced entries carry the source system's own event id so a re-sync updates or removes changed entries instead of duplicating them.
 
 ### Privacy by design
 
@@ -66,6 +73,8 @@ These came up during actual development, not a spec sheet, and are a better sign
 - **Nightly lead sourcing** — searches configured trades/cities, scores each site for negative signals (already has a callbot, franchise/network site, etc.) via a handful of regexes run against the decoded page text, and auto-discards anything above a threshold before it ever reaches a human review queue.
 - **Daily business health check** — overdue invoices and due follow-ups surfaced once a day, not polled constantly.
 - **Job search monitoring** (`emploi.js`) — background polling with dedupe.
+- **Job application follow-up** — the same weekly-batching follow-up pattern applied to job applications: a reminder is scheduled from the *real* send date (not the draft date — applications are often written days before they're actually sent), counted in business days, with the same auto-cutoff after 2 unanswered follow-ups.
+- **Scheduled external sync** — `fac.js` runs on a weekly timer with a manual override, same guard pattern (`state.json`-backed "last run" timestamp) used elsewhere in the codebase for anything that shouldn't re-run on every server tick.
 
 ## Security model (`securite.js`)
 
@@ -79,7 +88,7 @@ Every action the LLM proposes is decided **by code, never by the prompt**:
 
 ## Tech stack
 
-**Node.js** (core engine, CommonJS; MCP server as ESM) · **Python** (MetaTrader5 bridge, PDF parsing for CV scrubbing) · **Google Gemini** (primary LLM) with **Groq** and local **Ollama** as fallbacks · **Claude** via **MCP** (Claude Desktop) · **Zoho Mail API** (OAuth2) · **Telegram Bot API** · **GitHub** / **Netlify** APIs (read-only dashboard integrations) · openWakeWord / Picovoice (wake word) · Edge TTS (voice output).
+**Node.js** (core engine, CommonJS; MCP server as ESM) · **Python** (MetaTrader5 bridge, PDF parsing for CV scrubbing) · **Google Gemini** (primary LLM) with **Groq** and local **Ollama** as fallbacks · **Claude** via **MCP** (Claude Desktop) · **Zoho Mail API** (OAuth2) · **Playwright** (headless-browser automation for portals without an API) · **Telegram Bot API** · **GitHub** / **Netlify** APIs (read-only dashboard integrations) · openWakeWord / Picovoice (wake word) · Edge TTS (voice output).
 
 `config.example.json` and `mcp/zoho_config.example.json` are included to show the full shape of the configuration (every setting is commented in French, matching the rest of the codebase) — not as a setup guide. This repo is for reading, not for running: see the note at the top.
 
