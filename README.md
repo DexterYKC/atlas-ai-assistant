@@ -2,6 +2,8 @@
 
 Atlas is an always-on personal assistant I built and run daily: a Telegram bot, a voice assistant (wake-word + speech-to-text + TTS), and a web dashboard, all backed by one Node.js process, plus a standalone **MCP server** that lets **Claude Desktop** manage real business data (CRM-style prospect tracking, Zoho Mail drafting) through Atlas's own API.
 
+**Atlas was originally called Jarvis; internal file names kept the old name.**
+
 ![Dashboard overview — personal data and the chat panel content are blurred for this screenshot](docs/screenshots/overview.png)
 ![Agents IA — AI-sourced lead triage; third-party contact details are blurred for this screenshot](docs/screenshots/agents-ia.png)
 
