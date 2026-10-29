@@ -4,8 +4,8 @@ Atlas is an always-on personal assistant I built and run daily: a Telegram bot, 
 
 **Atlas was originally called Jarvis; internal file names kept the old name.**
 
-![Dashboard overview — personal data and the chat panel content are blurred for this screenshot](docs/screenshots/overview.png)
-![Agents IA — AI-sourced lead triage; third-party contact details are blurred for this screenshot](docs/screenshots/agents-ia.png)
+![Dashboard overview — chat panel and card content use fictional placeholder data](docs/screenshots/overview.png)
+![Agents IA — AI-sourced lead triage; business names and contact details are fictional placeholder data](docs/screenshots/agents-ia.png)
 
 This repo is a **curated, read-only code export for review purposes** — not a toy demo and not a packaged installer. Real secrets, personal data (prospects, journal, calendar), and runtime-only files (voice biometrics, Telegram session, trading login state) are excluded; see [What's excluded](#whats-excluded--why) below. It isn't meant to be cloned and run as-is: it's wired into my own live Telegram bot, a running MetaTrader terminal, and my own Zoho/Google/GitHub accounts. What's here is the real logic that runs every day, for reading.
 
