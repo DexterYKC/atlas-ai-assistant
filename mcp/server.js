@@ -14,6 +14,7 @@
 // Donne aussi accès aux candidatures de la section Emploi (marquer « postulée », réponse reçue, relance) : mêmes
 // garanties (API locale d'Atlas uniquement, jamais d'écriture directe dans state.json) — voir emploi.js.
 import { z } from 'zod';
+import dns from 'node:dns';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { atlas, BASE_URL } from './atlas.js';
@@ -29,15 +30,44 @@ const erreur = (e) => ({ content: [{ type: 'text', text: `Erreur : ${e.message |
 
 // ---------- lire_site : lecture seule du site d'un prospect (jamais d'URL fournie par l'appelant) ----------
 const LIMITE_CARACTERES = 15000;
-// Hôtes locaux/privés interdits : le site vient de données stockées (Google Places/OSM via Atlas), pas directement de l'appelant,
-// mais si business.json était un jour altéré, ça empêche l'outil de servir à sonder le réseau local (SSRF).
-function urlInterdite(u) {
-  let h;
-  try { h = new URL(u).hostname.toLowerCase(); } catch { return true; }
-  if (!h || h === 'localhost' || h === '0.0.0.0' || h === '::1' || h.endsWith('.local')) return true;
-  if (/^127\./.test(h) || /^10\./.test(h) || /^192\.168\./.test(h) || /^169\.254\./.test(h)) return true;
-  if (/^172\.(1[6-9]|2\d|3[01])\./.test(h)) return true;
+// Hôtes locaux/privés interdits (SSRF) : le site vient de données stockées (Google Places/OSM via Atlas), pas
+// directement de l'appelant, mais si business.json était un jour altéré, ça empêche l'outil de servir à sonder le
+// réseau local. Merci à Matt Abate pour le signalement (par mail, pas une issue publique, vu la nature du sujet) :
+// la version précédente ne vérifiait que l'URL de départ, alors que fetch() suit les redirections (redirect:'follow')
+// sans jamais revérifier l'adresse de chaque saut — un site pouvait rediriger (302) vers 127.0.0.1 ou une IP privée
+// et passer au travers. Elle ne vérifiait non plus que la forme littérale de l'hôte, jamais l'IP réellement résolue
+// (un nom de domaine pointant vers une IP privée passait). Corrigé par : recupererPage() suit les redirections à la
+// main en revérifiant chaque saut, et urlInterdite() résout l'hôte et vérifie aussi l'IP obtenue. Reste un résidu non
+// couvert : un "DNS rebinding" actif (résolution différente entre cette vérification et la connexion réelle de
+// fetch()) — hors de portée raisonnable pour ce serveur MCP local, un filtrage réseau au niveau OS serait la seule
+// protection complète.
+function ipv4Privee(ip) {
+  const p = ip.split('.').map(Number);
+  if (p.length !== 4 || p.some((n) => !Number.isInteger(n) || n < 0 || n > 255)) return true; // IP mal formée : refusée par prudence
+  const [a, b] = p;
+  return a === 127 || a === 10 || a === 0 || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || (a === 169 && b === 254);
+}
+function ipv6Privee(ip) {
+  const h = ip.toLowerCase();
+  if (h === '::1' || h === '::') return true;
+  const mappee = h.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/);
+  if (mappee) return ipv4Privee(mappee[1]);
+  const premierGroupe = parseInt(h.split(':')[0] || '0', 16) || 0;
+  if ((premierGroupe & 0xfe00) === 0xfc00) return true; // fc00::/7 (unique local)
+  if ((premierGroupe & 0xffc0) === 0xfe80) return true; // fe80::/10 (link-local)
   return false;
+}
+const ipPrivee = (ip) => (ip.includes(':') ? ipv6Privee(ip) : ipv4Privee(ip));
+async function urlInterdite(u) {
+  let host;
+  try { host = new URL(u).hostname.toLowerCase(); } catch { return true; }
+  if (!host) return true;
+  const propre = host.replace(/^\[|\]$/g, ''); // IPv6 entre crochets dans une URL, ex. "[::1]"
+  if (propre === 'localhost' || propre.endsWith('.local')) return true;
+  if (/^\d+\.\d+\.\d+\.\d+$/.test(propre)) return ipv4Privee(propre);
+  if (propre.includes(':')) return ipv6Privee(propre); // déjà une IPv6 littérale
+  try { return (await dns.promises.lookup(propre, { all: true, verbatim: true })).some((a) => ipPrivee(a.address)); }
+  catch { return true; } // résolution DNS impossible : refusé par prudence
 }
 const ENTITES_HTML = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ',
   eacute: 'é', egrave: 'è', ecirc: 'ê', euml: 'ë', agrave: 'à', acirc: 'â', auml: 'ä',
@@ -81,8 +111,16 @@ function trouverLienContact(liens, base) {
   const parTexte = meme.find((l) => re.test(l.texte));
   return parTexte ? parTexte.url : null;
 }
-async function recupererPage(url) {
-  const res = await fetch(url, { signal: AbortSignal.timeout(10000), redirect: 'follow', headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AtlasProspectBot/1.0)' } });
+async function recupererPage(url, profondeur = 0) {
+  if (profondeur > 5) throw new Error('trop de redirections');
+  if (await urlInterdite(url)) throw new Error("adresse non autorisée (hôte local/privé)");
+  // redirect:'manual' : chaque saut repasse par urlInterdite() avant d'être suivi (voir le commentaire plus haut).
+  const res = await fetch(url, { signal: AbortSignal.timeout(10000), redirect: 'manual', headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AtlasProspectBot/1.0)' } });
+  if ([301, 302, 303, 307, 308].includes(res.status)) {
+    const loc = res.headers.get('location');
+    if (!loc) throw new Error(`redirection ${res.status} sans adresse`);
+    return recupererPage(new URL(loc, url).toString(), profondeur + 1);
+  }
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return { html: await res.text(), urlFinale: res.url || url };
 }
@@ -134,7 +172,7 @@ server.registerTool('lire_site', {
     const site = String((prospect || {}).site || '').trim();
     if (!site) throw new Error(`Aucun site enregistré pour le prospect ${id}.`);
     const base = /^https?:\/\//i.test(site) ? site : 'https://' + site;
-    if (urlInterdite(base)) throw new Error("Cette adresse n'est pas autorisée (hôte local/privé).");
+    if (await urlInterdite(base)) throw new Error("Cette adresse n'est pas autorisée (hôte local/privé).");
 
     const accueil = await recupererPage(base).catch((e) => { throw new Error(`Page d'accueil injoignable (${e.message}).`); });
     const morceaux = [`=== Page d'accueil (${accueil.urlFinale}) ===\n${nettoyerTexte(accueil.html)}`];
@@ -142,7 +180,7 @@ server.registerTool('lire_site', {
     const lienContact = trouverLienContact(extraireLiens(accueil.html, accueil.urlFinale), accueil.urlFinale);
     if (!lienContact) {
       morceaux.push("\n=== Page contact ===\n(aucun lien de contact trouvé sur la page d'accueil)");
-    } else if (urlInterdite(lienContact)) {
+    } else if (await urlInterdite(lienContact)) {
       morceaux.push('\n=== Page contact ===\n(lien ignoré : adresse non autorisée)');
     } else {
       try { const contact = await recupererPage(lienContact); morceaux.push(`\n=== Page contact (${contact.urlFinale}) ===\n${nettoyerTexte(contact.html)}`); }

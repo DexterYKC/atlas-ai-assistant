@@ -6,16 +6,20 @@
 import { atlas } from './atlas.js';
 
 const dateOk = (v) => /^\d{4}-\d{2}-\d{2}$/.test(v || '') && !isNaN(new Date(`${v}T12:00:00`));
+// Date LOCALE, jamais UTC (toISOString() donne la date UTC : selon le fuseau, elle reste sur la veille pendant la
+// première heure ou deux après minuit local — une candidature due "aujourd'hui" disparaissait de la liste, et
+// "postulee_le" affichait la veille pour un envoi juste après minuit). Merci à Matt Abate pour le signalement (issue #2).
+const dateLocale = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
 export async function listerCandidaturesARelancer() {
   const { offres, a_relancer } = await atlas('GET', '/api/emploi');
-  const aujourdhui = new Date().toISOString().slice(0, 10);
+  const aujourdhui = dateLocale();
   const dus = offres.filter((o) => o.statut === 'postulee' && !o.reponse_le && o.relance_le && o.relance_le <= aujourdhui);
   return {
     total: a_relancer,
     candidatures: dus.map((o) => ({
       id: o.id, titre: o.titre, societe: o.societe, url: o.url,
-      postulee_le: new Date(o.postule_le).toISOString().slice(0, 10),
+      postulee_le: dateLocale(new Date(o.postule_le)),
       relance_prevue: o.relance_le, nb_relances_deja_faites: o.nb_relances || 0,
     })),
   };

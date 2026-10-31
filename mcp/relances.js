@@ -7,7 +7,11 @@ import { atlas } from './atlas.js';
 import { compteEmail, idDossier, rechercherMessages, ajouterSignature, creerEtVerifierBrouillon } from './zoho.js';
 
 const seoNorm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-const dateDuJour = () => new Date().toISOString().slice(0, 10);
+// Date LOCALE, jamais UTC (toISOString() donne la date UTC : selon le fuseau, elle reste sur la veille pendant la
+// première heure ou deux après minuit local, et une relance due "aujourd'hui" disparaissait de la liste pendant cette
+// fenêtre). Merci à Matt Abate pour le signalement (issue #2), reproduit.
+const dateLocale = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const dateDuJour = () => dateLocale();
 // Même format que frDate() de ui/index.html (ex. "14 oct."), pour que la note ajoutée par l'outil ressemble à celle du bouton.
 const frDateCourte = (iso) => (iso ? new Date(iso + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '');
 
@@ -64,7 +68,7 @@ export async function listerRelances() {
       try {
         if (!date_premier_mail) {
           const { premier } = await mailsEnvoyesA(accountId, p.email);
-          if (premier) { date_premier_mail = new Date(Number(premier.sentDateInGMT)).toISOString().slice(0, 10); depuisMs = Number(premier.sentDateInGMT); }
+          if (premier) { date_premier_mail = dateLocale(new Date(Number(premier.sentDateInGMT))); depuisMs = Number(premier.sentDateInGMT); }
         }
         a_repondu = depuisMs ? await aRepondu(accountId, p.email, depuisMs) : false; // jamais envoyé : pas de réponse possible
       } catch { /* une recherche Zoho en échec pour ce prospect ne doit pas faire échouer toute la liste */ }

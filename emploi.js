@@ -18,7 +18,16 @@ const sansScripts = (s) => s.replace(/<(script|style)\b[\s\S]*?<\/\1\s*>/gi, ' '
 const texteBrut = (h) => decoder(sansScripts(decoder(sansScripts(String(h == null ? '' : h)))).replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim();
 const lien = (u) => { try { const x = new URL(String(u)); return x.protocol === 'https:' || x.protocol === 'http:' ? x.href : ''; } catch { return ''; } };   // jamais de javascript: ni de data:
 const echapper = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const contient = (texte, terme) => new RegExp(`(?<![a-z0-9])${echapper(norm(terme))}(?![a-z0-9])`).test(texte);
+// Garde de frontière seulement du côté où le terme lui-même commence/finit par une lettre/chiffre : pour un terme qui
+// commence par de la ponctuation (ex. ".net"), exiger aussi un non-alphanumérique AVANT le point empêchait le terme de
+// matcher à l'intérieur d'un mot comme "asp.net" (le caractère précédent cassait le lookbehind) — merci à Matt Abate
+// pour le signalement (issue #1), reproduit : "asp.net developer" et "vb.net developer" n'étaient jamais exclus.
+const contient = (texte, terme) => {
+  const t = norm(terme);
+  const avant = /^[a-z0-9]/.test(t) ? '(?<![a-z0-9])' : '';
+  const apres = /[a-z0-9]$/.test(t) ? '(?![a-z0-9])' : '';
+  return new RegExp(`${avant}${echapper(t)}${apres}`).test(texte);
+};
 const liste = (v) => (Array.isArray(v) ? v : v ? [v] : []).map(String);
 const ms = (v) => { const n = Number(v); if (Number.isFinite(n) && n > 1e9) return n < 1e12 ? n * 1000 : n; const t = Date.parse(v); return Number.isFinite(t) ? t : 0; };
 const salaire = (a, b, dev, per) => (Number(a) > 0 ? `${Number(a)}${Number(b) > 0 ? '-' + Number(b) : ''} ${dev || ''}${per ? '/' + per : ''}`.trim() : '');
