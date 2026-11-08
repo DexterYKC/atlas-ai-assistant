@@ -496,6 +496,14 @@
   <h1 class="sec-titre">Journal</h1>
   <div id="journal"><p class="aide">Chargement…</p></div>
 </div></div>
+<div id="sec-bureau_distance" class="sec" hidden><div class="sec-corps">
+  <h1 class="sec-titre">Bureau à distance</h1>
+  <div id="bureauDistance"><p class="aide">Chargement…</p></div>
+</div></div>
+<div id="sec-camera" class="sec" hidden><div class="sec-corps">
+  <h1 class="sec-titre">Caméra</h1>
+  <div id="camera"><p class="aide">Chargement…</p></div>
+</div></div>
 <div id="sec-musique" class="sec" hidden><div class="sec-corps">
   <h1 class="sec-titre">Musique</h1>
   <div id="musLecteur"><p class="aide">Chargement…</p></div>
@@ -522,22 +530,47 @@
     <div class="ajout"><input id="ai-metiers" placeholder="Métiers (facultatif, virgule)"><input id="ai-villes" placeholder="Villes (facultatif, virgule)"><button class="btn gold" id="ai-lancer">🔎 Chercher</button></div>
     <p class="aide">Laisse vide pour utiliser sa liste de métiers configurée et avancer tout seul dans la rotation des villes.</p>
     <p class="aide" id="ai-statut"></p>
-    <details class="emp-groupe" id="ai-hist-det" style="margin-top:10px"><summary><span>Historique des recherches</span></summary>
-      <div class="offres" id="ai-hist"><p class="aide">Aucune recherche pour l'instant.</p></div>
-    </details>
+  </section>
+  <section class="bloc-tete">
+    <h2>Trier le retard avec l'IA</h2>
+    <p class="aide">Les prospects déjà « à trier » (de recherches précédentes) n'ont pas forcément été relus par l'IA — ce bouton fait relire chaque site et trancher « bon »/« pas bon » au-dessus du seuil de confiance, comme pour une recherche en cours. Continue tout seul par lots jusqu'à ce que tout le retard soit passé.</p>
+    <div class="ajout"><button class="btn gold" id="ai-retard-lancer">🤖 Trier le retard avec l'IA</button></div>
+    <p class="aide" id="ai-retard-statut"></p>
+  </section>
+  <section class="bloc-tete">
+    <h2>Brouillons des nouveaux validés</h2>
+    <p class="aide">Seulement ceux qui n'ont <strong>jamais</strong> eu de premier mail (validés « Bon » à la main, sans date d'envoi donnée au moment du tri) — jamais les validés déjà contactés. Prépare en un lot leur brouillon de premier mail, avec une seule date d'envoi. Une fois préparés, programme leur envoi depuis l'onglet Prospects (même bouton que pour les relances).</p>
+    <div class="ajout"><button class="btn gold" id="ai-brouillons-lancer">📝 Préparer les brouillons des nouveaux validés</button></div>
+    <p class="aide" id="ai-brouillons-statut"></p>
   </section>
   <div class="onglets" id="ai-onglets" role="tablist">
     <button class="onglet" type="button" role="tab" data-v="trier">À trier</button>
     <button class="onglet" type="button" role="tab" data-v="valides">Validés</button>
+    <button class="onglet" type="button" role="tab" data-v="rejetes">Rejetés</button>
+    <button class="onglet" type="button" role="tab" data-v="historique">Historique</button>
   </div>
   <section id="ai-sec-trier">
     <h2>À trier <span class="aide" id="ai-compte"></span></h2>
     <div class="ligne" id="ai-filtres" style="margin-bottom:12px"></div>
     <div class="grille ai-grille" id="ai-trier"><p class="aide">Chargement…</p></div>
   </section>
-  <section id="ai-sec-valides" hidden><h2>Validés, groupés par métier</h2>
+  <section id="ai-sec-valides" hidden><h2>Validés, groupés par métier <span class="aide" id="ai-compte-valides"></span></h2>
     <div id="ai-valides"><p class="aide">Chargement…</p></div>
   </section>
+  <section id="ai-sec-rejetes" hidden><h2>Rejetés, groupés par métier <span class="aide" id="ai-compte-rejetes"></span></h2>
+    <p class="aide">Pourquoi chacun a été écarté — règle automatique (site, doublon, hors cible) ou avis de l'IA.</p>
+    <div id="ai-rejetes"><p class="aide">Chargement…</p></div>
+  </section>
+  <section id="ai-sec-historique" hidden><h2>Historique</h2>
+    <p class="aide">Recherches et passages de tri du retard, les plus récents en premier.</p>
+    <div class="offres" id="ai-hist"><p class="aide">Aucune activité pour l'instant.</p></div>
+  </section>
+</div></div>
+<div id="sec-retoursdemo" class="sec" hidden><div class="sec-corps">
+  <h1 class="sec-titre">Retours démo</h1>
+  <p class="aide">Tests de la démo masnasoft.com (navigateur ou rappel téléphonique), rattachés au prospect par le lien utilisé. Lecture seule depuis l'API Retell, synchronisé toutes les 15 min. Les visites des liens (« A visité sans tester ») viennent de la liste Upstash du site, aussi en lecture seule, toutes les 15 min.</p>
+  <div class="ligne" id="rd-filtres" style="margin-bottom:12px"></div>
+  <div id="rd-liste"><p class="aide">Chargement…</p></div>
 </div></div>
 </div>
 <div id="jarvisRail"><button id="jarvisToggle" type="button" aria-label="Afficher ou masquer Atlas" title="Afficher ou masquer Atlas"><span class="fleche">‹</span></button></div>
@@ -593,6 +626,14 @@
     <div><button class="btn gold" id="i-ok">Importer les dossiers cochés</button></div>
   </div>
 </dialog>
+<dialog id="dlgEnvoi" aria-label="Date d'envoi">
+  <div class="dlg-tete"><strong style="flex:1;font:600 20px var(--display)">Date d'envoi</strong><button class="btn small" data-fermer="dlgEnvoi">Annuler</button></div>
+  <div class="dlg-corps">
+    <p class="aide" id="envoiTexte"></p>
+    <label class="aide">Date d'envoi<input type="date" id="envoiDate" style="width:100%"></label>
+    <div class="row" style="margin-top:12px"><button class="btn primary" id="envoiOk">Confirmer</button></div>
+  </div>
+</dialog>
 <dialog id="dlgRapport" aria-label="Rapport d'étude">
   <div class="dlg-tete"><strong style="flex:1;font:600 20px var(--display)" id="rapTitre">Rapport</strong><button class="btn small" data-fermer="dlgRapport" autofocus>Fermer</button></div>
   <div class="dlg-corps"><pre class="jtxt" id="rapTexte" style="white-space:pre-wrap;max-height:65vh;overflow:auto"></pre></div>
@@ -644,7 +685,7 @@
       <div class="pres-boutons" style="margin-top:8px">
         <button class="btn" data-calme="+60">🌙 1 h</button><button class="btn" data-calme="+180">🌙 3 h</button><button class="btn" data-calme="fin">☀️ Terminer</button>
       </div>
-      <p class="aide" style="margin:8px 0 0">Ou dis à Atlas « je dors jusqu'à 10 h », « je fais une sieste d'une heure », « réveille-moi à 9 h » (il t'appelle), ou « je suis réveillé ». Tes routines (importantes ou non) et tes rappels restent actifs.</p>
+      <p class="aide" style="margin:8px 0 0">Ou dis à Atlas « je dors jusqu'à 10 h », « je fais une sieste d'une heure », « réveille-moi à 9 h » (il t'appelle), ou « je suis réveillé ». Tes routines (médicament…) et tes rappels restent actifs.</p>
     </section>
     <section id="telBloc"><h4>Mon iPhone</h4>
       <div class="sec-statut" id="telEtat"></div>
@@ -681,7 +722,10 @@ function accordeonsAnimer(racine) {
     const sum = det.querySelector('summary'); if (!sum) return;
     det.dataset.accAnime = '1';
     const reste = [...det.childNodes].filter((n) => n !== sum);
-    const wrap = el('div', 'acc-anim'); reste.forEach((n) => wrap.append(n)); det.append(wrap);
+    // Un seul enfant direct de .acc-anim : avec plusieurs (une ligne par item, etc.), la grille n'anime que la
+    // 1re rangée en 0fr/1fr, les suivantes restent en grid-auto-rows:auto (donc toujours visibles, même "fermé").
+    const contenu = el('div'); reste.forEach((n) => contenu.append(n));
+    const wrap = el('div', 'acc-anim'); wrap.append(contenu); det.append(wrap);
     det.classList.toggle('ferme', !det.open); det.open = true;
     sum.addEventListener('click', (e) => {
       e.preventDefault();
@@ -722,6 +766,42 @@ async function api(chemin, corps) {
 }
 let tt;
 function toast(msg, err) { const t = $('#toast'); t.textContent = msg; t.className = 'toast on' + (err ? ' err' : ''); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('on'), 3200); }
+// Prochaine occurrence d'un jour de semaine (ex. "mardi") : toujours strictement future, jamais aujourd'hui.
+function prochaineOccurrenceOv(jourNom) {
+  const idx = JOURS_NOMS_OV.indexOf(jourNom), d = new Date();
+  let delta = (idx - d.getDay() + 7) % 7; if (delta <= 0) delta += 7;
+  d.setDate(d.getDate() + delta);
+  return d;
+}
+const dateOvISO = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+// Date proposée pour un premier mail (jamais un relance) : évite de retomber sur le jour fixe de relance s'il est déjà
+// chargé (sa demande explicite du 31/10 : "j'ai beaucoup de relances le mardi, choisir le mercredi") — décale d'un
+// jour si le jour de relance a déjà des envois prévus, et donne toujours le nombre déjà en file pour le jour choisi.
+async function proposerDatePremierMail() {
+  let b; try { b = await api('/business'); } catch { return { iso: '', charge: 0 }; }
+  const prospects = b.prospects || [];
+  const charge = (iso) => prospects.filter((p) => p.dateEnvoiPrevue === iso).length;
+  let candidat = prochaineOccurrenceOv(b.jour_relance || 'mardi'), iso = dateOvISO(candidat), c = charge(iso);
+  if (c > 0) { candidat.setDate(candidat.getDate() + 1); iso = dateOvISO(candidat); c = charge(iso); }
+  return { iso, charge: c };
+}
+// Date d'envoi (jamais le jour même) : demandée avant de préparer des brouillons — jamais devinée. Annuler = null.
+function demanderDateEnvoi(texte, dateProposeeISO) {
+  return new Promise((resolve) => {
+    $('#envoiTexte').textContent = texte || "Date à laquelle vous enverrez ces brouillons (jamais le jour même).";
+    const di = $('#envoiDate');
+    const demain = new Date(Date.now() + 86400000);
+    const demainISO = `${demain.getFullYear()}-${String(demain.getMonth() + 1).padStart(2, '0')}-${String(demain.getDate()).padStart(2, '0')}`;
+    di.value = dateProposeeISO || demainISO; di.min = demainISO;
+    const dlg = $('#dlgEnvoi'), okBtn = $('#envoiOk');
+    let decide = false;
+    const fini = (v) => { if (decide) return; decide = true; okBtn.removeEventListener('click', onOk); dlg.removeEventListener('close', onClose); dlg.close(); resolve(v); };
+    const onOk = () => fini(di.value || null);
+    const onClose = () => fini(null);
+    okBtn.addEventListener('click', onOk); dlg.addEventListener('close', onClose);
+    dlg.showModal();
+  });
+}
 async function op(o, silencieux) {
   try {
     const r = await api('/api/projets/op', o);
@@ -1227,7 +1307,7 @@ async function decideArtisan(id, decision, motif) {
   try { await api('/api/agentsia/decider', { id, decision, motif }); agentsIASig = ''; chargerAgentsIA(); }
   catch (e) { toast(e.message, true); }
 }
-function carteArtisan(e) {
+function carteArtisan(e, { actions = true, motifFinal = '' } = {}) {
   const c = el('div', 'offre');
   const haut = el('div', 'haut');
   haut.append(el('span', 'titre', e.nom));
@@ -1236,11 +1316,22 @@ function carteArtisan(e) {
   c.append(el('div', 'meta', `${e.metier || '?'} · ${e.ville || '?'}${e.tel ? ' · ' + e.tel : ''}${e.email ? ' · ' + e.email : ''}`));
   if (e.site) { const l = el('div', 'meta'); l.append(lien(e.site, e.site)); c.append(l); }
   if (e.trouves && e.trouves.length) { const ch = el('div', 'chips'); e.trouves.forEach((t) => ch.append(el('span', 'chip', '⚠ ' + t))); c.append(ch); }
-  const act = el('div', 'ligne');
-  const bBon = el('button', 'btn small gold', '✅ Bon'); bBon.onclick = () => decideArtisan(e.id, 'bon');
-  const bPas = el('button', 'btn small', '❌ Pas bon');
-  bPas.onclick = () => { const motif = prompt('Pourquoi pas bon ? (facultatif — sert à cibler les prochaines recherches)', ''); if (motif === null) return; decideArtisan(e.id, 'pas_bon', motif); };
-  act.append(bBon, bPas); c.append(act);
+  if (e.iaSuggestion) {
+    const s = e.iaSuggestion;
+    const icone = s.verdict === 'bon' ? '✅' : s.verdict === 'pas_bon' ? '❌' : '❓';
+    c.append(el('div', 'meta', `${icone} Avis IA (confiance ${Math.round((s.confiance || 0) * 100)}%) : ${s.verdict} — ${s.motif || ''}`));
+    if (s.accroche) c.append(el('div', 'meta', `💬 Accroche possible : « ${s.accroche} »`));
+  }
+  // Motif final : celui vraiment retenu pour écarter (règle auto ou motif tapé à la main), parfois différent de
+  // l'avis IA ci-dessus (ex. "Hors cible"/"Doublon" tranchés par une règle de données, jamais par l'IA).
+  if (motifFinal && (!e.iaSuggestion || e.iaSuggestion.motif !== motifFinal)) c.append(el('div', 'meta', `✖ Motif retenu : ${motifFinal}`));
+  if (actions) {
+    const act = el('div', 'ligne');
+    const bBon = el('button', 'btn small gold', '✅ Bon'); bBon.onclick = () => decideArtisan(e.id, 'bon');
+    const bPas = el('button', 'btn small', '❌ Pas bon');
+    bPas.onclick = () => { const motif = prompt('Pourquoi pas bon ? (facultatif — sert à cibler les prochaines recherches)', ''); if (motif === null) return; decideArtisan(e.id, 'pas_bon', motif); };
+    act.append(bBon, bPas); c.append(act);
+  }
   return c;
 }
 let aiVue = 'trier'; try { aiVue = localStorage.getItem('ai_vue') || 'trier'; } catch {}
@@ -1248,6 +1339,8 @@ function appliquerVueAI() {
   $('#ai-onglets').querySelectorAll('.onglet').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.v === aiVue)));
   $('#ai-sec-trier').hidden = aiVue !== 'trier';
   $('#ai-sec-valides').hidden = aiVue !== 'valides';
+  $('#ai-sec-rejetes').hidden = aiVue !== 'rejetes';
+  $('#ai-sec-historique').hidden = aiVue !== 'historique';
 }
 function choisirVueAI(v) { aiVue = v; try { localStorage.setItem('ai_vue', aiVue); } catch {} appliquerVueAI(); }
 $('#ai-onglets').querySelectorAll('.onglet').forEach((b) => b.onclick = () => choisirVueAI(b.dataset.v));
@@ -1290,43 +1383,105 @@ async function chargerAgentsIA() {
     if (!r.ok) return;
     agentsIAData = r;
     const nbValides = Object.values(r.valides).reduce((n, l) => n + l.length, 0);
-    $('#ai-kpi-trier').textContent = r.aTrier.length; $('#ai-kpi-valides').textContent = nbValides; $('#ai-kpi-rejetes').textContent = r.rejetes;
+    $('#ai-kpi-trier').textContent = r.aTrier.length; $('#ai-kpi-valides').textContent = nbValides; $('#ai-kpi-rejetes').textContent = r.rejetes_total;
     dessinerFiltresAgents(); dessinerTrierAgents();
     const b = $('#ai-lancer'); b.disabled = r.en_cours;
     const derniere = (r.historique || [])[0];
-    $('#ai-statut').textContent = r.en_cours ? '⏳ Recherche en cours…' : derniere ? `Dernière recherche ${ilYa(derniere.le) || "aujourd'hui"} : ${derniere.erreur ? 'échec (' + derniere.erreur + ')' : `${derniere.retenus} retenu(s) sur ${derniere.trouves} trouvé(s)`}.` : 'Aucune recherche pour l\'instant.';
+    $('#ai-statut').textContent = r.en_cours ? '⏳ Recherche en cours…' : derniere ? `Dernière activité ${ilYa(derniere.le) || "aujourd'hui"} : ${derniere.source === 'tri du retard' ? `${derniere.traites} passé(s) à l'IA, ${derniere.autoMarques} tranché(s)` : derniere.erreur ? 'échec (' + derniere.erreur + ')' : `${derniere.retenus} retenu(s) sur ${derniere.trouves} trouvé(s)`}.` : 'Aucune activité pour l\'instant.';
+    // Historique : deux formats selon le type d'entrée — une recherche (métiers/villes/trouvés) ou un passage de tri
+    // du retard (traités/tranchés/restants), sa demande du 31/10 de voir la date du tri qu'on vient de faire.
     $('#ai-hist').replaceChildren(...((r.historique || []).length ? r.historique.map((h) => {
       const c = el('div', 'offre');
       const haut = el('div', 'haut');
       haut.append(el('span', 'titre', new Date(h.le).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })));
-      haut.append(el('span', 'chip', h.source === 'automatique (nuit)' ? '🌙 nocturne' : '🖐 manuelle'));
+      haut.append(el('span', 'chip', h.source === 'automatique (nuit)' ? '🌙 nocturne' : h.source === 'tri du retard' ? '🤖 tri du retard' : '🖐 recherche manuelle'));
       c.append(haut);
-      if (h.erreur) c.append(el('div', 'meta', '✖ Échec : ' + h.erreur));
+      if (h.source === 'tri du retard') c.append(el('div', 'meta', `${h.traites} prospect(s) passé(s) à l'IA, ${h.autoMarques} tranché(s) automatiquement, ${h.traites - h.autoMarques} resté(s) « à vérifier »${h.restants ? `, ${h.restants} encore en attente` : ''}`));
+      else if (h.erreur) c.append(el('div', 'meta', '✖ Échec : ' + h.erreur));
       else c.append(el('div', 'meta', `${(h.metiers || []).join(', ') || '?'} à ${(h.villes || []).join(', ') || '?'} · ${h.retenus} retenu(s) sur ${h.trouves} trouvé(s)${h.autoRejetes ? `, ${h.autoRejetes} auto-écarté(s)` : ''}`));
       return c;
-    }) : [el('p', 'aide', 'Aucune recherche pour l\'instant.')]));
-    const metiers = Object.keys(r.valides).sort();
-    $('#ai-valides').replaceChildren(...(metiers.length ? metiers.map((m) => {
+    }) : [el('p', 'aide', 'Aucune activité pour l\'instant.')]));
+    const groupeParMetier = (liste, afficherMotif) => {
+      const parMetier = {};
+      for (const e of liste) { const k = e.metier || 'Autre'; (parMetier[k] = parMetier[k] || []).push(e); }
+      return Object.keys(parMetier).sort().map((m) => {
+        const det = el('details', 'emp-groupe');
+        const sum = el('summary', ''); sum.append(el('span', '', m), el('span', 'n', String(parMetier[m].length)));
+        det.append(sum);
+        const box = el('div', 'offres grille');
+        box.append(...parMetier[m].map((e) => carteArtisan(e, { actions: false, motifFinal: afficherMotif ? e.motif : '' })));
+        det.append(box); return det;
+      });
+    };
+    $('#ai-compte-valides').textContent = nbValides ? `(${nbValides})` : '';
+    const metiersValides = Object.keys(r.valides).sort();
+    $('#ai-valides').replaceChildren(...(metiersValides.length ? groupeParMetier(metiersValides.flatMap((m) => r.valides[m]), false) : [el('p', 'aide', 'Aucun artisan validé pour l\'instant.')]));
+    // Rejetés groupés PAR SESSION d'abord (un grand bloc date/heure par entrée d'historique), puis par métier à
+    // l'intérieur de chaque bloc — sa demande du 31/10. Les rejets manuels isolés (bouton "Pas bon", sans session)
+    // vont dans un dernier bloc "Décisions manuelles".
+    $('#ai-compte-rejetes').textContent = r.rejetes_total ? (r.rejetes.length < r.rejetes_total ? `(${r.rejetes.length} affichés sur ${r.rejetes_total})` : `(${r.rejetes_total})`) : '';
+    const sessions = (r.historique || []).filter((h) => !h.erreur);
+    const blocs = [];
+    for (const h of sessions) {
+      const liste = r.rejetes.filter((e) => e.sessionLe === h.le);
+      if (!liste.length) continue;
       const det = el('details', 'emp-groupe');
-      const sum = el('summary', ''); sum.append(el('span', '', m), el('span', 'n', String(r.valides[m].length)));
+      const sum = el('summary', '');
+      sum.append(el('span', '', `${new Date(h.le).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })} — ${h.source === 'tri du retard' ? 'tri du retard' : h.source === 'automatique (nuit)' ? 'recherche nocturne' : 'recherche manuelle'}`), el('span', 'n', String(liste.length)));
       det.append(sum);
-      const box = el('div', 'offres grille');
-      box.append(...r.valides[m].map((e) => {
-        const c = el('div', 'offre');
-        const h = el('div', 'haut'); h.append(el('span', 'titre', e.nom)); c.append(h);
-        c.append(el('div', 'meta', `${e.ville || '?'}${e.tel ? ' · ' + e.tel : ''}${e.email ? ' · ' + e.email : ''}`));
-        if (e.site) { const l = el('div', 'meta'); l.append(lien(e.site, e.site)); c.append(l); }
-        return c;
-      }));
-      det.append(box); return det;
-    }) : [el('p', 'aide', 'Aucun artisan validé pour l\'instant.')]));
+      const box = el('div');
+      box.append(...groupeParMetier(liste, true));
+      det.append(box); blocs.push(det);
+    }
+    const sansSession = r.rejetes.filter((e) => !sessions.some((h) => h.le === e.sessionLe));
+    if (sansSession.length) {
+      const det = el('details', 'emp-groupe');
+      const sum = el('summary', ''); sum.append(el('span', '', 'Décisions manuelles / anciennes'), el('span', 'n', String(sansSession.length)));
+      det.append(sum);
+      const box = el('div'); box.append(...groupeParMetier(sansSession, true));
+      det.append(box); blocs.push(det);
+    }
+    $('#ai-rejetes').replaceChildren(...(blocs.length ? blocs : [el('p', 'aide', 'Aucun artisan rejeté pour l\'instant.')]));
   } catch (e) { if (sectionCourante === 'agentsia') $('#ai-trier').replaceChildren(el('p', 'aide', e.message)); }
 }
 $('#ai-lancer').onclick = async () => {
+  // Date d'envoi facultative : si donnée, les prospects tranchés "bon" par l'IA pendant CETTE recherche ont leur
+  // brouillon de premier mail préparé tout de suite (voir jarvis.js > /api/agentsia/rechercher) ; sinon la recherche
+  // se fait quand même, juste sans préparation de brouillon.
+  // Date proposée = jour fixe de relance, décalé d'un jour s'il est déjà chargé (pipeline visible dans le texte).
+  const propose = await proposerDatePremierMail();
+  const date = await demanderDateEnvoi(`Date d'envoi des éventuels premiers mails des nouveaux prospects validés${propose.charge ? ` (${propose.charge} déjà prévu(s) ce jour-là)` : ''} (Annuler = chercher sans préparer de brouillon).`, propose.iso);
   const b = $('#ai-lancer'); b.disabled = true; b.textContent = 'Recherche…';
-  try { const r = await api('/api/agentsia/rechercher', { metiers: $('#ai-metiers').value.trim(), villes: $('#ai-villes').value.trim() }); toast(r.message, !r.ok); if (r.ok) { agentsIASig = ''; chargerAgentsIA(); } }
-  catch (e) { toast(e.message, true); }
+  try {
+    const r = await api('/api/agentsia/rechercher', { metiers: $('#ai-metiers').value.trim(), villes: $('#ai-villes').value.trim(), date_envoi: date || undefined });
+    toast(r.message, !r.ok); if (r.ok) { agentsIASig = ''; chargerAgentsIA(); }
+  } catch (e) { toast(e.message, true); }
   b.disabled = false; b.textContent = 'Chercher';
+};
+$('#ai-retard-lancer').onclick = async () => {
+  const b = $('#ai-retard-lancer'); b.disabled = true;
+  let total = 0, totalAuto = 0;
+  const sessionLe = Date.now();   // même session pour tous les lots de ce clic : un seul bloc dans l'Historique, pas un par lot de 40
+  try {
+    for (;;) {
+      $('#ai-retard-statut').textContent = `En cours… (${total} déjà passés à l'IA)`;
+      const r = await api('/api/agentsia/trier-retard', { limite: 40, session_le: sessionLe });
+      if (!r.ok) { $('#ai-retard-statut').textContent = r.message || 'Échec.'; break; }
+      total += r.traites; totalAuto += r.autoMarques;
+      if (!r.traites || !r.restants) { $('#ai-retard-statut').textContent = `Terminé : ${total} prospect(s) passé(s) à l'IA, ${totalAuto} tranché(s) automatiquement.`; agentsIASig = ''; chargerAgentsIA(); break; }
+    }
+  } catch (e) { $('#ai-retard-statut').textContent = e.message; }
+  b.disabled = false;
+};
+$('#ai-brouillons-lancer').onclick = async () => {
+  const propose = await proposerDatePremierMail();
+  const date = await demanderDateEnvoi(`Préparer les brouillons de premier mail des nouveaux validés (jamais contactés)${propose.charge ? ` — ${propose.charge} déjà prévu(s) ce jour-là` : ''} — date d'envoi ?`, propose.iso);
+  if (!date) return;
+  const b = $('#ai-brouillons-lancer'); b.disabled = true;
+  $('#ai-brouillons-statut').textContent = 'Préparation en cours…';
+  try { const r = await api('/api/agentsia/brouillons-valides', { date_envoi: date }); $('#ai-brouillons-statut').textContent = r.message || (r.ok ? 'Fait.' : 'Échec.'); }
+  catch (e) { $('#ai-brouillons-statut').textContent = e.message; }
+  b.disabled = false;
 };
 
 $('#d-fermer').onclick = () => dlg.close();
@@ -1408,21 +1563,25 @@ const ICO_NAV = {
   musique: '<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>',
   securite: '<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9.5 12l2 2 3-3.5"/>',
   parametres: '<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>',
+  bureau_distance: '<rect x="2.5" y="4" width="19" height="13" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><path d="M9 9.5l3-2 3 2"/>',
+  camera: '<rect x="2.5" y="6.5" width="14" height="11" rx="2.5"/><path d="M16.5 10.5l5-2.8v8.6l-5-2.8z"/><circle cx="9.5" cy="12" r="2.8"/>',
   agentsia: '<path d="M6.5 3.5h3l1.3 3.6-2 1.6a12.5 12.5 0 0 0 6 6l1.6-2 3.6 1.3v3c0 1-.8 1.8-1.8 1.7C10.3 18.5 5.5 13.7 4.8 6.3c-.1-1 .7-1.8 1.7-1.8z"/>',
+  retoursdemo: '<path d="M12 3a3.5 3.5 0 0 1 3.5 3.5v5a3.5 3.5 0 0 1-7 0v-5A3.5 3.5 0 0 1 12 3z"/><path d="M6 11v1a6 6 0 0 0 12 0v-1M12 18v3M9 21h6"/>',
   mail: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5"/>',
   notes: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="14 3 14 9 20 9"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>',
   automatisation: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82A1.65 1.65 0 0 0 3 13.09H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
   retour: '<path d="M15 5l-7 7 7 7"/>',
   presence: '<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/>',
 };
-const SECTIONS = [['overview', 'Overview'], ['projets', 'Projets'], ['notes', 'Notes'], ['agenda', 'Agenda'], ['business', 'Prospects'], ['emploi', 'Emploi'], ['trading', 'Trading'], ['mail', 'Mail'], ['agentsia', 'Agents IA'], ['automatisation', 'Automatisation'], ['journal', 'Journal'], ['musique', 'Musique'], ['securite', 'Sécurité'], ['parametres', 'Paramètres']];
+const SECTIONS = [['overview', 'Overview'], ['projets', 'Projets'], ['notes', 'Notes'], ['agenda', 'Agenda'], ['business', 'Prospects'], ['emploi', 'Emploi'], ['trading', 'Trading'], ['mail', 'Mail'], ['agentsia', 'Agents IA'], ['retoursdemo', 'Retours démo'], ['automatisation', 'Automatisation'], ['journal', 'Journal'], ['bureau_distance', 'Bureau à distance'], ['camera', 'Caméra'], ['musique', 'Musique'], ['securite', 'Sécurité'], ['parametres', 'Paramètres']];
 // Regroupement de la barre latérale (pour ne pas avoir 13 icônes à plat) : un groupe se déplie/replie, un seul ouvert à la fois.
 const GROUPES_NAV = [
   { v: 'overview' },
   { g: 'projets', lib: 'Projets', enfants: ['projets', 'automatisation'] },
-  { g: 'business', lib: 'Business', ico: 'groupe_business', enfants: ['business', 'emploi', 'trading', 'agentsia', 'mail'] },
+  { g: 'business', lib: 'Business', ico: 'groupe_business', enfants: ['business', 'emploi', 'trading', 'agentsia', 'retoursdemo', 'mail'] },
   { g: 'organisation', lib: 'Organisation', enfants: ['agenda', 'notes', 'journal'] },
   { g: 'systeme', lib: 'Système', enfants: ['parametres', 'securite'] },
+  { g: 'acces_pc', lib: 'Accès PC', ico: 'bureau_distance', enfants: ['bureau_distance', 'camera'] },
   { v: 'musique' },
 ];
 const groupeDe = (v) => (GROUPES_NAV.find((x) => x.enfants && x.enfants.includes(v)) || {}).g || null;
@@ -1502,7 +1661,7 @@ function appliquerBadges() {
     set('.nav-btn[data-groupe="' + it.g + '"] .pt', pire, pire === 'ko' ? '!' : '');
   }
 }
-let musTimer = null, musTick = null, jourTimer = null, empTimer = null, tradTimer = null, mailTimer = null, autoTimer = null, overTimer = null, paramTimer = null, notesTimer = null, agentsIATimer = null;
+let musTimer = null, musTick = null, jourTimer = null, empTimer = null, tradTimer = null, mailTimer = null, autoTimer = null, overTimer = null, paramTimer = null, notesTimer = null, agentsIATimer = null, camTimer = null, retoursTimer = null;
 function afficherSection(s) {
   if (!SECTIONS.some(([v]) => v === s)) s = 'projets';
   sectionCourante = s; try { localStorage.setItem('projets_section', s); } catch {}
@@ -1526,9 +1685,12 @@ function afficherSection(s) {
   clearInterval(paramTimer); if (s === 'parametres') { chargerParametres(); paramTimer = setInterval(chargerParametres, 5000); }
   clearInterval(notesTimer); if (s === 'notes') { chargerNotes(); notesTimer = setInterval(chargerNotes, 15000); }
   clearInterval(agentsIATimer); if (s === 'agentsia') { chargerAgentsIA(); agentsIATimer = setInterval(chargerAgentsIA, 20000); }
+  clearInterval(retoursTimer); if (s === 'retoursdemo') { chargerRetoursDemo(); retoursTimer = setInterval(chargerRetoursDemo, 20000); }
   if (s === 'journal') { chargerJournal(); jourTimer = setInterval(chargerJournal, 6000); }
   if (s === 'musique') { chargerMusique(); musTimer = setInterval(chargerMusique, 4000); musTick = setInterval(tickMusique, 1000); }
   if (s === 'securite') chargerSecurite();
+  if (s === 'bureau_distance') chargerBureauDistance();
+  clearInterval(camTimer); if (s === 'camera') { chargerCamera(); camTimer = setInterval(chargerCameraStatut, 15000); }
   $('#contenu').scrollTop = 0;
 }
 
@@ -1922,8 +2084,8 @@ function dessinerUrgent(biz) {
   const jourDuJour = JOURS_NOMS_OV[new Date().getDay()];
   const estJourRelance = jourDuJour === biz.jour_relance;
   const estVeille = JOURS_NOMS_OV[(new Date().getDay() + 1) % 7] === biz.jour_relance;
-  const urgents = (biz.prospects || []).filter((p) => p.email && p.relance && p.relance <= today && !relancesIgnoreesOv.has(p.id))
-    .sort((a, b) => a.relance.localeCompare(b.relance));
+  const urgents = (biz.prospects || []).filter((p) => p.email && p.relance && p.relance <= today && !relancesIgnoreesOv.has(p.id) && !p.email_invalide && !p.premier_mail_introuvable)
+    .sort((a, b) => (prioRelance(b) - prioRelance(a)) || a.relance.localeCompare(b.relance));
   const tete = el('div', 'ov-urgent-tete');
   tete.append(el('h2', '', 'À faire'));
   if (urgents.length) tete.append(el('span', 'pill', String(urgents.length)));
@@ -1948,6 +2110,127 @@ function dessinerUrgent(biz) {
   }
   box.append(liste);
   return box;
+}
+
+// ---------- Retours démo (Business) : tests masnasoft.com synchronisés depuis Retell (lecture seule, côté serveur) ----------
+let rdFiltre = 'tous', rdData = null;
+const frDateHeureOv = (iso) => iso ? new Date(iso).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+function dureeOv(ms) { const s = Math.round((ms || 0) / 1000); return s >= 60 ? `${Math.floor(s / 60)} min ${s % 60}` : `${s} s`; }
+async function chargerRetoursDemo() {
+  try {
+    const biz = await api('/business');
+    if (sectionCourante !== 'retoursdemo') return;
+    rdData = biz;
+    dessinerFiltresRetours(); dessinerRetoursDemo();
+  } catch (e) { $('#rd-liste').textContent = e.message; }
+}
+// Visites des liens de démo (synchro Upstash côté serveur, p.visiteLe / p.clicLe). Priorité pour la prochaine relance :
+// a testé la démo > a visité ou cliqué sans tester > les autres. La visite n'apparaît JAMAIS dans le texte d'une relance.
+function prioRelance(p) { return p.demoTesteLe ? 2 : (p.visiteLe || p.clicLe) ? 1 : 0; }
+const visiteSansTest = (p) => !!(p.visiteLe || p.clicLe) && !p.demoTesteLe;
+const jourCourtOv = (d) => d ? new Date(d + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '';
+// Mêmes règles que eligibleRelanceVisite() côté serveur (jarvis.js) : un seul brouillon de ce type par prospect.
+const eligibleRelanceVisiteOv = (p) => !!p.email && p.etape !== 'perdu' && !p.reponseMessageId && !p.relanceVisiteLe
+  && visiteSansTest(p) && Array.isArray(p.slugs) && p.slugs.length > 0;
+function joursOuvresApresOv(dateJourISO, n) {
+  const d = new Date(`${dateJourISO}T12:00:00`);
+  for (let ajoutes = 0; ajoutes < n;) { d.setDate(d.getDate() + 1); if (d.getDay() !== 0 && d.getDay() !== 6) ajoutes++; }
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+function creneauRelanceVisiteOv(p) {
+  const jour = (p.clicLe && (!p.visiteLe || p.clicLe >= p.visiteLe)) ? p.clicLe : (p.visiteLe || '');
+  return jour ? joursOuvresApresOv(jour, 1) : '';
+}
+function dessinerFiltresRetours() {
+  const box = $('#rd-filtres'); box.replaceChildren();
+  const nbVisites = ((rdData && rdData.prospects) || []).filter(visiteSansTest).length;
+  const options = [['tous', 'Tous'], ['semaine', 'Cette semaine'], ['rdv', 'A demandé RDV'], ['direct', 'Visiteurs directs'], ['visite', '👀 A visité sans tester' + (nbVisites ? ` (${nbVisites})` : '')]];
+  for (const [v, lib] of options) {
+    const ch = el('button', 'chip', lib); ch.type = 'button';
+    ch.setAttribute('aria-pressed', rdFiltre === v ? 'true' : 'false');
+    ch.onclick = () => { rdFiltre = v; dessinerFiltresRetours(); dessinerRetoursDemo(); };
+    box.append(ch);
+  }
+}
+function dessinerRetoursDemo() {
+  const liste = $('#rd-liste'); if (!liste) return;
+  if (!rdData) return;
+  if (rdFiltre === 'visite') {
+    // Prospects qui ont ouvert (ou cliqué) leur lien de démo sans la tester : en priorité pour la prochaine relance.
+    const gens = (rdData.prospects || []).filter(visiteSansTest)
+      .sort((a, b) => String(b.clicLe || b.visiteLe).localeCompare(String(a.clicLe || a.visiteLe)) || String(b.visiteLe || '').localeCompare(String(a.visiteLe || '')));
+    if (!gens.length) { liste.replaceChildren(el('p', 'aide', 'Personne n\'a visité son lien sans tester pour l\'instant.')); return; }
+    const intro = el('p', 'aide', 'Ils ont ouvert leur lien de démo (ou cliqué sur « Lancer la démo ») sans aller jusqu\'au test. Ils passent en priorité pour la prochaine relance ; le message de relance, lui, ne le mentionne jamais.');
+    intro.style.marginBottom = '12px';
+    const eligibles = gens.filter(eligibleRelanceVisiteOv);
+    const barre = el('div', 'ligne'); barre.style.marginBottom = '12px';
+    const bTout = el('button', 'btn gold', `📝 Tout préparer (${eligibles.length})`); bTout.type = 'button';
+    bTout.disabled = !eligibles.length;
+    bTout.onclick = async () => {
+      bTout.disabled = true;
+      try { const r = await api('/business/relances-visite/preparer', {}); toast(r.message || (r.ok ? 'Fait.' : 'Échec.'), !r.ok); }
+      catch (e) { toast(e.message, true); }
+      chargerRetoursDemo();
+    };
+    barre.append(bTout);
+    liste.replaceChildren(intro, barre, ...gens.map((p) => {
+      const c = el('div', 'offre');
+      const haut = el('div', 'haut');
+      haut.append(el('span', 'titre', p.nom));
+      haut.append(el('span', 'chip', p.clicLe ? '🖱️ a cliqué sans tester' : '👀 a visité sans tester'));
+      c.append(haut);
+      c.append(el('div', 'meta', [p.visiteLe ? 'dernière visite ' + jourCourtOv(p.visiteLe) : '', p.clicLe ? 'dernier clic ' + jourCourtOv(p.clicLe) : '', p.relance ? 'relance prévue ' + jourCourtOv(p.relance) : ''].filter(Boolean).join(' · ')));
+      const bas = el('div', 'ligne');
+      if (p.relanceVisiteLe) {
+        bas.append(el('span', 'chip', `✅ relance préparée le ${jourCourtOv(p.relanceVisiteLe)}`));
+      } else if (eligibleRelanceVisiteOv(p)) {
+        const creneau = creneauRelanceVisiteOv(p);
+        if (creneau) bas.append(el('span', 'meta', `Envoi conseillé : ${jourCourtOv(creneau)}, entre 8h et 9h (heure de Paris)`));
+        const bPrep = el('button', 'btn small gold', '📝 Préparer la relance'); bPrep.type = 'button';
+        bPrep.onclick = async () => {
+          bPrep.disabled = true;
+          try {
+            const r = await api('/business/prospect/relance-visite', { id: p.id });
+            toast(r.ok ? `Brouillon créé — objet : « ${r.objet} ». Envoi conseillé : ${jourCourtOv(r.creneau)}, 8h-9h (Paris).` : (r.message || 'Échec.'), !r.ok);
+          } catch (e) { toast(e.message, true); }
+          chargerRetoursDemo();
+        };
+        bas.append(bPrep);
+      } else if (p.reponseMessageId) {
+        bas.append(el('span', 'meta', 'A déjà répondu : pas de relance.'));
+      }
+      if (bas.childNodes.length) c.append(bas);
+      return c;
+    }));
+    return;
+  }
+  const uneSemaine = Date.now() - 7 * 24 * 3600 * 1000;
+  let retours = (rdData.retours || []).slice();
+  if (rdFiltre === 'semaine') retours = retours.filter((r) => new Date(r.date).getTime() >= uneSemaine);
+  else if (rdFiltre === 'rdv') retours = retours.filter((r) => r.rdvDemande);
+  else if (rdFiltre === 'direct') retours = retours.filter((r) => !r.prospectId);
+  retours.sort((a, b) => b.date.localeCompare(a.date));
+  if (!retours.length) { liste.replaceChildren(el('p', 'aide', 'Aucun retour pour l\'instant.')); return; }
+  liste.replaceChildren(...retours.map((r) => {
+    const prospect = r.prospectId ? (rdData.prospects || []).find((p) => p.id === r.prospectId) : null;
+    const c = el('div', 'offre');
+    const haut = el('div', 'haut');
+    haut.append(el('span', 'titre', prospect ? prospect.nom : 'Visiteur direct'));
+    haut.append(el('span', 'chip', r.channel === 'rappel' ? '📞 rappel' : '🎙️ navigateur'));
+    if (r.rdvDemande) haut.append(el('span', 'chip score', '📅 RDV demandé'));
+    c.append(haut);
+    c.append(el('div', 'meta', `${frDateHeureOv(r.date)} · ${dureeOv(r.duree_ms)} · ${r.metier || 'métier non précisé'}`));
+    // Générique plutôt que 3 champs figés : chaque scénario (serrurier, vétérinaire, générique...) a ses propres
+    // champs d'extraction — on affiche tout ce qui est non vide, en excluant les champs internes déjà montrés ailleurs
+    // (sms_patron, les booléens de rappel déjà couverts par le badge RDV).
+    const CACHES = new Set(['sms_patron', 'rappel_prioritaire', 'rappel_demande', 'rendez_vous_demande']);
+    const detail = Object.entries(r.extraction || {})
+      .filter(([k, v]) => !CACHES.has(k) && v !== '' && v !== false && v != null)
+      .map(([k, v]) => `${k.replace(/_/g, ' ')} : ${v}`)
+      .join(' · ');
+    if (detail) c.append(el('div', 'meta', detail));
+    return c;
+  }));
 }
 
 // ---------- Notes : tout ce qu'Atlas retient tout seul en conversation (idées, décisions...), pour ne rien perdre de ce qui se dit à la voix ----------
@@ -2375,7 +2658,7 @@ function dessinerJournal() {
   }
   parts.push(bt);
   if (jrn.suivis.length) {
-    const box = el('div'); box.append(H4('Confirmations (routines importantes…)'));
+    const box = el('div'); box.append(H4('Confirmations (médicament…)'));
     for (const x of jrn.suivis) {
       const l = el('div', 'suivi'), ic = x.statut === 'confirme' ? ['✔ Confirmé', 'ok'] : x.statut === 'echec' ? ['✖ Non confirmé', 'ko'] : ['⏳ En cours', 'att'];
       l.append(el('span', ic[1], ic[0]), el('span', '', x.texte), el('small', '', `${x.quand} · ${x.essai}/${x.max} essai(s)`)); box.append(l);
@@ -2510,7 +2793,7 @@ function guideOwnTracks(base) {
     e("App Store → « OwnTracks » (gratuite) → installe-la, ouvre-la et accepte la localisation « Toujours », « Position exacte » et l'actualisation en arrière-plan."),
     e("Dans OwnTracks : Réglages → Mode → « HTTP ». (Les noms exacts peuvent varier un peu d'une version à l'autre : cherche l'option équivalente.)"),
     e('Réglages → Configuration : URL, puis Authentification activée avec ces valeurs :',
-      el('div', 'aide', 'URL :'), ligneCopie(base + '/owntracks'), el('div', 'aide', 'Identifiant (UserID) :'), ligneCopie('utilisateur'),
+      el('div', 'aide', 'URL :'), ligneCopie(base + '/owntracks'), el('div', 'aide', 'Identifiant (UserID) :'), ligneCopie('youssef'),
       el('div', 'aide', 'Mot de passe (le jeton de Atlas, ne le partage jamais) :'), ligneCopie(token), el('div', 'aide', 'Device ID :'), ligneCopie('iphone')),
     e("Mode de localisation : « Significatif » pour commencer (économe : une position à chaque déplacement notable). « Déplacement » est plus précis mais consomme davantage la batterie."),
     e("Régions → « + » → nom exact « maison » → position actuelle (chez toi), rayon 100 à 150 m. Ça donne des entrées / sorties fiables, en plus des Raccourcis."),
@@ -2535,6 +2818,99 @@ let sec = null, secSig = '';
 const LIBELLES = { NOTE: 'Ajouter une note au carnet', RAPPEL: 'Créer un rappel', AGENDA_AJOUT: 'Ajouter un rendez-vous', AGENDA_MODIF: 'Modifier un rendez-vous', AGENDA_SUPPR: 'Supprimer un rendez-vous', PAUSE: 'Poser un jour de pause',
   PROSPECT: 'Gérer les prospects', DOC: 'Créer devis et factures', APPEL: "T'appeler au téléphone", OUVRIR: 'Ouvrir une page dans Firefox', APP: 'Ouvrir une application', EMPLOI: "Chercher des offres d'emploi", CALME: 'Mode ne pas déranger', PRESENCE: 'Noter où tu es', TELEPHONE: 'Retrouver ton iPhone', SPOTIFY: 'Piloter Spotify', PERSO: 'Changer sa personnalité', NOM: 'Changer son nom',
   PROJET_AJOUT: 'Créer un projet', PROJET_MODIF: 'Modifier un projet', TACHE_AJOUT: 'Ajouter une tâche', TACHE_FAIT: 'Cocher une tâche', PROJET_NOTE: 'Ajouter une note à un projet', PROJET_SUPPR: 'Supprimer un projet' };
+// ---------- Caméra (2e PC, go2rtc) : jamais de requête directe vers go2rtc — tout passe par jarvis.js, qui ajoute
+// l'identifiant côté serveur. Le flux vidéo est un MP4 progressif (pas de WebSocket ici : le navigateur ne peut pas
+// y mettre le mot de passe), proxié par /camera/stream.mp4?t=JETON (même principe que /doc, qui utilise déjà un
+// jeton dans l'adresse plutôt qu'un en-tête, pour les éléments qui ne peuvent pas en envoyer). ----------
+async function chargerCamera() {
+  const c = $('#camera'); c.innerHTML = '';
+  const box = el('div', 'bloc');
+  const video = el('video'); video.id = 'cam-video'; video.autoplay = true; video.muted = true; video.playsInline = true; video.controls = true;
+  video.style.width = '100%'; video.style.maxWidth = '640px'; video.style.borderRadius = '12px'; video.style.background = '#000';
+  video.onerror = () => { statut.textContent = '🔴 Flux interrompu (webcam indisponible côté petit PC).'; };
+  video.onplaying = () => { statut.textContent = '🟢 En ligne'; };
+  video.onstalled = () => { statut.textContent = '🟠 Flux en attente…'; };
+  box.append(video);
+  const statut = el('p', 'aide'); statut.id = 'cam-statut';
+  box.append(statut);
+  const btns = el('div', 'ligne');
+  const bMute = el('button', 'btn small', '🔊 Activer le son'); bMute.type = 'button';
+  bMute.onclick = () => { video.muted = !video.muted; bMute.textContent = video.muted ? '🔊 Activer le son' : '🔇 Couper le son'; };
+  const bRefresh = el('button', 'btn small', '🔄 Actualiser'); bRefresh.type = 'button';
+  bRefresh.onclick = () => {
+    // Recharge juste le flux côté client (nouveau src, token anti-cache) sans toucher go2rtc : utile en cas de lag
+    // ou de connexion coincée, bien plus léger que Couper/Rallumer qui redémarre go2rtc sur le 2e PC.
+    video.pause(); video.removeAttribute('src'); video.load();
+    statut.textContent = '⏳ Connexion…';
+    chargerCameraStatut();
+  };
+  const bOff = el('button', 'btn small', '⛔ Couper la caméra'); bOff.type = 'button';
+  bOff.onclick = async () => {
+    bOff.disabled = true;
+    try { const r = await api('/api/camera/off', {}); toast(r.ok ? 'Caméra coupée.' : (r.message || 'Échec.'), !r.ok); if (r.ok) { video.pause(); video.removeAttribute('src'); } }
+    catch (e) { toast(e.message, true); }
+    chargerCameraStatut(); bOff.disabled = false;
+  };
+  const bOn = el('button', 'btn small gold', '🟢 Rallumer la caméra'); bOn.type = 'button';
+  bOn.onclick = async () => {
+    bOn.disabled = true;
+    // On efface le src existant (même cassé/en erreur) AVANT de resonder : sinon chargerCameraStatut() le voit déjà
+    // posé et ne retente jamais de charger une nouvelle URL (le <video> ne se relance pas tout seul après un onerror).
+    video.pause(); video.removeAttribute('src'); video.load();
+    try { const r = await api('/api/camera/on', {}); toast(r.ok ? 'Caméra rallumée.' : (r.message || 'Échec.'), !r.ok); if (r.ok) setTimeout(chargerCameraStatut, 1500); }
+    catch (e) { toast(e.message, true); }
+    bOn.disabled = false;
+  };
+  btns.append(bMute, bRefresh, bOff, bOn);
+  box.append(btns);
+  c.append(box);
+  await chargerCameraStatut();
+}
+async function chargerCameraStatut() {
+  const statut = $('#cam-statut'), video = $('#cam-video');
+  if (!statut || !video) return;
+  // Une fois la vidéo lancée, c'est elle (événements error/playing/stalled) qui dit l'état réel — on ne sonde plus
+  // go2rtc en parallèle : une 2e requête (ex. frame.jpeg) ouvrirait un 2e processus ffmpeg sur le même périphérique
+  // exclusif et le ferait planter ("device already in use"). On ne sonde /api/camera que tant qu'aucun flux n'a
+  // encore été tenté.
+  if (video.getAttribute('src')) return;
+  try {
+    const d = await api('/api/camera');
+    if (!d.configuree) { statut.textContent = "Caméra non configurée (config.json > camera)."; return; }
+    if (!d.en_ligne) { statut.textContent = '🔴 Hors ligne'; return; }
+    statut.textContent = '⏳ Connexion…';
+    // Safari/iOS ne lit pas bien le MP4 progressif infini, mais sait lire du HLS nativement : on lui donne ce format,
+    // les autres navigateurs gardent le MP4 (plus simple, latence plus faible).
+    const hls = video.canPlayType('application/vnd.apple.mpegurl');
+    video.src = hls ? `/camera/stream.m3u8?t=${encodeURIComponent(token)}` : `/camera/stream.mp4?t=${encodeURIComponent(token)}`;
+  } catch (e) { statut.textContent = e.message; }
+}
+// ---------- Bureau à distance (2e PC, via Tailscale) ----------
+// Pas de client RDP intégré (demanderait Guacamole/Docker en permanence, trop lourd pour ce PC) : sur le PC lui-même,
+// un bouton lance mstsc directement ; depuis un autre appareil (ex. téléphone), on affiche juste l'adresse/l'identifiant
+// pour l'app Microsoft Remote Desktop (le mot de passe, tu le connais déjà — jamais affiché ici).
+async function chargerBureauDistance() {
+  const c = $('#bureauDistance');
+  try {
+    const d = await api('/api/bureau-distance');
+    if (!d.adresse) { c.replaceChildren(el('p', 'aide', "Adresse non configurée (config.json > bureau_distance.adresse).")); return; }
+    const box = el('div', 'bloc');
+    box.append(el('p', '', 'Adresse : ' + d.adresse), el('p', '', 'Utilisateur : ' + (d.utilisateur || '—')));
+    if (d.local) {
+      const btn = el('button', 'ok', 'Se connecter'); btn.type = 'button';
+      btn.onclick = async () => {
+        btn.disabled = true;
+        try { const r = await api('/api/bureau-distance/connecter', {}); toast(r.ok ? 'Connexion lancée.' : (r.message || 'Échec.'), !r.ok); }
+        catch (e) { toast(e.message, true); }
+        btn.disabled = false;
+      };
+      box.append(btn);
+    } else {
+      box.append(el('p', 'aide', "Depuis ce téléphone/cet appareil : ouvre l'app « Microsoft Remote Desktop » (Tailscale déjà connecté), ajoute un PC avec cette adresse et cet utilisateur — le mot de passe, tu le connais déjà."));
+    }
+    c.replaceChildren(box);
+  } catch (e) { c.replaceChildren(el('p', 'aide', e.message)); }
+}
 async function chargerSecurite() {
   try { sec = await api('/securite/etat?n=60'); majBadgeSecu(); if (sectionCourante === 'securite') dessinerSecurite(); } catch { /* facultatif */ }
 }

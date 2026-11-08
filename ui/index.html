@@ -174,7 +174,8 @@
     width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--line);
     background: var(--panel-base); color: var(--text); font: 400 16px var(--body); margin-bottom: 14px;
   }
-  .row { display: flex; gap: 10px; justify-content: flex-end; }
+  .row { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+  .btn svg { width: 16px; height: 16px; vertical-align: -3px; margin-right: 6px; }
   .btn { border-radius: 10px; padding: 10px 16px; border: 1px solid var(--line); background: transparent; }
   .btn.primary { background: var(--gold); border-color: var(--gold); color: #FFFFFF; font-weight: 600; }
   #qr { background: #fff; padding: 12px; border-radius: 12px; width: fit-content; margin: 0 auto 14px; }
@@ -343,6 +344,7 @@
     </div>
     <p class="hint">Dites par exemple : « Nouveau prospect Karim, restaurant, trouvé sur Malt », « Fais un devis pour Karim : site vitrine 800 € », « Transforme le devis en facture ».</p>
     <p class="hint">Touchez un prospect pour le corriger, ou utilisez les boutons ci-dessous.</p>
+    <div id="relancesResume"></div>
     <div id="relancesUrgentes"></div>
     <div id="aContacterAutrement"></div>
     <div class="addbar"><button class="btn primary" id="prAdd">+ Prospect</button><button class="btn" id="docAdd">+ Devis / facture</button></div>
@@ -371,6 +373,35 @@
   </div>
 </footer>
 
+<dialog id="programmerDlg">
+  <h2>📤 Programmer l'envoi</h2>
+  <p class="hint" id="programmerTexte"></p>
+  <p class="hint" style="color:var(--red)">Les mails partiront RÉELLEMENT, tout seuls, aux heures ci-dessous — annulable dans le dossier « Programmés » de Zoho tant que l'heure n'est pas passée.</p>
+  <label for="programmerDate">Date d'envoi</label>
+  <input type="date" id="programmerDate">
+  <label for="programmerHeure">Heure de départ</label>
+  <input type="time" id="programmerHeure" value="09:00">
+  <label for="programmerIntervalle">Intervalle entre chaque mail (minutes)</label>
+  <input type="number" id="programmerIntervalle" min="1" max="15" value="3">
+  <div class="row"><button class="btn primary" id="programmerOk">Programmer</button><button class="btn" id="programmerAnnuler">Annuler</button></div>
+</dialog>
+
+<dialog id="formulaireDlg">
+  <h2>📝 Message formulaire</h2>
+  <p class="hint" id="formulaireTexte"></p>
+  <label for="formulaireSujet">Sujet</label>
+  <input id="formulaireSujet">
+  <label for="formulaireCorps">Message</label>
+  <textarea id="formulaireCorps" rows="12"></textarea>
+  <p class="hint" id="formulaireStatut"></p>
+  <div class="row">
+    <button class="btn" id="formulaireRegenerer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1"/><path d="M20.5 4v5h-5"/></svg>Régénérer</button>
+    <button class="btn primary" id="formulaireEnregistrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h11l3 3v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-14a1 1 0 0 1 1-1z"/><path d="M8 4.5v5h7v-5M8 20v-6h8v6"/></svg>Enregistrer</button>
+    <button class="btn" id="formulaireCopier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="1.5"/><path d="M5.5 15H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v.5"/></svg>Copier</button>
+    <button class="btn" id="formulaireFermer">Fermer</button>
+  </div>
+</dialog>
+
 <dialog id="loginDlg">
   <h2>Connecter cet appareil</h2>
   <p>Scannez le code affiché sur votre PC (bouton téléphone en haut de l'app), ou collez le jeton ici.</p>
@@ -391,6 +422,14 @@
   </div>
   <p id="phoneMissing" class="hidden">Adresse du téléphone non réglée. Lancez « tailscale serve --bg 8765 », puis mettez l'adresse https affichée dans config.json, champ url_telephone, et relancez Atlas.</p>
   <div class="row"><button class="btn" id="phoneClose">Fermer</button></div>
+</dialog>
+
+<dialog id="envoiDlg">
+  <h2>Date d'envoi</h2>
+  <p id="envoiTexte" class="hint">Date à laquelle vous enverrez ces brouillons (jamais le jour même).</p>
+  <label for="envoiDate">Date d'envoi</label>
+  <input type="date" id="envoiDate">
+  <div class="row"><button class="btn primary" id="envoiOk">Confirmer</button><button class="btn" id="envoiAnnuler">Annuler</button></div>
 </dialog>
 
 <dialog id="evDlg">
@@ -434,7 +473,7 @@
 <dialog id="docDlg" class="big">
   <h2 id="docH">Devis ou facture</h2>
   <div id="docTypeBox"><label for="docType">Type</label><select id="docType"><option value="devis">Devis</option><option value="facture">Facture</option></select></div>
-  <div id="docEmetteurBox"><label for="docEmetteur">Émetteur</label><select id="docEmetteur"><option value="freelance">Freelance</option><option value="masnasoft">Masnasoft</option></select></div>
+  <div id="docEmetteurBox"><label for="docEmetteur">Émetteur</label><select id="docEmetteur"><option value="freelance">Youssef Kacem (freelance)</option><option value="masnasoft">Masnasoft</option></select></div>
   <label for="docClient">Client</label><input id="docClient" maxlength="500" autocomplete="off">
   <label for="docObjet">Objet</label><input id="docObjet" maxlength="500" autocomplete="off">
   <div class="two">
@@ -808,7 +847,10 @@ function accordeonsAnimer(racine) {
     const sum = det.querySelector('summary'); if (!sum) return;
     det.dataset.accAnime = '1';
     const reste = [...det.childNodes].filter((n) => n !== sum);
-    const wrap = el('div', 'acc-anim'); reste.forEach((n) => wrap.append(n)); det.append(wrap);
+    // Un seul enfant direct de .acc-anim : avec plusieurs (une ligne par prospect, etc.), la grille n'anime que la
+    // 1re rangée en 0fr/1fr, les suivantes restent en grid-auto-rows:auto (donc toujours visibles, même "fermé").
+    const contenu = el('div'); reste.forEach((n) => contenu.append(n));
+    const wrap = el('div', 'acc-anim'); wrap.append(contenu); det.append(wrap);
     det.classList.toggle('ferme', !det.open); det.open = true;
     sum.addEventListener('click', (e) => {
       e.preventDefault();
@@ -820,12 +862,17 @@ function accordeonsAnimer(racine) {
 new MutationObserver(() => accordeonsAnimer(document.body)).observe(document.body, { childList: true, subtree: true });
 accordeonsAnimer(document.body);
 
+// Priorité pour la prochaine relance : a testé la démo > a visité ou cliqué sans tester > les autres.
+function prioRelance(p) { return p.demoTesteLe ? 2 : (p.visiteLe || p.clicLe) ? 1 : 0; }
 function ligneProspect(p, today) {
   const row = el('div', 'line');
   const what = el('span', 'what', p.nom + (p.entreprise && p.entreprise !== p.nom ? ' — ' + p.entreprise : ''));
   const info = [p.cree ? 'créé ' + frDate(p.cree) : '', p.relance ? 'relance ' + frDate(p.relance) : ''].filter(Boolean).join(' · ');
   if (info) what.append(el('small', p.relance && p.relance <= today ? 'late' : '', info));
   if (p.site || p.email) what.append(el('small', '', [p.site, p.email].filter(Boolean).join(' · ')));
+  if (p.demoTesteLe) what.append(el('small', '', (p.demoTesteChannel === 'rappel' ? '📞 rappel testé · ' : '🎙️ démo testée · ') + frDate(p.demoTesteLe)));
+  // Visite ou clic sur son lien de démo, sans test (synchro Upstash) : visible ici seulement, jamais dans un message.
+  else if (p.visiteLe || p.clicLe) what.append(el('small', '', (p.clicLe ? '🖱️ a cliqué sans tester · ' + frDate(p.clicLe) : '👀 a visité sans tester · ' + frDate(p.visiteLe))));
   what.classList.add('clickable'); what.addEventListener('click', () => openProspect(p));
   const col = el('div', 'rowbtns');
   col.append(el('span', 'stage', p.etape));
@@ -846,12 +893,66 @@ function openDocPourProspect(p) {
 // quelques secondes, rouvrirait une carte qu'on vient de fermer).
 function groupeOuvert(lib) { try { return localStorage.getItem('biz_groupe_' + lib) !== '0'; } catch { return true; } }
 function sauverGroupeOuvert(lib, ouvert) { try { localStorage.setItem('biz_groupe_' + lib, ouvert ? '1' : '0'); } catch {} }
+// Résumé relances (sa demande explicite, 31/10) : être précis sur qui relancer et quand, repérer les doublons et les
+// refusés AVANT de préparer des brouillons, pour ne jamais relancer quelqu'un qui a déjà dit non ou en double.
+function dessinerResumeRelances(data, today) {
+  const rc = $('#relancesResume'); rc.innerHTML = '';
+  const actifs = data.prospects.filter((p) => !['gagné', 'perdu'].includes(p.etape));
+  const avecEmail = actifs.filter((p) => p.email);
+  const dus = avecEmail.filter((p) => p.relance && p.relance <= today && !p.email_invalide && !p.premier_mail_introuvable);
+  const aVenir = avecEmail.filter((p) => p.relance && p.relance > today && !p.email_invalide && !p.premier_mail_introuvable);
+  const prets = data.prospects.filter((p) => p.dateEnvoiPrevue);
+  const refuses = data.prospects.filter((p) => p.etape === 'perdu');
+  // Doublons : même nom normalisé OU même email, sur TOUS les prospects (y compris gagné/perdu — un doublon reste un
+  // doublon même si l'un des deux est déjà clos).
+  const normalise = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+  const groupes = new Map();
+  for (const p of data.prospects) {
+    for (const cle of [normalise(p.nom) && 'n:' + normalise(p.nom), p.email && 'e:' + String(p.email).toLowerCase()].filter(Boolean)) {
+      if (!groupes.has(cle)) groupes.set(cle, []);
+      if (!groupes.get(cle).includes(p)) groupes.get(cle).push(p);
+    }
+  }
+  const doublonsSet = new Set();
+  for (const liste of groupes.values()) if (liste.length > 1) liste.forEach((p) => doublonsSet.add(p));
+  const doublons = [...doublonsSet];
+
+  const box = el('div', 'urgent');
+  box.append(el('h3', '', '📊 Résumé relances'));
+  const chips = el('p', 'hint');
+  chips.append(`${dus.length} dû${dus.length > 1 ? 's' : ''}/en retard · ${aVenir.length} programmé${aVenir.length > 1 ? 's' : ''} · ${prets.length} brouillon${prets.length > 1 ? 's' : ''} prêt${prets.length > 1 ? 's' : ''} · ${refuses.length} refusé${refuses.length > 1 ? 's' : ''}${doublons.length ? ` · ⚠ ${doublons.length} doublon${doublons.length > 1 ? 's' : ''} potentiel${doublons.length > 1 ? 's' : ''}` : ''}`);
+  box.append(chips);
+  if (doublons.length) {
+    const det = el('details'); det.open = true;
+    const sum = el('summary', ''); sum.append(el('span', '', '⚠ Doublons potentiels'), el('span', 'n', String(doublons.length)));
+    det.append(sum);
+    for (const p of doublons) {
+      const row = el('div', 'line');
+      row.append(el('span', 'what', `${p.nom}${p.entreprise && p.entreprise !== p.nom ? ' — ' + p.entreprise : ''} (${p.etape}${p.email ? ' · ' + p.email : ''})`));
+      det.append(row);
+    }
+    box.append(det);
+  }
+  if (refuses.length) {
+    const det = el('details');
+    const sum = el('summary', ''); sum.append(el('span', '', '⛔ Refusés (ne plus contacter)'), el('span', 'n', String(refuses.length)));
+    det.append(sum);
+    for (const p of refuses.slice(0, 50)) {
+      const row = el('div', 'line');
+      row.append(el('span', 'what', `${p.nom}${p.motifRefus ? ' — ' + p.motifRefus : ''}`));
+      det.append(row);
+    }
+    box.append(det);
+  }
+  rc.append(box);
+}
 async function loadBiz() {
   try {
     const data = await (await api('/business')).json();
     $('#enJeu').textContent = data.en_jeu;
     $('#impaye').textContent = data.impaye;
     const today = new Date().toISOString().slice(0, 10);
+    dessinerResumeRelances(data, today);
 
     // Relances dues, en évidence au-dessus de + Prospect / + Devis-facture — seulement le jour de relance fixé
     // (config.json > business.jour_relance), ou la veille si activé : les autres jours, une ligne discrète suffit.
@@ -859,8 +960,29 @@ async function loadBiz() {
     const jourDuJour = JOURS_NOMS[new Date().getDay()];
     const estJourRelance = jourDuJour === data.jour_relance;
     const estVeille = JOURS_NOMS[(new Date().getDay() + 1) % 7] === data.jour_relance;
-    const urgents = data.prospects.filter((p) => p.email && p.relance && p.relance <= today && !relancesIgnorees.has(p.id))
-      .sort((a, b) => a.relance.localeCompare(b.relance));
+    const urgents = data.prospects.filter((p) => p.email && p.relance && p.relance <= today && !relancesIgnorees.has(p.id) && !p.email_invalide && !p.premier_mail_introuvable)
+      .sort((a, b) => (prioRelance(b) - prioRelance(a)) || a.relance.localeCompare(b.relance));
+    // Bouton toujours visible (pas seulement le jour de relance fixé) : il doit pouvoir le voir, le tester, ou
+    // rattraper un jour manqué n'importe quand. Sans rien de dû, le serveur répond juste "Aucune relance due" (aucun
+    // risque à cliquer dans le vide).
+    const ligneLot = el('div', 'line');
+    ligneLot.append(el('span', 'what', urgents.length ? `${urgents.length} relance${urgents.length > 1 ? 's' : ''} due${urgents.length > 1 ? 's' : ''}/en retard` : 'Aucune relance due pour le moment'));
+    const bLot = el('button', 'ok', '📝 Préparer tous les brouillons');
+    const statutLot = el('small', 'hint');
+    bLot.addEventListener('click', async () => {
+      // Date proposée par défaut = prochaine occurrence du jour fixe de relance (ex. mardi prochain) : il envoie
+      // toujours groupé, donc le jour d'envoi suit la même logique que le jour de relance, pas juste "demain".
+      const propose = prochaineOccurrence(data.jour_relance || 'mardi');
+      const proposeISO = `${propose.getFullYear()}-${String(propose.getMonth() + 1).padStart(2, '0')}-${String(propose.getDate()).padStart(2, '0')}`;
+      const date = await demanderDateEnvoi(`Préparer les brouillons de relance dus — date d'envoi ?`, proposeISO);
+      if (!date) return;
+      bLot.disabled = true; statutLot.textContent = 'Préparation en cours…';
+      try { const r = await post('/business/relances/preparer', { date_envoi: date }); statutLot.textContent = r.message || (r.ok ? 'Fait.' : 'Échec.'); }
+      catch (e) { statutLot.textContent = e.message; }
+      bLot.disabled = false; loadBiz();
+    });
+    ligneLot.append(bLot, statutLot);
+    ub.append(ligneLot);
     if ((estJourRelance || (estVeille && data.veille_bandeau)) && urgents.length) {
       const box = el('div', 'urgent');
       box.append(el('h3', '', estJourRelance ? `🔴 ${urgents.length} relance${urgents.length > 1 ? 's' : ''} à faire` : `🟠 ${urgents.length} relance${urgents.length > 1 ? 's' : ''} à préparer pour demain`));
@@ -882,11 +1004,39 @@ async function loadBiz() {
       }
       ub.append(box);
     } else {
-      // Pas le jour de relance : une ligne discrète plutôt que le bandeau rouge en continu.
+      // Pas le jour de relance : une ligne discrète plutôt que le bandeau rouge en continu (le bouton du dessus
+      // reste de toute façon disponible en permanence).
       const prochaine = prochaineOccurrence(data.jour_relance || 'mardi');
       const prochaineISO = prochaine.toISOString().slice(0, 10);
       const aVenir = data.prospects.filter((p) => p.email && p.relance && p.relance <= prochaineISO && !['perdu', 'sans réponse'].includes(p.etape));
       if (aVenir.length) ub.append(el('p', 'hint', `Prochaine session de relance : ${data.jour_relance || 'mardi'} ${frDate(prochaineISO)} (${aVenir.length} prospect${aVenir.length > 1 ? 's' : ''})`));
+    }
+    // Brouillons déjà préparés (relance groupée ou premier mail après tri), pas encore confirmés envoyés : la date qu'il
+    // a donnée au moment de la préparation, pour qu'il se souvienne de quand il a prévu de les envoyer lui-même.
+    const enAttenteEnvoi = data.prospects.filter((p) => p.dateEnvoiPrevue).sort((a, b) => a.dateEnvoiPrevue.localeCompare(b.dateEnvoiPrevue));
+    if (enAttenteEnvoi.length) {
+      const boxEnv = el('div', 'hint');
+      boxEnv.append(el('p', '', `📝 ${enAttenteEnvoi.length} brouillon${enAttenteEnvoi.length > 1 ? 's' : ''} prêt${enAttenteEnvoi.length > 1 ? 's' : ''}, en attente d'envoi :`));
+      for (const p of enAttenteEnvoi) boxEnv.append(el('p', 'hint', `• ${p.nom} — envoi prévu le ${frDate(p.dateEnvoiPrevue)}`));
+      // Programmation réelle (31/10, sa demande) : envoi via l'API Zoho (isSchedule), espacé dans le temps pour ne pas
+      // arriver d'un coup dans les boîtes des prospects. Proposée par date de lot (la plus proche en premier).
+      const dateLaPlusProche = enAttenteEnvoi[0].dateEnvoiPrevue;
+      const nbCetteDate = enAttenteEnvoi.filter((p) => p.dateEnvoiPrevue === dateLaPlusProche).length;
+      const bProg = el('button', 'ok', `📤 Programmer l'envoi (${dateLaPlusProche === enAttenteEnvoi[enAttenteEnvoi.length - 1].dateEnvoiPrevue ? 'tous' : 'du ' + frDate(dateLaPlusProche)})`);
+      const statutProg = el('small', 'hint');
+      bProg.addEventListener('click', async () => {
+        const r = await demanderProgrammation(`Programmer l'envoi de ${nbCetteDate} brouillon${nbCetteDate > 1 ? 's' : ''} prévu${nbCetteDate > 1 ? 's' : ''} le ${frDate(dateLaPlusProche)}.`, dateLaPlusProche);
+        if (!r) return;
+        bProg.disabled = true; statutProg.textContent = 'Programmation en cours…';
+        // alert() plutôt que juste statutProg : loadBiz() tourne toutes les 20s et reconstruit ce bouton — si
+        // l'interaction (ouvrir la boîte, choisir la date) dure plus longtemps, bProg/statutProg sont déjà remplacés
+        // quand la réponse arrive, et le message écrit sur l'ancien nœud détaché ne s'affiche jamais.
+        try { const resp = await post('/business/relances/programmer', { date: r.date, heure_debut: r.heure, intervalle_minutes: r.intervalle }); alert(resp.message || (resp.ok ? 'Fait.' : 'Échec.')); }
+        catch (e) { alert(e.message); }
+        bProg.disabled = false; loadBiz();
+      });
+      boxEnv.append(bProg, statutProg);
+      ub.append(boxEnv);
     }
 
     // Prospects sans email : pas de relance possible par ce canal — liste séparée, sans bandeau rouge.
@@ -917,7 +1067,9 @@ async function loadBiz() {
           } catch {}
           loadBiz();
         });
-        btns.append(bContacte, bAbandon);
+        const bFormulaire = el('button', '', '📝 Message formulaire');
+        bFormulaire.addEventListener('click', () => ouvrirFormulaireDlg(p));
+        btns.append(bFormulaire, bContacte, bAbandon);
         row.append(what, btns); box.append(row);
       }
       ac.append(box);
@@ -990,6 +1142,86 @@ async function post(path, body) {
   const r = await api(path, { method: 'POST', body: JSON.stringify(body) });
   if (!r.ok) throw new Error(await r.text());
   return r.json();
+}
+// Date d'envoi (jamais le jour même) : demandée une fois, en lot, avant de préparer des brouillons — jamais devinée.
+function demanderDateEnvoi(texte, dateProposeeISO) {
+  return new Promise((resolve) => {
+    $('#envoiTexte').textContent = texte || "Date à laquelle vous enverrez ces brouillons (jamais le jour même).";
+    const di = $('#envoiDate');
+    const demain = new Date(Date.now() + 86400000);
+    const demainISO = `${demain.getFullYear()}-${String(demain.getMonth() + 1).padStart(2, '0')}-${String(demain.getDate()).padStart(2, '0')}`;
+    di.value = dateProposeeISO || demainISO; di.min = demainISO;
+    const dlg = $('#envoiDlg'), okBtn = $('#envoiOk'), annBtn = $('#envoiAnnuler');
+    const fini = (v) => { dlg.close(); okBtn.removeEventListener('click', onOk); annBtn.removeEventListener('click', onAnn); resolve(v); };
+    const onOk = () => fini(di.value || null);
+    const onAnn = () => fini(null);
+    okBtn.addEventListener('click', onOk); annBtn.addEventListener('click', onAnn);
+    dlg.showModal();
+  });
+}
+// Date + heure de départ + intervalle pour programmer un envoi réel. Annuler = null.
+function demanderProgrammation(texte, dateProposeeISO) {
+  return new Promise((resolve) => {
+    $('#programmerTexte').textContent = texte || '';
+    $('#programmerDate').value = dateProposeeISO || '';
+    $('#programmerHeure').value = '09:00';
+    $('#programmerIntervalle').value = '3';
+    const dlg = $('#programmerDlg'), okBtn = $('#programmerOk'), annBtn = $('#programmerAnnuler');
+    const fini = (v) => { dlg.close(); okBtn.removeEventListener('click', onOk); annBtn.removeEventListener('click', onAnn); resolve(v); };
+    const onOk = () => {
+      const date = $('#programmerDate').value, heure = $('#programmerHeure').value, intervalle = Number($('#programmerIntervalle').value) || 3;
+      if (!date || !heure) { $('#programmerTexte').textContent = 'Date et heure obligatoires.'; return; }   // feedback visible : jamais un simple clic silencieux
+      fini({ date, heure, intervalle });
+    };
+    const onAnn = () => fini(null);
+    okBtn.addEventListener('click', onOk); annBtn.addEventListener('click', onAnn);
+    dlg.showModal();
+  });
+}
+
+// Message prêt à copier/coller (formulaire du site, ou à lire au téléphone) pour un prospect sans email — même
+// accroche IA que le premier mail, mais en texte brut. Généré une fois et gardé sur la fiche jusqu'à édition/régénération.
+async function ouvrirFormulaireDlg(p) {
+  const dlg = $('#formulaireDlg'), sujetI = $('#formulaireSujet'), corpsI = $('#formulaireCorps'), statut = $('#formulaireStatut');
+  $('#formulaireTexte').textContent = `Pour ${p.nom}${p.site ? ' — ' + p.site : ''}`;
+  statut.textContent = '';
+  sujetI.value = p.messageFormulaireSujet || ''; corpsI.value = p.messageFormulaireTexte || '';
+  dlg.showModal();
+  const generer = async (regenerer) => {
+    statut.textContent = regenerer ? 'Régénération en cours…' : 'Génération en cours…';
+    try {
+      const r = await post('/business/prospect/message-formulaire', { id: p.id, regenerer: !!regenerer });
+      if (r.ok) { sujetI.value = r.sujet || ''; corpsI.value = r.texte || ''; p.messageFormulaireSujet = r.sujet; p.messageFormulaireTexte = r.texte; statut.textContent = ''; }
+      else statut.textContent = r.message || 'Échec.';
+    } catch (e) { statut.textContent = e.message; }
+  };
+  if (!p.messageFormulaireTexte) await generer(false);
+  const onRegenerer = () => generer(true);
+  const onEnregistrer = async () => {
+    statut.textContent = 'Enregistrement…';
+    try {
+      await post('/business/prospect/message-formulaire/enregistrer', { id: p.id, sujet: sujetI.value, texte: corpsI.value });
+      p.messageFormulaireSujet = sujetI.value; p.messageFormulaireTexte = corpsI.value;
+      statut.textContent = 'Enregistré.';
+    } catch (e) { statut.textContent = e.message; }
+  };
+  const onCopier = async () => {
+    const texte = (sujetI.value ? `Objet : ${sujetI.value}\n\n` : '') + corpsI.value;
+    try { await navigator.clipboard.writeText(texte); statut.textContent = 'Copié.'; }
+    catch { statut.textContent = 'Copie impossible : sélectionne le texte à la main.'; }
+  };
+  const onFermer = () => fini();
+  function fini() {
+    dlg.close();
+    $('#formulaireRegenerer').removeEventListener('click', onRegenerer);
+    $('#formulaireEnregistrer').removeEventListener('click', onEnregistrer);
+    $('#formulaireCopier').removeEventListener('click', onCopier);
+    $('#formulaireFermer').removeEventListener('click', onFermer);
+  }
+  $('#formulaireRegenerer').addEventListener('click', onRegenerer);
+  $('#formulaireEnregistrer').addEventListener('click', onEnregistrer);
+  $('#formulaireCopier').addEventListener('click', onCopier);
+  $('#formulaireFermer').addEventListener('click', onFermer);
 }
 
 // Rendez-vous
