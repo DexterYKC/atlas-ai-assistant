@@ -3,10 +3,14 @@
   "nom": "Atlas",
   "business": {
     "jour_relance": "tuesday",
-    "veille_bandeau": true
+    "veille_bandeau": true,
+    "numeros_test": []
   },
   "telegram_token": "",
   "gemini_key": "",
+  "retell_key": "",
+  "upstash_url": "",
+  "upstash_token_ro": "",
   "allowed_user_id": "YOUR_TELEGRAM_USER_ID",
   "brief_hour": 8,
   "brief_minute": 0,

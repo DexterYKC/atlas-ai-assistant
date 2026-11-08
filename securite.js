@@ -22,6 +22,9 @@ const NIVEAUX = {
   AUTOMATISATION_CREER: 'libre',                                  // crée un workflow N8N simple via son API — TOUJOURS désactivé (active:false) : lui seul l'active après vérification dans N8N
   AUDIT_SEO: 'libre', RECHERCHE_SEO: 'libre', MAIL_SEO: 'libre', EVALUER_PDF_SEO: 'libre',  // outil SEO (audit + prospection + brouillon de mail + lecture d'un PDF déjà déposé par lui) : aucun mail n'est jamais envoyé par le code
   RECHERCHE_ARTISANS: 'libre',                                    // prospection d'artisans pour les agents IA téléphoniques : recherche Google Maps + email, met en attente de tri — jamais de mail, jamais d'envoi
+  TRIER_RETARD: 'libre',                                          // relit les sites déjà en attente et tranche avec l'IA — même garde-fou que RECHERCHE_ARTISANS (règle de DONNÉES, pas de jugement caché)
+  CAMERA_PHOTO: 'libre', CAMERA_CLIP: 'libre', CAMERA_ON: 'libre', CAMERA_OFF: 'libre',   // caméra du 2e PC : lecture/écoute à la demande, réservé à Telegram (compte autorisé uniquement) — jamais à la voix du PC ni déclenché tout seul
+  BROUILLON_PROSPECT: 'libre',                                    // prépare un BROUILLON de premier mail dans Zoho pour un prospect Business existant — structure fixe (code), jamais un texte libre, jamais un envoi
             // CANDIDATURE : prépare un BROUILLON (rien n'est envoyé)
                                                                                                // veille d'offres d'emploi (flux publics, lecture seule)
   APP: 'confirmer',                                                                                             // ouvrir une application installée : à valider la 1re fois (ensuite « autorisée » par le code, jamais par l'IA)
