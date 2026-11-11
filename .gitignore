@@ -21,3 +21,7 @@ personnalite.md
 journal/
 *.session
 *.log
+
+# Binaires / runtime Tor (jamais commités, voir tor/torrc pour la config)
+tor/bin/
+tor/data/

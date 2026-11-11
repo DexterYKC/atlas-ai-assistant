@@ -8,6 +8,7 @@ const os = require('os');
 const { pathToFileURL } = require('url');
 const { execFileSync, execFile, spawn } = require('child_process');
 const { Readable } = require('node:stream');
+const { SocksProxyAgent } = require('socks-proxy-agent');
 
 const DIR = __dirname;
 const cfg = JSON.parse(fs.readFileSync(path.join(DIR, 'config.json'), 'utf8'));
@@ -469,10 +470,23 @@ const jourRelance = () => (cfg.business && cfg.business.jour_relance) || 'mardi'
 // ressemblent à celles ajoutées par les anciens boutons (qui construisaient la date en JS côté client).
 const frDateCourte = (iso) => (iso ? new Date(`${iso}T12:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '');
 const impayees = () => biz.docs.filter((d) => d.type === 'facture' && ['envoyée', 'en retard'].includes(d.statut));
+// Chiffres d'entonnoir (9/11, pour que le bilan hebdo et toute question sur la conversion s'appuient sur de vrais
+// chiffres plutôt qu'une impression) : businessTexte() ne listait jamais clics/tests/réponses/gagnés, seulement
+// la liste brute des prospects — impossible pour l'IA de juger la conversion sans ça.
+function entonnoirTexte() {
+  const tous = biz.prospects;
+  const premiersMails = tous.filter((p) => p.date_premier_mail).length;
+  const visitesOuClics = tous.filter((p) => p.visiteLe || p.clicLe).length;
+  const testes = tous.filter((p) => p.demoTesteLe).length;
+  const repondus = tous.filter((p) => p.reponseMessageId).length;
+  const gagnes = tous.filter((p) => p.etape === 'gagné').length;
+  const perdus = tous.filter((p) => p.etape === 'perdu').length;
+  return `Entonnoir (tous prospects) : ${tous.length} au total, ${premiersMails} premier(s) mail(aux) envoyé(s), ${visitesOuClics} ont visité/cliqué le lien démo, ${testes} ont testé la démo, ${repondus} ont répondu, ${gagnes} gagné(s), ${perdus} perdu(s).`;
+}
 function businessTexte() {
   const act = prospectsActifs().map((p) => `#${p.id} ${p.nom}${p.entreprise ? ` (${p.entreprise})` : ''} — ${p.etape} — ${money(p.montant, p.devise)}${p.relance ? ` — relance le ${p.relance}` : ''}${p.source ? ` — via ${p.source}` : ''}${p.site ? ` — site ${p.site}` : ''}${p.email ? ` — email ${p.email}` : ''}`);
   const docs = biz.docs.slice(-25).map((d) => `#${d.id} ${d.numero} (${d.type}) — ${d.client || '?'} — ${money(d.total, d.devise)} — ${d.statut}${d.echeance ? ` — échéance ${d.echeance}` : ''}`);
-  return `Prospects actifs :\n${act.join('\n') || '(aucun)'}\nDevis et factures :\n${docs.join('\n') || '(aucun)'}\nArgent en jeu (prospects actifs) : ${totaux(prospectsActifs(), 'montant')}\nFactures impayées : ${totaux(impayees(), 'total')}`;
+  return `${entonnoirTexte()}\nProspects actifs :\n${act.join('\n') || '(aucun)'}\nDevis et factures :\n${docs.join('\n') || '(aucun)'}\nArgent en jeu (prospects actifs) : ${totaux(prospectsActifs(), 'montant')}\nFactures impayées : ${totaux(impayees(), 'total')}`;
 }
 function parseJsonTag(t) { try { const o = JSON.parse(t); return o && typeof o === 'object' ? o : null; } catch { return null; } }
 // L'IA n'écrit pas toujours l'étape exacte (vu "contacté", "relance envoyée"...) : ramené au stade canonique le plus proche, jamais stocké tel quel.
@@ -655,6 +669,7 @@ Fais mon bilan business de la semaine, en t'appuyant sur le carnet ci-dessus pou
 3) Ce que j'ai repoussé et ce que ça me coûte.
 4) Ma note sur 10, justifiée en une phrase, sans complaisance.
 5) LA priorité de la semaine prochaine et les 3 actions de lundi matin.
+6) Conversion (prospection) : si 0 "gagné" cette semaine, ne te contente pas de "persévère" — propose 1 ou 2 changements CONCRETS à tester (texte du mail, page démo, ciblage des métiers/villes), basés sur les chiffres réels ci-dessus (clics, tests, réponses), pas des généralités.
 Court et dur.`;
 async function bilan() {
   await ask([{ text: BILAN_PROMPT() }], '[Bilan de la semaine]');
@@ -707,7 +722,9 @@ RÈGLES TECHNIQUES (toujours valables) :
   "ROUTINE_AJOUT: HH:MM | jours | mode | texte" — jours : "tous", "semaine" (lundi à vendredi), "weekend" ou une liste "lun,mer,ven" ; mode : "appel" (PAR DÉFAUT : voix sur le PC + Telegram + appel), "rappel" (sans appel, seulement s'il le dit) ou "point" (tu prends de ses nouvelles à cette heure, texte vide) ; texte : ce que tu lui diras, à la 2e personne ("Prenez votre médicament."). Exemple : "ROUTINE_AJOUT: 21:00 | tous | appel | Prenez votre médicament."
   "ROUTINE_MODIF: numéro | HH:MM | jours | mode | texte" (laisse vide ce qui ne change pas, ex : "ROUTINE_MODIF: 2 | 21:30 | | |") et "ROUTINE_SUPPR: numéro" (les numéros sont dans le bloc SES ROUTINES). Une routine sert aussi pour "rappelle-moi tous les jours de manger".
   Un médicament est confirmé automatiquement : à l'appel tu lui demandes "me confirmez-vous que c'est fait ?", et s'il répond oui (ou dit à tout moment qu'il l'a pris) écris "ROUTINE_FAIT: numéro de la routine" (visible dans l'appel automatique, ou dans le bloc SES ROUTINES).
+  Si une confirmation de routine est EN COURS ou a ÉCHOUÉ (visible dans SES ROUTINES) et qu'il te demande de la DÉCALER/REPORTER ("je le prendrai à 23h", "rappelle-moi plus tard", "ne me rappelle pas", "ne m'appelle pas, juste un message"), écris "ROUTINE_REPORTER: numéro | HH:MM" (ajoute "sans appel" dans la ligne s'il a demandé de ne pas être appelé, ex : "ROUTINE_REPORTER: 1 | sans appel | 23:00"). Ne dis JAMAIS que c'est décalé/reporté sans écrire cette ligne : sinon le système continue sur son ancien horaire et le rappelle quand même.
   Ne dis JAMAIS qu'un rappel ou un appel répété est enregistré, modifié ou annulé si tu n'as pas écrit la ligne ROUTINE_ correspondante : sans elle, rien n'est programmé. S'il manque l'heure ou les jours, demande-les au lieu de deviner.
+  Une routine de confirmation en cours ou en échec (visible dans SES ROUTINES) est une information pour toi, pas un sujet à ramener spontanément dans chaque réponse : ne la mentionne que si on t'en parle, ou si c'est le moment où elle doit vraiment se déclencher.
 - AGENDA : tu gères son agenda (bloc SON AGENDA ci-dessous, chaque entrée a un numéro #). Quand il te donne un rendez-vous, une tâche datée, une pause ou un changement, ajoute une ligne par action :
   "AGENDA_AJOUT: AAAA-MM-JJ HH:MM | durée en minutes | titre" (sans heure : "AAAA-MM-JJ journee")
   "AGENDA_MODIF: numéro | AAAA-MM-JJ HH:MM | durée | titre" (laisse vide ce qui ne change pas, ex : "AGENDA_MODIF: 4 | 2026-09-22 15:00 | |")
@@ -1562,7 +1579,7 @@ function geminiCache(parts) {
   return gemini(parts);
 }
 // Ce qui sera lu à voix haute, sans les lignes-commandes : sert à préparer la voix à l'avance.
-const TAGS_ACTIONS = 'NOTE|PERSO|NOM|RAPPEL|AGENDA_AJOUT|AGENDA_MODIF|AGENDA_SUPPR|PAUSE|PROSPECT|DOC|APPEL|OUVRIR|SECTION|SPOTIFY|PROJET_AJOUT|PROJET_MODIF|PROJET_SUPPR|PROJET_NOTE|TACHE_AJOUT|TACHE_FAIT|ROUTINE_AJOUT|ROUTINE_MODIF|ROUTINE_SUPPR|ROUTINE_FAIT|POINT|PRESENCE|TELEPHONE|CALME|MODE_FOCUS|APP|EMPLOI|CANDIDATURE|TRADING|TRADING_ORDRE|TRADING_FERMER|MAIL|AUTOMATISATION|AUTOMATISATION_CREER|RECHERCHE_ARTISANS|TRIER_RETARD|CAMERA_PHOTO|CAMERA_CLIP|CAMERA_ON|CAMERA_OFF|BROUILLON_PROSPECT';
+const TAGS_ACTIONS = 'NOTE|PERSO|NOM|RAPPEL|AGENDA_AJOUT|AGENDA_MODIF|AGENDA_SUPPR|PAUSE|PROSPECT|DOC|APPEL|OUVRIR|SECTION|SPOTIFY|PROJET_AJOUT|PROJET_MODIF|PROJET_SUPPR|PROJET_NOTE|TACHE_AJOUT|TACHE_FAIT|ROUTINE_AJOUT|ROUTINE_MODIF|ROUTINE_SUPPR|ROUTINE_FAIT|ROUTINE_REPORTER|POINT|PRESENCE|TELEPHONE|CALME|MODE_FOCUS|APP|EMPLOI|CANDIDATURE|TRADING|TRADING_ORDRE|TRADING_FERMER|MAIL|AUTOMATISATION|AUTOMATISATION_CREER|RECHERCHE_ARTISANS|TRIER_RETARD|CAMERA_PHOTO|CAMERA_CLIP|CAMERA_ON|CAMERA_OFF|BROUILLON_PROSPECT';
 const LIGNES_COMMANDES = new RegExp(`^\\s*(${TAGS_ACTIONS}|TRANSCRIPTION|FIN|IGNORER):`);
 function apercuOral(raw) {
   if (/(^|\s)IGNORER\s*:/.test(raw)) return { ignore: true, oral: '' };
@@ -2909,7 +2926,8 @@ function metierDemo(metierBrut) {
   if (/plomb/.test(m)) return 'plomberie';
   if (/v[ée]t[ée]rinaire/.test(m)) return 'veterinaire';
   if (/\bbois\b|menuis/.test(m)) return 'bois';
-  return 'plomberie';   // électricien, vitrier, et tout le reste : repli générique (11/10)
+  if (/[ée]lectri/.test(m)) return 'electricien';
+  return 'plomberie';   // vitrier, et tout le reste : repli générique (11/10, électricien à part depuis 11/11)
 }
 function lienDemo(metierBrut, nom, langue, slugFixe) {
   const base = String(langue || '').toLowerCase() === 'en' ? DEMO_BASE_EN : DEMO_BASE;
@@ -2918,21 +2936,24 @@ function lienDemo(metierBrut, nom, langue, slugFixe) {
 // Nouveau paragraphe démo (3/11) : la démo masnasoft.com permet maintenant un appel (numéro de tel. + rappel
 // immédiat), plus seulement une écoute passive — remplace l'ancien "La démo dure 2 minutes... Écouter la démo"
 // dans les deux modèles (premier mail et relance), jamais ajouté en plus (ça aurait fait doublon).
+// Un seul CTA (cliquer le lien) : jamais une deuxième option dans le même mail ("Parler à Masnasoft" reste
+// disponible sur la page démo elle-même, pas ici) — deux appels à l'action dans un même mail font baisser le
+// taux de clic sur chacun des deux (9/11).
 function paragrapheDemo(lien, nom) {
   return `<div>J'ai préparé une démo à votre nom : <a href="${esc(lien)}" target="_blank">Démo préparée pour ${esc(nom || 'vous')}</a>.<br>` +
-    `Entrez votre numéro, notre assistant vous appelle en quelques secondes et vous lui parlez comme un client. Cela prend 2 minutes.<br>` +
-    `Si vous préférez poser vos questions ou prendre rendez-vous, choisissez « Parler à Masnasoft » sur la même page.</div><div><br></div>`;
+    `Entrez votre numéro, notre assistant vous appelle en quelques secondes et vous lui parlez comme un client. Cela prend 2 minutes, gratuit et sans engagement.</div><div><br></div>`;
 }
 const SCENARIO_METIER_RELANCE = {
   serrurier: "un client bloqué dehors en urgence", plomberie: "un client avec une fuite d'eau",
   veterinaire: "un client qui prend rendez-vous pour son animal", bois: "un client qui demande un devis de menuiserie",
+  electricien: "un client avec une panne de courant en urgence",
 };
 const SYSTEME_PREMIER_MAIL = `Tu rédiges l'accroche d'un premier mail de prospection pour Masnasoft (assistant téléphonique IA pour artisans/professions libérales qui ratent des appels pendant leurs interventions). Le mail suit TOUJOURS cette structure fixe, tu n'écris QUE 3 champs :
 "Bonjour, [ACCROCHE] J'ai mis en place un assistant téléphonique qui décroche à votre place dans ces moments-là. Il prend le nom, l'adresse et [DETAIL_METIER], et vous envoie un résumé sur votre téléphone. La démo dure 2 minutes, depuis votre téléphone : [lien]. Si ce n'est pas pour vous, un simple « non merci » suffit. Bien cordialement,"
-Réponds UNIQUEMENT par un JSON : {"objet":"ligne d'objet courte et concrète, jamais clickbait, dans le style ci-dessous","accroche":"1 à 3 phrases en français. Utilise un fait RÉEL et vérifiable du site (note, nombre d'avis, ville, ancienneté...) si tu en trouves un dans le texte fourni ; sinon décris simplement le problème courant pour ce métier (appels manqués pendant une intervention). N'invente JAMAIS un chiffre, un avis ou un fait absent du texte.","detail_metier":"2 à 5 mots sur ce que le prospect gère au quotidien, ex. \\"fuite, panne d'eau chaude, chauffage\\" pour un plombier, \\"porte claquée, clé cassée, serrure forcée\\" pour un serrurier"}
+Réponds UNIQUEMENT par un JSON : {"objet":"ligne d'objet courte et concrète, jamais clickbait, dans le style ci-dessous","accroche":"1 à 3 phrases en français. Utilise un fait RÉEL et vérifiable du site (note, nombre d'avis, ville, ancienneté...) si tu en trouves un dans le texte fourni ; sinon décris simplement le problème courant pour ce métier (appels manqués pendant une intervention). N'invente JAMAIS un chiffre, un avis ou un fait absent du texte.","detail_metier":"2 à 5 mots sur ce que le prospect gère au quotidien, ex. \\"fuite, panne d'eau chaude, chauffage\\" pour un plombier, \\"porte claquée, clé cassée, serrure forcée\\" pour un serrurier","metier_detecte":"le métier précis de ce prospect déduit du site (un seul mot ou une courte expression, ex. Serrurier, Plombier, Électricien, Couvreur, Chauffagiste, Vitrier, Menuiserie, Garage automobile, Soins vétérinaires), chaîne vide si vraiment impossible à déterminer"}
 Exemples d'objets déjà envoyés (même registre, à varier, jamais recopiés tels quels) : "La fuite urgente qui appelle pendant que vous êtes sur un chantier", "Les appels qui arrivent pendant que vous êtes sur un toit", "1 500 avis, et les appels qui arrivent pendant vos interventions".`;
 async function accrochePremierMail(e) {
-  const repli = { objet: 'Les appels qui arrivent pendant vos interventions', accroche: "Les appels de clients arrivent souvent au pire moment, quand vous êtes déjà en intervention et que personne ne peut décrocher.", detail_metier: 'le problème et son urgence' };
+  const repli = { objet: 'Les appels qui arrivent pendant vos interventions', accroche: "Les appels de clients arrivent souvent au pire moment, quand vous êtes déjà en intervention et que personne ne peut décrocher.", detail_metier: 'le problème et son urgence', metier_detecte: '' };
   if (!e.texteSite) return repli;
   const message = `=== Site du prospect (${e.nom || '?'}, ${e.metier || '?'}, ${e.ville || '?'}) ===\n${e.texteSite}`;
   for (let essai = 0; essai < 2; essai++) {
@@ -2941,7 +2962,7 @@ async function accrochePremierMail(e) {
       const m = String(r.text || '').match(/\{[\s\S]*\}/);
       if (!m) continue;
       const obj = JSON.parse(m[0]);
-      if (obj.objet && obj.accroche && obj.detail_metier) return { objet: String(obj.objet).slice(0, 120), accroche: String(obj.accroche).slice(0, 500), detail_metier: String(obj.detail_metier).slice(0, 100) };
+      if (obj.objet && obj.accroche && obj.detail_metier) return { objet: String(obj.objet).slice(0, 120), accroche: String(obj.accroche).slice(0, 500), detail_metier: String(obj.detail_metier).slice(0, 100), metier_detecte: String(obj.metier_detecte || '').slice(0, 60) };
     } catch { /* retry */ }
   }
   return repli;
@@ -2952,7 +2973,7 @@ function corpsPremierMail({ accroche, detail_metier }, lien, nom) {
     `<div>${esc(accroche)}</div><div><br></div>`,
     `<div>J'ai mis en place un assistant téléphonique qui décroche à votre place dans ces moments-là. Il prend le nom, l'adresse et ${esc(detail_metier)}, et vous envoie un résumé sur votre téléphone.</div><div><br></div>`,
     paragrapheDemo(lien, nom),
-    "<div>L'essai de deux semaines est gratuit et sans engagement. Est-ce que ça vaut un court échange de 10 minutes ?</div><div><br></div>",
+    "<div>Si ce n'est pas pour vous, un simple « non merci » suffit.</div><div><br></div>",
     '<div>Bien cordialement,</div>',
   ].join('');
 }
@@ -2961,7 +2982,7 @@ function corpsRelance(scenario, lien, nom) {
   return [
     `<div>Je me permets de revenir vers vous avec une version plus simple : vous parlez à l'assistant comme le ferait ${esc(scenario)}.</div><div><br></div>`,
     paragrapheDemo(lien, nom),
-    "<div>L'essai de deux semaines reste gratuit et sans engagement. Et si ce n'est pas pour vous, un simple « non merci » suffit, je ne vous relancerai plus.</div><div><br></div>",
+    "<div>Si ce n'est pas pour vous, un simple « non merci » suffit, je ne vous relancerai plus.</div><div><br></div>",
     '<div>Bien cordialement,</div>',
   ].join('');
 }
@@ -3035,20 +3056,24 @@ async function preparerBrouillonProspection(e, { relance = false } = {}) {
   const slugGenere = slug(e.nom);
   if (!Array.isArray(e.slugs)) e.slugs = [];
   if (!e.slugs.includes(slugGenere)) e.slugs.push(slugGenere);
-  const lien = lienDemo(e.metier, e.nom, e.langue);
   let z;
   try { z = await zoho(); } catch (err) { return { ok: false, message: err.message }; }
   let accountId, fromAddress, sentId;
   try { ({ accountId, fromAddress } = await z.compteEmail()); sentId = await z.idDossier(accountId, 'Sent'); }
   catch (err) { return { ok: false, message: err.message }; }
-  let objet, corps;
+  let objet, corps, lien;
   if (relance) {
+    lien = lienDemo(e.metier, e.nom, e.langue);
     const sujetOriginal = await dernierObjetEnvoye(z, accountId, sentId, e.email);
     objet = sujetOriginal ? (/^re\s*:/i.test(sujetOriginal) ? sujetOriginal : `Re: ${sujetOriginal}`) : 'Une version plus simple de ma proposition';
     // S'il a déjà testé la démo (Retell), la relance va droit au but (10 min d'échange) sans jamais dire qu'on a vu le test.
     corps = e.demoTesteLe ? corpsRelanceDirecte(lien, e.nom) : corpsRelance(SCENARIO_METIER_RELANCE[metierDemo(e.metier)], lien, e.nom);
   } else {
     const a = await accrochePremierMail({ ...e, texteSite: e.texteSite || (e.site ? (await signauxNegatifs(e.site).catch(() => ({}))).texteSite : '') });
+    // Atlas lit déjà le site pour l'accroche : s'il en déduit un métier et qu'on n'en avait aucun, on le garde (impératif,
+    // demandé le 11/11) — jamais écrasé si un métier existe déjà, déduit ou renseigné à la main.
+    if (!e.metier && a.metier_detecte) e.metier = a.metier_detecte;
+    lien = lienDemo(e.metier, e.nom, e.langue);
     objet = a.objet;
     corps = corpsPremierMail(a, lien, e.nom);
   }
@@ -3527,6 +3552,84 @@ function modeFocusDesactiver(source) {
   pushFeed('jarvis', msg, 'focus');
   return { ok: true, message: msg };
 }
+// ================= Tor (proxy SOCKS5 pour anonymiser des requêtes sortantes, 11/11) =================
+// Démon tor.exe (Tor Expert Bundle officiel, PAS le navigateur) lancé en arrière-plan, jamais automatiquement :
+// route réservée au PC, comme le reste des interrupteurs sensibles ci-dessus. Sert à de l'OSINT défensif sur son
+// propre périmètre (vérifier sa propre exposition sans se signaler) et à la lecture de pages pendant un test
+// d'outil, sans passer par les API habituelles (qui bloquent souvent les sorties Tor).
+//
+// Note sur le périmètre de cet export : dans le projet privé, cette brique vit à côté d'un "mode uncensored" plus
+// large (chat séparé, onglets Outils, analyse de dépôts GitHub, sandbox isolée) qui n'est pas repris ici — seule
+// la mécanique Tor elle-même (démarrage/arrêt du démon, fetch via SOCKS5, nettoyage HTML) est portée, parce
+// qu'elle est autonome et ne dépend d'aucune autre pièce de ce système plus large. Voir le README pour le contexte.
+const TOR_EXE = path.join(DIR, 'tor', 'bin', 'tor', 'tor.exe');
+const TOR_RC = path.join(DIR, 'tor', 'torrc');
+const TOR_SOCKS = '127.0.0.1:9050';
+let torProc = null;
+let torEtat = { enCours: false, depuis: 0 };
+function torDisponible() { return fs.existsSync(TOR_EXE); }
+function torDemarrer() {
+  return new Promise((resolve) => {
+    if (!torDisponible()) return resolve({ ok: false, message: "Tor n'est pas installé (tor/bin/tor/tor.exe manquant)." });
+    if (torEtat.enCours) return resolve({ ok: true, message: 'Tor est déjà en marche.' });
+    torProc = spawn(TOR_EXE, ['-f', TOR_RC], { cwd: DIR, windowsHide: true });
+    let fini = false;
+    const auTimeout = setTimeout(() => { if (!fini) { fini = true; torArreter(); resolve({ ok: false, message: "Tor n'a pas démarré à temps (60 s)." }); } }, 60000);
+    torProc.stdout.on('data', (d) => {
+      if (fini) return;
+      if (/Bootstrapped 100%/.test(d.toString())) {
+        fini = true; clearTimeout(auTimeout);
+        torEtat = { enCours: true, depuis: Date.now() };
+        resolve({ ok: true, message: 'Tor démarré (circuit prêt).' });
+      }
+    });
+    torProc.on('exit', () => { torEtat = { enCours: false, depuis: 0 }; torProc = null; });
+    torProc.on('error', (e) => { if (!fini) { fini = true; clearTimeout(auTimeout); resolve({ ok: false, message: 'Échec du démarrage : ' + e.message }); } });
+  });
+}
+function torArreter() {
+  if (torProc) { try { torProc.kill(); } catch {} torProc = null; }
+  const etait = torEtat.enCours;
+  torEtat = { enCours: false, depuis: 0 };
+  return { ok: true, message: etait ? 'Tor arrêté.' : "Tor n'était pas en marche." };
+}
+// fetch() natif (undici) n'accepte pas un agent SOCKS ; on passe par https/http avec socks-proxy-agent.
+function torFetch(urlStr, opts = {}) {
+  return new Promise((resolve, reject) => {
+    if (!torEtat.enCours) return reject(new Error('Tor non démarré.'));
+    let u; try { u = new URL(urlStr); } catch { return reject(new Error('URL invalide.')); }
+    if (!['http:', 'https:'].includes(u.protocol)) return reject(new Error('Seuls http/https sont acceptés.'));
+    const lib = u.protocol === 'https:' ? require('https') : require('http');
+    const req = lib.request(u, { method: opts.method || 'GET', agent: new SocksProxyAgent(`socks5h://${TOR_SOCKS}`), headers: { 'User-Agent': 'Mozilla/5.0', ...(opts.headers || {}) }, timeout: opts.timeoutMs || 20000 }, (res) => {
+      const chunks = []; let taille = 0;
+      res.on('data', (c) => { taille += c.length; if (taille < 3_000_000) chunks.push(c); });
+      res.on('end', () => resolve({ status: res.statusCode, body: Buffer.concat(chunks).toString('utf8') }));
+    });
+    req.on('error', reject);
+    req.on('timeout', () => req.destroy(new Error('Délai dépassé (Tor).')));
+    req.end();
+  });
+}
+function htmlVersTexte(html) {
+  return String(html || '')
+    .replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<br\s*\/?>/gi, '\n').replace(/<\/(p|div|li|h[1-6])>/gi, '\n')
+    .replace(/<[^>]+>/g, ' ').split('\n').map((l) => decoderEntites(l).replace(/\s+/g, ' ').trim()).filter(Boolean).join('\n');
+}
+// Lecture d'une page via Tor (y compris .onion) : utilitaire autonome, pas relié ici à un chat/un modèle (voir la
+// note en tête de section) — exposé pour un éventuel appelant interne et par la route /api/tor/page ci-dessous.
+async function torPageLire(urlStr) {
+  const u = String(urlStr || '').trim().slice(0, 500);
+  if (!u) return '⚠️ URL vide.';
+  if (!torEtat.enCours) return "⚠️ Tor n'est pas démarré (bouton PC-only dans le tableau de bord, jamais automatique).";
+  // Les .onion passent par un circuit de rendez-vous (plus lent qu'un simple noeud de sortie) : délai plus long que pour un site normal.
+  let r;
+  try { r = await torFetch(u, { timeoutMs: /\.onion(\/|$)/i.test(u) ? 60000 : 20000 }); }
+  catch (e) { return `⚠️ Lecture impossible via Tor (${e.message}).`; }
+  if (r.status >= 400) return `⚠️ La page a répondu HTTP ${r.status}.`;
+  const texte = htmlVersTexte(r.body).slice(0, 3000);
+  return texte ? `📄 Contenu de ${u} (via Tor) :\n${texte}` : '⚠️ Page vide ou illisible.';
+}
 // ================= RELANCES d'un "petit point" resté sans réponse : BORNÉES =================
 // PC vocal -> (10 min) Telegram + appel -> (15 min) appel -> (25 min) appel -> stop, et un trou. Jamais la nuit (appels). Tout s'arrête dès qu'il répond où que ce soit
 // (voix PC, appli, Telegram, ou pendant l'appel : le serveur note alors son message).
@@ -3587,12 +3690,12 @@ function lancerSuivi(r) {
 }
 function essaiSuivi(s) {
   s.essai++; s.prochain = Date.now() + (cfg.routines_confirmation_delai_min ?? 10) * 60000; save();
-  if (s.essai > 1) {
+  if (s.essai > 1 || s.sansAppel) {
     const txt = `⚠️ Pas de confirmation : « ${s.texte} » (essai ${s.essai}/${s.max}).`;
     pushFeed('jarvis', txt, 'alerte'); annonces.push(`Monsieur, je n'ai pas eu votre confirmation : ${s.texte}`);
     if (state.chatId) send(state.chatId, txt + '\nRéponds « fait » ici dès que c\'est fait.').catch(() => {});
   }
-  if (!cfg.appels?.actif) return;                            // sans appels : voix PC + Telegram seulement
+  if (!cfg.appels?.actif || s.sansAppel) return;              // sans appels (config, ou demandé pour ce suivi) : voix PC + Telegram seulement
   appeler(`${s.texte} Me confirmez-vous que c'est fait ?`, { contexte: 'confirmation', ref: `routine #${s.routineId}`, attente_s: 12, tours_max: 3 }).then((res) => {
     if (s.statut !== 'en_cours') return;                     // déjà confirmé (ROUTINE_FAIT dit pendant l'appel, ou message Telegram)
     if (ouiDit((res.transcriptions || []).join(' '))) confirmerSuivi(s, 'confirmé par appel');
@@ -3644,7 +3747,13 @@ function parseJours(t) {
 }
 const libelleJours = (j) => !j.length || j.length === 7 ? 'tous les jours' : j.join() === '1,2,3,4,5' ? 'du lundi au vendredi' : j.join() === '0,6' ? 'le week-end' : j.map((x) => JOURS_NOMS[x]).join(', ');
 const libelleRoutine = (r) => `${libelleJours(r.jours)} à ${r.heure.replace(':', 'h')} — ${r.mode === 'point' ? 'il prend de tes nouvelles' : (r.mode === 'appel' ? 'appel' : 'rappel sans appel') + ` « ${r.texte} »`}${r.confirmer ? ' (avec confirmation)' : ''}`;
-const routinesTexte = () => state.routines.length ? state.routines.map((r) => `#${r.id} ${libelleRoutine(r)}${r.derniere ? ` (dernier déclenchement : ${r.derniere})` : ''}`).join('\n') : '(aucune)';
+function suiviEnCoursTexte(routineId) {
+  const s = state.suivis.slice().reverse().find((x) => x.routineId === routineId && (x.statut === 'en_cours' || x.statut === 'echec'));
+  if (!s) return '';
+  const h = (ms) => new Date(ms).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  return s.statut === 'en_cours' ? ` — CONFIRMATION EN ATTENTE (prochaine relance ${h(s.prochain)})` : ` — CONFIRMATION EN ÉCHEC (non confirmée après ${s.max} essais, depuis ${h(s.fin)})`;
+}
+const routinesTexte = () => state.routines.length ? state.routines.map((r) => `#${r.id} ${libelleRoutine(r)}${r.derniere ? ` (dernier déclenchement : ${r.derniere})` : ''}${r.confirmer ? suiviEnCoursTexte(r.id) : ''}`).join('\n') : '(aucune)';
 
 async function appliquerRoutines(tagged, extra, source, externe) {
   for (const a of tagged('ROUTINE_AJOUT:').slice(0, 3)) {
@@ -3682,9 +3791,26 @@ async function appliquerRoutines(tagged, extra, source, externe) {
   }
   for (const a of tagged('ROUTINE_FAIT:').slice(0, 3)) {    // "j'ai pris mon médicament" : confirme la routine
     const id = Number(a.replace('#', '').trim());
-    const s = state.suivis.find((x) => x.routineId === id && x.statut === 'en_cours') || state.suivis.slice().reverse().find((x) => x.routineId === id && x.statut === 'en_cours');
+    const s = state.suivis.slice().reverse().find((x) => x.routineId === id && x.statut === 'en_cours');
     if (s) { confirmerSuivi(s, 'confirmé (voix ou message)'); extra.push(`✅ Confirmé : ${s.texte}`); }
     else { const r = state.routines.find((x) => x.id === id); if (r) { journal(`- ${heureNow()} ✅ Fait : ${r.texte}`); extra.push(`✅ Noté : ${r.texte}`); } else extra.push(`⚠️ Routine #${id} introuvable.`); }
+  }
+  for (const a of tagged('ROUTINE_REPORTER:').slice(0, 2)) {   // "je le prendrai à 23h, ne me rappelle pas" : décale la relance de confirmation en cours
+    const sansAppel = /sans appel/i.test(a);
+    const [idPart, heurePart] = a.replace(/sans appel\s*\|?\s*/i, '').split('|').map((x) => (x || '').trim());
+    const id = Number(String(idPart).replace('#', ''));
+    const r = state.routines.find((x) => x.id === id);
+    if (!r) { extra.push(`⚠️ Routine #${id} introuvable.`); continue; }
+    const heure = parseHeure(heurePart);
+    if (!heure) { extra.push(`⚠️ Report de la routine #${id} NON fait : heure incomprise.`); continue; }
+    const n = new Date();
+    let at = new Date(n.getFullYear(), n.getMonth(), n.getDate(), Number(heure.slice(0, 2)), Number(heure.slice(3))).getTime();
+    if (at <= Date.now()) at += 86400000;   // l'heure demandée est déjà passée aujourd'hui : on reporte à demain
+    let s = state.suivis.slice().reverse().find((x) => x.routineId === id && (x.statut === 'en_cours' || x.statut === 'echec'));
+    if (s) { s.statut = 'en_cours'; s.essai = 0; s.prochain = at; s.since = Date.now(); s.sansAppel = sansAppel; save(); }
+    else { s = { id: nid(state.suivis), routineId: id, texte: r.texte, essai: 0, max: cfg.routines_confirmation_essais ?? 3, prochain: at, since: Date.now(), statut: 'en_cours', sansAppel }; state.suivis.push(s); state.suivis = state.suivis.slice(-100); save(); }
+    journal(`- ${heureNow()} ⏰ Confirmation « ${r.texte} » reportée à ${new Date(at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}${sansAppel ? ' (sans appel)' : ''}.`);
+    extra.push(`⏰ Confirmation reportée à ${new Date(at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} : « ${r.texte} »${sansAppel ? ' (sans appel, rappel écrit seulement)' : ''}.`);
   }
   for (const a of tagged('ROUTINE_SUPPR:').slice(0, 3)) {
     const i = state.routines.findIndex((x) => x.id === Number(a.replace('#', '').trim()));
@@ -3872,6 +3998,13 @@ async function ask(parts, label, opts = {}) {
   // Message vocal : sa bulle n'apparaît qu'une fois transcrit (ligne TRANSCRIPTION: de la réponse).
   const vocal = parts.some((p) => p.inline_data);
   const moi = vocal ? null : pushFeed('moi', label);
+  // Garde-fou indépendant du modèle : une confirmation de routine importante (médicament...) en attente ou en échec récent
+  // ne doit jamais rester bloquée parce que le modèle a mal compris/oublié d'écrire ROUTINE_FAIT (vu le 10/11 : réponse
+  // hors-sujet à "c bon pour le medicament"). On la referme directement si le texte ressemble clairement à une confirmation.
+  if (!vocal && label) {
+    const s = state.suivis.slice().reverse().find((x) => x.statut === 'en_cours' || (x.statut === 'echec' && Date.now() - x.fin < 3 * 3600000));
+    if (s && ouiDit(label)) confirmerSuivi(s, 'confirmé (détecté automatiquement dans le chat)');
+  }
   let raw, sources;
   try {
     ({ text: raw, sources } = await geminiCache(parts));
@@ -4127,6 +4260,9 @@ async function ask(parts, label, opts = {}) {
     // Un rappel = la voix sur le PC + Telegram + un APPEL (au cas où tu ne serais pas devant le PC), sauf si tu as dit "sans m'appeler".
     const sans = /^sans appel\s*\|/i.test(m[6]), texte = m[6].replace(/^sans appel\s*\|\s*/i, '');
     const appel = !sans && !!cfg.appels?.actif && cfg.appels.rappels_par_appel !== false;
+    // Garde-fou doublon : deux messages très proches (ex. une répétition vocale mal captée) peuvent chacun redemander
+    // le même rappel. On ignore silencieusement un rappel identique (même texte, même minute) déjà en attente.
+    if (state.reminders.some((x) => x.text === texte && Math.abs(x.at - at) < 60000)) continue;
     state.reminders.push({ at, text: texte, appel });
     extra.push(`⏰ Rappel le ${new Date(at).toLocaleString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })} : ${texte}${appel ? ' (voix sur le PC, Telegram et appel)' : ' (sans appel)'}`);
   }
@@ -5102,6 +5238,23 @@ function startVoiceServer() {
       if (req.method === 'POST' && url.pathname === '/api/automatisation/arreter') return json(await n8nArreter('tableau de bord'));
       if (req.method === 'POST' && url.pathname === '/api/focus/activer') return json(await modeFocusActiver('tableau de bord'));
       if (req.method === 'POST' && url.pathname === '/api/focus/desactiver') return json(modeFocusDesactiver('tableau de bord'));
+      // Tor : bouton PC-only, jamais démarré/arrêté automatiquement — voir torPageLire.
+      if (req.method === 'POST' && url.pathname === '/api/tor/demarrer') {
+        if (!isLocal(req)) return json({ ok: false, message: 'Réservé au PC.' });
+        return json(await torDemarrer());
+      }
+      if (req.method === 'POST' && url.pathname === '/api/tor/arreter') {
+        if (!isLocal(req)) return json({ ok: false, message: 'Réservé au PC.' });
+        return json(torArreter());
+      }
+      if (req.method === 'GET' && url.pathname === '/api/tor/etat') {
+        if (!isLocal(req)) return json({ ok: false, message: 'Réservé au PC.' });
+        return json({ disponible: torDisponible(), enCours: torEtat.enCours, depuis: torEtat.depuis });
+      }
+      if (req.method === 'POST' && url.pathname === '/api/tor/page') {
+        if (!isLocal(req)) return json({ ok: false, message: 'Réservé au PC.' });
+        return json({ message: await torPageLire(String(body.url || '')) });
+      }
       if (req.method === 'POST' && url.pathname === '/api/trading/etude') {
         if (etudeEnCours) return json({ ok: false, message: 'Une étude est déjà en cours.' });
         etudeTrading('tableau de bord').catch(() => {}); return json({ ok: true, lancee: true });

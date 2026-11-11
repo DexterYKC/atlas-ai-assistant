@@ -1,0 +1,4 @@
+SocksPort 127.0.0.1:9050
+DataDirectory tor/data
+Log notice stdout
+AvoidDiskWrites 1
